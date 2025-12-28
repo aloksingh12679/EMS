@@ -1,11 +1,10 @@
-import React from 'react'
+import Employees from "./Employees";
+import "./App.css";
 
-const App = () => {
+function App() {
   return (
-    <div>
-      
-    </div>
-  )
+    <Employees />
+  );
 }
 
-export default App
+export default App;
