@@ -1,5 +1,5 @@
 import React from "react";
-import "./Employees.css";
+import "../../assets/styles/EmployeePagesCSS/Employees.css";
 
 const employees = [
   {

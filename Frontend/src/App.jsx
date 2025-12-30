@@ -1,4 +1,4 @@
-import Employees from "./Employees";
+import Employees from "./pages/admin/EmployeesPage";
 import "./App.css";
 
 function App() {
