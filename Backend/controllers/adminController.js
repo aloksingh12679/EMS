@@ -83,6 +83,7 @@ const {
 
 } =  req.body;
 
+console.log(firstName);
 if(!firstName && !email && !position){
   return res.status(400).json({
     message : "Please provide necessary details"
@@ -102,9 +103,11 @@ if(email){
 const generateEmployeeId = async () => {
   const lastEmployee = await User.findOne({role : "employee"} , {employeeId :  true} , {sort : {createdAt : -1}});
   //  let intialNum = 2025;
+  console.log(lastEmployee);
    let nextNum = 2025;
   if(lastEmployee && lastEmployee.employeeId) { 
-    const match = lastEmployee.employeeId.match(/EMP(\d+)/);
+    const match = lastEmployee.employeeId.match(/EMP-(\d+)/);
+    console.log(match);
     if(match && match[1]){
       nextNum = parseInt(match[1]) + 1;
     }
@@ -130,7 +133,7 @@ const generateEmployeeId = async () => {
     jobType,
     role: 'employee',
     isActive: true,
-    createdBy: req.user._id 
+   
 
 
  });
@@ -148,7 +151,7 @@ const generateEmployeeId = async () => {
  });
 
   }catch(err){
-
+  console.log("create employee " , err);
       res.status(500).json({
             success: false,
             message: 'Error creating employee'
@@ -169,10 +172,189 @@ const getEmployeebyId = async(req,res,next) => {
             })
     }
     
+    if(employee.role != "employee"){
+      return res.status(status.NOT_FOUND).json({
+        success : false,
+        message : "User is not an Employee"
+            })
+    }
+
+    res.status(200).json({
+      success : false,
+      data : employee
+    })
   }catch(err){
+
+    console.log("get employee error" , err);
+   
+    if (err.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid employee ID'
+            });
+        }
+        
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching employee'
+        });
 
   }
 }
+
+const updateEmployee = async(req,res) => {
+ try{
+  const {id} = req.params;
+  const updatedData = req.body;
+
+
+  const employee = await User.findByIdAndUpdate(id , { ...updatedData , updatedBy : req.user._id} , {new :true , runValidators : true})
+  .select('-password').populate('department' , 'name');
+
+
+  if(!employee){
+    return res.status(status.NOT_FOUND).json({
+                success: false,
+                message: 'Employee not found'
+            });
+  }
+
+   res.status(status.OK).json({
+            success: true,
+            message: 'Employee updated successfully',
+            data: employee
+        });
+ }catch(err){
+
+
+  console.log("update employee error" , err);
+  if (err.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid employee ID'
+            });
+        }
+
+
+         res.status(500).json({
+            success: false,
+            message: 'Error updating employee'
+        });
+
+
+ }
+}
+
+
+const deleteEmployee = async(req,res) => {
+  try{
+    const {id} = req.params;
+    const {hardDelete = false} = req.query;
+    if(hardDelete === 'true'){
+       const employee = await User.findByIdAndDelete(id);
+       if(!employee){
+        return res.status(NOT_FOUND).json({
+          success : false,
+          message : "Employee Not found"
+        });
+       }
+
+       return res.status(status.OK).json({
+                success: true,
+                message: 'Employee permanently deleted'
+            });
+    }
+   }catch(err){
+    console.log("delete employee error" , deleteEmployee);
+    if (err.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid employee ID'
+            });
+        }
+        
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting employee'
+        });
+   }
+}
+
+
+// route   GET /api/v1/admin/departments
+const getAlldepartments =  async(req,res) => {
+  try{
+    const departments = await Department.find({isActive : true})
+    .populate('manager' , 'firstName lastname email')
+    .sort({name : 1});
+
+    res.status(status.OK).json({
+      success : true,
+      data : departments
+    })
+
+  }catch(err){
+    console.error('Get departments error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching departments'
+        });
+  }
+}
+
+
+const createDepartment = async (req,res) => {
+  try{
+    const {name , code , description , budget , manager} = req.body;
+
+     if(!name && !code && !description){
+      return res.status(400).json({
+        success :false,
+        message : "name , code and decription are required"
+      })
+     }
+      const department = new Department({
+            name,
+            code,
+            description,
+            manager,
+            budget
+        });
+        
+        await department.save();
+         res.status(status.OK).json({
+            success: true,
+            message: 'Department created successfully',
+            data: department
+        });
+  }catch(err){
+ console.error('Create department error:', error);
+        
+        if (err.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: 'Department name or code already exists'
+            });
+        }
+        
+        res.status(500).json({
+            success: false,
+            message: 'Error creating department'
+        });
+  }
+}
+
+//todo getAllEmployees 
+const getAllEmployees = async(req,res) => {
+
+}
 module.exports = {
-    getDashboardstats
+    getDashboardstats, 
+    getAllEmployees,
+    getEmployeebyId,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee,
+    getAlldepartments,
+    createDepartment
 }
