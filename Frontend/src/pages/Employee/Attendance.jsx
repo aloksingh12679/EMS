@@ -31,22 +31,22 @@ export default function App() {
       active: true,
     },
   ]);
-const [attendance, setAttendance] = useState({});
- 
- // -------- HELPERS FOR VIEW LOGIC --------
-const getTodayKey = () =>
-  new Date().toISOString().split("T")[0];
+  const [attendance, setAttendance] = useState({});
 
-const getWeekKeys = (date = new Date()) => {
-  const start = new Date(date);
-  start.setDate(date.getDate() - date.getDay()); // Sunday
+  // -------- HELPERS FOR VIEW LOGIC --------
+  const getTodayKey = () =>
+    new Date().toISOString().split("T")[0];
 
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    return d.toISOString().split("T")[0];
-  });
-};
+  const getWeekKeys = (date = new Date()) => {
+    const start = new Date(date);
+    start.setDate(date.getDate() - date.getDay()); // Sunday
+
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      return d.toISOString().split("T")[0];
+    });
+  };
 
 
   // live clock
@@ -61,81 +61,81 @@ const getWeekKeys = (date = new Date()) => {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const calendarDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
- 
-const handleClockOut = () => {
-  if (!clockedIn) return;
 
-  const out = new Date();
-  const todayKey = out.toISOString().split("T")[0];
+  const handleClockOut = () => {
+    if (!clockedIn) return;
 
-  const start = clockInTime.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+    const out = new Date();
+    const todayKey = out.toISOString().split("T")[0];
 
-  const end = out.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+    const start = clockInTime.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-  setClockOutTime(out);
-  setClockedIn(false);
+    const end = out.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-  // 🔥 INJECTION POINT → calendar updates here
-  setAttendance((prev) => ({
-    ...prev,
-    [todayKey]: {
-      status: "present",
-      range: `${start} - ${end}`,
-    },
-  }));
+    setClockOutTime(out);
+    setClockedIn(false);
 
-  setLogs((prev) => [
-    { time: out.toLocaleString(), status: "Punched Out", active: false },
-    ...prev,
-  ]);
-};
+    // 🔥 INJECTION POINT → calendar updates here
+    setAttendance((prev) => ({
+      ...prev,
+      [todayKey]: {
+        status: "present",
+        range: `${start} - ${end}`,
+      },
+    }));
 
-const handleExport = () => {
-  // Filter attendance for selected month & year
-  const filtered = Object.entries(attendance).filter(([date]) => {
-    const d = new Date(date);
-    return d.getMonth() === month && d.getFullYear() === year;
-  });
+    setLogs((prev) => [
+      { time: out.toLocaleString(), status: "Punched Out", active: false },
+      ...prev,
+    ]);
+  };
 
-  if (filtered.length === 0) {
-    alert("No attendance data to export for this month.");
-    return;
-  }
+  const handleExport = () => {
+    // Filter attendance for selected month & year
+    const filtered = Object.entries(attendance).filter(([date]) => {
+      const d = new Date(date);
+      return d.getMonth() === month && d.getFullYear() === year;
+    });
 
-  // CSV Header
-  let csv = "Date,Status,Working Hours\n";
+    if (filtered.length === 0) {
+      alert("No attendance data to export for this month.");
+      return;
+    }
 
-  // CSV Rows
-  filtered.forEach(([date, data]) => {
-    csv += `${date},${data.status},${data.range || ""}\n`;
-  });
+    // CSV Header
+    let csv = "Date,Status,Working Hours\n";
 
-  // Create downloadable file
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = window.URL.createObjectURL(blob);
+    // CSV Rows
+    filtered.forEach(([date, data]) => {
+      csv += `${date},${data.status},${data.range || ""}\n`;
+    });
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `attendance_${month + 1}_${year}.csv`;
-  a.click();
+    // Create downloadable file
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
 
-  window.URL.revokeObjectURL(url);
-};
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attendance_${month + 1}_${year}.csv`;
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  };
 
   const durationMs = (clockOutTime || now) - clockInTime;
   const hours = Math.floor(durationMs / 3600000);
   const minutes = Math.floor((durationMs % 3600000) / 60000);
 
   return (
-    <div className="flex min-h-screen bg-[#f6f8fc]">
+    <div className="flex min-h-screen bg-[#f6f8fc] flex-col lg:flex-row">
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r flex flex-col">
+      <aside className="hidden lg:flex w-64 bg-white border-r flex-col">
         <div className="p-6 flex items-center gap-2 font-semibold text-lg">
           <div className="h-8 w-8 bg-slate-900 rounded-lg" /> EMS
         </div>
@@ -160,9 +160,9 @@ const handleExport = () => {
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 p-8 space-y-6">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
         {/* HEADER */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
           <div>
             <p className="text-sm text-slate-500">
               Home / HR / <span className="text-slate-900 font-medium">Attendance</span>
@@ -173,9 +173,8 @@ const handleExport = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <input
-              className="px-4 py-2 rounded-xl border bg-white text-sm"
+          <div className="flex items-center gap-3 w-full lg:w-auto">
+            <input className="px-4 py-2 rounded-xl border bg-white text-sm w-full sm:w-72"
               placeholder="Search employees..."
             />
             <button className="h-10 w-10 rounded-xl border bg-white flex items-center justify-center">
@@ -185,7 +184,7 @@ const handleExport = () => {
         </div>
 
         {/* FILTER BAR */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
           <div className="flex gap-3">
             <select className="px-4 py-2 rounded-xl border bg-white text-sm">
               <option>
@@ -197,26 +196,25 @@ const handleExport = () => {
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="flex bg-white border rounded-xl overflow-hidden">
               {["Daily", "Weekly", "Monthly"].map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
-                  className={`px-4 py-2 text-sm ${
-                    view === v ? "bg-slate-900 text-white" : ""
-                  }`}
+                  className={`px-4 py-2 text-sm ${view === v ? "bg-slate-900 text-white" : ""
+                    }`}
                 >
                   {v}
                 </button>
               ))}
             </div>
-           <button
-  onClick={handleExport}
-  className="px-4 py-2 rounded-xl border bg-white text-sm flex items-center gap-2"
->
-  <Download size={16} /> Export
-</button>
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 rounded-xl border bg-white text-sm flex items-center gap-2"
+            >
+              <Download size={16} /> Export
+            </button>
 
             <button className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
               + Mark Today
@@ -225,211 +223,296 @@ const handleExport = () => {
         </div>
 
         {/* STATS */}
-       <div className="grid grid-cols-4 gap-4">
-  <Stat
-    title="Total Present"
-    value="22"
-    icon={<CheckCircle2 size={16} className="text-green-600" />}
-    iconBg="bg-green-100"
-    barColor="bg-green-500"
-    footer="▲ +2.5%"
-    footerColor="text-green-600"
-  />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
-  <Stat
-    title="Total Absent"
-    value="1"
-    icon={<XCircle size={16} className="text-red-600" />}
-    iconBg="bg-red-100"
-    barColor="bg-red-500"
-    footer="▲ +1"
-    footerColor="text-red-600"
-  />
+          <Stat
+            title="Total Present"
+            value="22"
+            icon={<CheckCircle2 size={16} className="text-green-600" />}
+            iconBg="bg-green-100"
+            barColor="bg-green-500"
+            footer="▲ +2.5%"
+            footerColor="text-green-600"
+          />
 
-  <Stat
-    title="Late Arrivals"
-    value="3"
-    icon={<Clock3 size={16} className="text-yellow-600" />}
-    iconBg="bg-yellow-100"
-    barColor="bg-yellow-400"
-    footer="▼ -10%"
-    footerColor="text-green-600"
-  />
+          <Stat
+            title="Total Absent"
+            value="1"
+            icon={<XCircle size={16} className="text-red-600" />}
+            iconBg="bg-red-100"
+            barColor="bg-red-500"
+            footer="▲ +1"
+            footerColor="text-red-600"
+          />
 
-  <Stat
-    title="Leave Balance"
-    value={
-      <span>
-        12 <span className="text-sm text-slate-400">days</span>
-      </span>
-    }
-    icon={<Umbrella size={16} className="text-blue-600" />}
-    iconBg="bg-blue-100"
-    barColor="bg-blue-500"
-    footer="Annual Quota"
-    footerColor="text-slate-400"
-  />
-</div>
+          <Stat
+            title="Late Arrivals"
+            value="3"
+            icon={<Clock3 size={16} className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+            barColor="bg-yellow-400"
+            footer="▼ -10%"
+            footerColor="text-green-600"
+          />
+
+          <Stat
+            title="Leave Balance"
+            value={
+              <span>
+                12 <span className="text-sm text-slate-400">days</span>
+              </span>
+            }
+            icon={<Umbrella size={16} className="text-blue-600" />}
+            iconBg="bg-blue-100"
+            barColor="bg-blue-500"
+            footer="Annual Quota"
+            footerColor="text-slate-400"
+          />
+        </div>
 
         {/* DAILY VIEW */}
-{view === "Daily" && (
-  <div className="bg-white rounded-2xl p-6">
-    <h3 className="font-semibold mb-2">Today Summary</h3>
+        {view === "Daily" && (
+          <div className="bg-white rounded-2xl p-4 sm:p-6">
+            <h3 className="font-semibold mb-2">Today Summary</h3>
 
-    {attendance[getTodayKey()] ? (
-      <>
-        <p className="text-sm text-slate-600">
-          Status:{" "}
-          <span className="font-medium text-green-600">
-            {attendance[getTodayKey()].status}
-          </span>
-        </p>
-        <p className="text-sm text-slate-500 mt-1">
-          Working Hours: {attendance[getTodayKey()].range}
-        </p>
-      </>
-    ) : (
-      <p className="text-sm text-slate-400">
-        No attendance marked today.
-      </p>
-    )}
-  </div>
-)}
-
-    {/* WEEKLY VIEW */}
-{view === "Weekly" && (
-  <div className="bg-white rounded-2xl p-6">
-    <h3 className="font-semibold mb-4">Weekly Attendance</h3>
-
-    <div className="grid grid-cols-7 gap-3 text-center">
-      {getWeekKeys().map((key, i) => {
-        const data = attendance[key];
-        return (
-          <div key={i} className="p-3 rounded-xl border text-xs">
-            <p className="font-medium">
-              {new Date(key).toLocaleDateString("en-US", {
-                weekday: "short",
-              })}
-            </p>
-
-            <div
-              className={`mt-2 h-1 rounded-full ${
-                data?.status === "present"
-                  ? "bg-green-500"
-                  : "bg-slate-200"
-              }`}
-            />
-
-            <p className="mt-1 text-slate-500">
-              {data ? data.status : "—"}
-            </p>
+            {attendance[getTodayKey()] ? (
+              <>
+                <p className="text-sm text-slate-600">
+                  Status:{" "}
+                  <span className="font-medium text-green-600">
+                    {attendance[getTodayKey()].status}
+                  </span>
+                </p>
+                <p className="text-sm text-slate-500 mt-1">
+                  Working Hours: {attendance[getTodayKey()].range}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-slate-400">
+                No attendance marked today.
+              </p>
+            )}
           </div>
-        );
-      })}
-    </div>
-  </div>
-)}
+        )}
 
-        {/* CALENDAR + CLOCK + RECENT LOGS */}
-        <div className="grid grid-cols-4 gap-6">
-          {/* Calendar */}
-          {view === "Monthly" && (
-  <div className="col-span-2 bg-white rounded-2xl p-6">
+        {/* DAILY → CLOCK + RECENT LOGS (HORIZONTAL) */}
+        {view === "Daily" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold">
-                {currentDate.toLocaleString("default", { month: "long" })} {year}
-              </h2>
-              <div className="flex gap-2">
-                <ChevronLeft
-                  size={18}
-                  onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
-                />
-                <ChevronRight
-                  size={18}
-                  onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
-                />
-              </div>
-              
-            </div>
-
-            <div className="grid grid-cols-7 gap-3 text-center text-sm">
-              {["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"].map((d) => (
-                <div key={d} className="text-slate-400">{d}</div>
-              ))}
-
-              {Array.from({ length: (firstDay + 6) % 7 }).map((_, i) => (
-                <div key={i} />
-              ))}
-
-              {calendarDays.map((d) => {
-  const dateObj = new Date(year, month, d);
-  const key = dateObj.toISOString().split("T")[0];
-  const data = attendance[key];
-
-  return (
-    <Day
-      key={d}
-      day={String(d).padStart(2, "0")}
-      status={data?.status}
-      range={data?.range}
-      active={
-        key === new Date().toISOString().split("T")[0]
-      }
-    />
-  );
-})}
-
-            </div>
-            
-          </div>
-          )}
-
-
-          {/* RIGHT COLUMN */}
-          <div className="col-span-2 flex flex-col gap-6">
-            {/* Clock Card */}
+            {/* CLOCK */}
             <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6">
               <p className="text-sm">
                 {now.toDateString()}
                 <span className="ml-2 px-2 py-1 text-xs bg-green-500 rounded-full">Active</span>
               </p>
+
               <h1 className="text-4xl font-semibold mt-4">
                 {now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </h1>
+
               <p className="text-sm text-slate-300">Standard Shift: 09:00 - 18:00</p>
 
-              <div className="flex gap-3 mt-6">
-                <button
-                  disabled={clockedIn}
-                  className="flex-1 bg-slate-700 py-3 rounded-xl text-sm disabled:opacity-60"
-                >
+              <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <button disabled className="flex-1 bg-slate-700 py-3 rounded-xl text-sm">
                   Clocked In
                 </button>
-                <button
-                  onClick={handleClockOut}
-                  className="flex-1 bg-red-500 py-3 rounded-xl text-sm"
-                >
+                <button onClick={handleClockOut} className="flex-1 bg-red-500 py-3 rounded-xl text-sm">
                   Clock Out
                 </button>
               </div>
 
               <div className="mt-6">
                 <p className="text-sm">Duration</p>
-                <p className="text-xs mt-1">
-                  {hours}h {minutes}m
-                </p>
+                <p className="text-xs mt-1">{hours}h {minutes}m</p>
               </div>
             </div>
 
             <RecentLogs logs={logs} />
           </div>
+        )}
+
+        {/* WEEKLY VIEW */}
+        {view === "Weekly" && (
+          <div className="bg-white rounded-2xl p-6">
+            <h3 className="font-semibold mb-4">Weekly Attendance</h3>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-center">
+              {getWeekKeys().map((key, i) => {
+                const data = attendance[key];
+                return (
+                  <div key={i} className="p-3 rounded-xl border text-xs">
+                    <p className="font-medium">
+                      {new Date(key).toLocaleDateString("en-US", {
+                        weekday: "short",
+                      })}
+                    </p>
+
+                    <div
+                      className={`mt-2 h-1 rounded-full ${data?.status === "present"
+                          ? "bg-green-500"
+                          : "bg-slate-200"
+                        }`}
+                    />
+
+                    <p className="mt-1 text-slate-500">
+                      {data ? data.status : "—"}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* WEEKLY → CLOCK + RECENT LOGS (HORIZONTAL) */}
+        {view === "Weekly" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+
+            {/* CLOCK */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6">
+              <p className="text-sm">
+                {now.toDateString()}
+                <span className="ml-2 px-2 py-1 text-xs bg-green-500 rounded-full">Active</span>
+              </p>
+
+              <h1 className="text-4xl font-semibold mt-4">
+                {now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </h1>
+
+              <p className="text-sm text-slate-300">Standard Shift: 09:00 - 18:00</p>
+
+              <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <button disabled className="flex-1 bg-slate-700 py-3 rounded-xl text-sm">
+                  Clocked In
+                </button>
+                <button onClick={handleClockOut} className="flex-1 bg-red-500 py-3 rounded-xl text-sm">
+                  Clock Out
+                </button>
+              </div>
+
+              <div className="mt-6">
+                <p className="text-sm">Duration</p>
+                <p className="text-xs mt-1">{hours}h {minutes}m</p>
+              </div>
+            </div>
+
+            <RecentLogs logs={logs} />
+          </div>
+        )}
+
+        {/* CALENDAR + CLOCK + RECENT LOGS */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Calendar */}
+          {view === "Monthly" && (
+            <div className="lg:col-span-2 bg-white rounded-2xl p-4 sm:p-6">
+
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-semibold">
+                  {currentDate.toLocaleString("default", { month: "long" })} {year}
+                </h2>
+                <div className="flex gap-2">
+                  <ChevronLeft
+                    size={18}
+                    onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
+                  />
+                  <ChevronRight
+                    size={18}
+                    onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
+                  />
+                </div>
+
+              </div>
+
+              <div className="grid grid-cols-7 gap-3 text-center text-sm">
+                {["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"].map((d) => (
+                  <div key={d} className="text-slate-400">{d}</div>
+                ))}
+
+                {Array.from({ length: (firstDay + 6) % 7 }).map((_, i) => (
+                  <div key={i} />
+                ))}
+
+                {calendarDays.map((d) => {
+                  const dateObj = new Date(year, month, d);
+                  const key = dateObj.toISOString().split("T")[0];
+                  const data = attendance[key];
+
+                  return (
+                    <Day
+                      key={d}
+                      day={String(d).padStart(2, "0")}
+                      status={data?.status}
+                      range={data?.range}
+                      active={
+                        key === new Date().toISOString().split("T")[0]
+                      }
+                    />
+                  );
+                })}
+
+              </div>
+
+            </div>
+          )}
+
+
+          {/* RIGHT COLUMN */}
+          {view === "Monthly" && (
+            <div className="lg:col-span-2 flex flex-col gap-6">
+
+              {/* CLOCK */}
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6">
+                <p className="text-sm">
+                  {now.toDateString()}
+                  <span className="ml-2 px-2 py-1 text-xs bg-green-500 rounded-full">
+                    Active
+                  </span>
+                </p>
+
+                <h1 className="text-4xl font-semibold mt-4">
+                  {now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </h1>
+
+                <p className="text-sm text-slate-300">
+                  Standard Shift: 09:00 - 18:00
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                  <button
+                    disabled={clockedIn}
+                    className="flex-1 bg-slate-700 py-3 rounded-xl text-sm disabled:opacity-60"
+                  >
+                    Clocked In
+                  </button>
+
+                  <button
+                    onClick={handleClockOut}
+                    className="flex-1 bg-red-500 py-3 rounded-xl text-sm"
+                  >
+                    Clock Out
+                  </button>
+                </div>
+
+                <div className="mt-6">
+                  <p className="text-sm">Duration</p>
+                  <p className="text-xs mt-1">
+                    {hours}h {minutes}m
+                  </p>
+                </div>
+              </div>
+
+              {/* RECENT LOGS */}
+              <RecentLogs logs={logs} />
+
+            </div>
+          )}
+
         </div>
 
         {/* CHARTS */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card title="Weekly Working Hours" footer="Average: 8h 12m | Goal: 40h">
-            <div className="flex items-end gap-4 h-40">
+            <div className="flex items-end gap-4 h-40 overflow-x-auto">
               {[6, 7, 5, 7, 6].map((h, i) => (
                 <div key={i} className="flex flex-col items-center gap-2">
                   <div
@@ -447,13 +530,12 @@ const handleExport = () => {
               {["on", "on", "late", "on", "early", "early", "on"].map((t, i) => (
                 <div
                   key={i}
-                  className={`w-2 rounded-full h-32 ${
-                    t === "late"
+                  className={`w-2 rounded-full h-32 ${t === "late"
                       ? "bg-yellow-400"
                       : t === "early"
-                      ? "bg-green-500"
-                      : "bg-slate-200"
-                  }`}
+                        ? "bg-green-500"
+                        : "bg-slate-200"
+                    }`}
                 />
               ))}
             </div>
@@ -480,9 +562,8 @@ function RecentLogs({ logs }) {
         {logs.map((log, i) => (
           <div key={i} className="flex gap-3">
             <span
-              className={`mt-1 h-3 w-3 rounded-full ${
-                log.active ? "bg-green-500" : "bg-slate-300"
-              }`}
+              className={`mt-1 h-3 w-3 rounded-full ${log.active ? "bg-green-500" : "bg-slate-300"
+                }`}
             />
             <div>
               <p className="text-xs text-slate-400">{log.time}</p>
@@ -505,9 +586,8 @@ function RecentLogs({ logs }) {
 function Menu({ icon, label, active }) {
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer ${
-        active ? "bg-slate-100 font-medium" : "hover:bg-slate-100"
-      }`}
+      className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer ${active ? "bg-slate-100 font-medium" : "hover:bg-slate-100"
+        }`}
     >
       {icon} {label}
     </div>
@@ -552,16 +632,15 @@ function Day({ day, range, status, active }) {
     status === "present"
       ? "bg-green-500"
       : status === "late"
-      ? "bg-yellow-400"
-      : status === "absent"
-      ? "bg-red-500"
-      : "bg-blue-500";
+        ? "bg-yellow-400"
+        : status === "absent"
+          ? "bg-red-500"
+          : "bg-blue-500";
 
   return (
     <div
-      className={`h-24 rounded-xl border p-2 text-left ${
-        active ? "border-slate-900" : "border-slate-200"
-      }`}
+      className={`h-20 sm:h-24 rounded-xl border p-2 text-left ${active ? "border-slate-900" : "border-slate-200"
+        }`}
     >
       <p className="text-sm font-medium">{day}</p>
       {range && <p className="text-xs text-slate-400">{range}</p>}
