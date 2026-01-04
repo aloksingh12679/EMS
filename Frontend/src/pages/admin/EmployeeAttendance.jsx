@@ -14,6 +14,7 @@ import {
   Clock3,
   Umbrella,
 } from "lucide-react";
+import AdminSidebar from "../../Components/AdminSidebar";
 
 export default function EmployeeAttendance() {
   const [view, setView] = useState("Daily");
@@ -135,7 +136,8 @@ export default function EmployeeAttendance() {
   return (
     <div className="flex min-h-screen bg-[#f6f8fc] flex-col lg:flex-row">
       {/* SIDEBAR */}
-      <aside className="hidden lg:flex w-64 bg-white border-r flex-col">
+
+      {/* <aside className="hidden lg:flex w-64 bg-white border-r flex-col">
         <div className="p-6 flex items-center gap-2 font-semibold text-lg">
           <div className="h-8 w-8 bg-slate-900 rounded-lg" /> EMS
         </div>
@@ -157,8 +159,8 @@ export default function EmployeeAttendance() {
             </div>
           </div>
         </div>
-      </aside>
-
+      </aside> */}
+<AdminSidebar />
       {/* MAIN */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
         {/* HEADER */}

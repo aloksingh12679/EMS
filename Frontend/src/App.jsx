@@ -72,7 +72,7 @@ function App() {
 
           <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
 
-          <Route path="/employee/attendance" element={<EmployeeAttendance />} />
+          <Route path="/admin/attendance" element={<EmployeeAttendance />} />
 
            <Route path="/admin/salary" element={< SalaryManagement/>} />
           {/* Protected Admin Routes */}

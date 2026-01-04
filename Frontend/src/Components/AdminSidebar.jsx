@@ -40,7 +40,7 @@ const AdminSidebar = () => {
         { icon: <MdPeople />, label: "Employees", path: "/admin/employees" },
         { icon: <MdEventAvailable />, label: "Attendance", path: "/admin/attendance" },
         { icon: <MdPeople />, label: "Leaves", path: "/admin/leaves" },
-        { icon: <MdPeople />, label: "Payroll", path: "/admin/payroll" }
+        { icon: <MdPeople />, label: "Payroll", path: "/admin/salary" }
     ];
 
     const handleLogout = () => {
