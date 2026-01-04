@@ -12,6 +12,7 @@ import HomePage from "./pages/common/HomePage";
 import EmployeeProfile from "./pages/admin/EmployeeProfile";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import EmployeeAttendance from "./pages/admin/EmployeeAttendance";
+import SalaryManagement from "./pages/admin/SalaryManagement";
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -73,7 +74,7 @@ function App() {
 
           <Route path="/employee/attendance" element={<EmployeeAttendance />} />
 
-
+           <Route path="/admin/salary" element={< SalaryManagement/>} />
           {/* Protected Admin Routes */}
           {/* <Route 
             path="/admin/dashboard" 

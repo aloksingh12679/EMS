@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../../assets/styles/SalaryManagementStyles/SalaryManagement.css";
+import AdminSidebar from "../../Components/AdminSidebar";
 const SalaryManagement = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,8 +68,9 @@ const SalaryManagement = () => {
 
   return (
     <div className="salary-app-container">
+      <AdminSidebar />
       {/* Sidebar */}
-      <aside className="salary-sidebar">
+      {/* <aside className="salary-sidebar">
         <div className="salary-sidebar-header">
           <div className="salary-logo">
             <div className="salary-logo-icon">EB</div>
@@ -112,7 +114,7 @@ const SalaryManagement = () => {
             <button className="salary-logout-btn">↗</button>
           </div>
         </div>
-      </aside>
+      </aside> */}
 
       {/* Main Content */}
       <main className="salary-main-content">
