@@ -81,13 +81,36 @@
   cursor: pointer;
 }
 
-@media (max-width: 790px) {
+.navbar-btn-div {
+  display: flex;
+}
+
+@media (max-width: 768px) {
   .navbar {
     padding: 0 20px;
   }
 
+  .navbar-container {
+    padding: 10px 0 !important;
+  }
+
   .mobile-menu-btn {
     display: block;
+  }
+  .navbar-btn-div {
+    display: flex ;
+    /* flex-direction: column; */
+    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .contact-sales-btn {
+    /* margin-left: 50px; */
+    padding: 0.5rem 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
   }
 
   .nav-menu {
