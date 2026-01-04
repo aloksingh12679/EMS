@@ -27,14 +27,13 @@ export const AuthProvider = ({children}) => {
       checkAuth();
     },[]);
 
-    const login = async (email,password) => {
-        const result = await authService.login(email,password);
+    const login = async (email,password,employeeId) => {
+       
+        const result = await authService.login(email,password,employeeId);
+ 
+       return result;
+        
 
-        if(result.success){
-            setUser(result.user);
-        }
-
-        return result;
     }
 
     const logout = () => {
@@ -47,7 +46,7 @@ export const AuthProvider = ({children}) => {
         loading,
         login,
         logout,
-        isAuthenticated : authService.isAuthenticated()
+        
     }
 
     return(

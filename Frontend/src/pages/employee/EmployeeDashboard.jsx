@@ -9,8 +9,9 @@ import {
   LogIn,
   LogOut,
 } from "lucide-react";
+import EmployeesSidebar from "../../Components/EmployeesSidebar";
 
-export default function App() {
+export default function EmployeeDashboard() {
   const [clockedIn, setClockedIn] = useState(true);
   const [clockInTime, setClockInTime] = useState(new Date());
   const [attendance] = useState(92);
@@ -22,7 +23,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-[#f6f8fb] font-sans flex-col lg:flex-row">
-      {/* SIDEBAR */}
+      {/* SIDEBAR
       <aside className="hidden lg:flex w-[280px] bg-gradient-to-b from-[#0b1220] to-[#020617] text-white flex-col justify-between">
         <div>
           <div className="px-6 py-6">
@@ -44,9 +45,10 @@ export default function App() {
             <div className="text-xs text-gray-400">Product Designer</div>
           </div>
         </div>
-      </aside>
+      </aside> */}
 
       {/* MAIN */}
+      <EmployeesSidebar />
       <main className="flex-1 p-4 sm:p-6 lg:p-10 space-y-8">
         <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>

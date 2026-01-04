@@ -5,11 +5,14 @@ const {status} = require('http-status');
 // api = api/v1/auth/login
 const login = async(req,res,next) => {
 try {
+    console.log("here");
  const {email , password , employeeId} = req.body;
     if(!email && !employeeId){
         return res.status(400).json({"message" : "please fill all given fields"});
     }
 console.log(email);
+console.log(password);
+console.log(employeeId);
  let currUser;
  let loginType;
 
@@ -22,7 +25,7 @@ console.log(email);
         loginType = 'email';
 
         if(!currUser){
-        return res.status(status.NOT_FOUND).json({"message" : "Wrong email or Password"});
+        return res.status(404).json({"message" : "Wrong email or Password"});
         }
          
         if(currUser.role !== 'admin'){
@@ -38,8 +41,8 @@ console.log(email);
 
 
     }else if(employeeId){
-        currUser = User.findOne({employeeId : employeeId.trim().toUppercase()});
-
+        currUser = await User.findOne({employeeId : employeeId});
+      console.log(currUser);
         loginType = 'employeeId' ; 
 
         if(!currUser) {

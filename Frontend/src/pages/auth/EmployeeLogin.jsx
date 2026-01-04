@@ -1,4 +1,4 @@
-export default function Login() {
+export default function EmployeeLogin() {
   return (
     <div className="min-h-screen flex bg-[#f6f7f8] font-[Inter]">
 

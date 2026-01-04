@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express').default || require('express');
 const router = express.Router();
 
 const {login , logout , getCurrentUser , forgotPassword} = require('../controllers/authController');

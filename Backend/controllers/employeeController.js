@@ -51,7 +51,7 @@ const getEmployeedashboard = async(req,res) => {
     }
 }
 
-// desc    Employee check-in
+// Employee check-in
 // route   POST /api/employee/checkin
 // access  Private (Employee only)
 
@@ -104,10 +104,69 @@ const checkIn = async(req,res) => {
       });
 
     }catch(err){
- console.error('Check-in error:', error);
+ console.error('Check-in error:', err);
     res.status(500).json({
       success: false,
       message: 'Error during check-in'
     });
     }
 }
+
+//  Employee check-in
+// route   POST /api/employee/checkOut
+// access  Private (Employee only)
+const checkOut = async(req,res) => {
+  try{
+      const employeeId = req.user.id;
+      const now = new Date();
+      const today = new Date();
+ 
+
+      today.setHours(0,0,0,0);
+
+      const attendance = await Attendance.findOne({
+        employee : employeeId,
+        date : {
+          $gte : today,
+          $lt : new Date(today.getTime() + 24 * 60 * 60 * 1000)
+        }
+      });
+
+      if(!attendance){
+        return res.status(400).json({
+        success: false,
+        message: 'You need to check in first'
+      });
+      }
+
+      if(attendance.checkOut) {
+         return res.status(400).json({
+        success: false,
+        message: 'Already checked out today'
+      });
+      }
+
+      attendance.checkOut = now;
+      await attendance.save();
+
+      res.status(status.OK).json({
+        message: 'checkout - succesfully',
+        data : {
+          checkIn : attendance.checkIn,
+          checkOut : attendance.checkOut,
+          workingHours : attendance.workingHours,
+          status : attendance.status  
+        }
+      })
+
+  }catch(err){
+
+    console.error('Check-out error:', eror);
+    res.status(500).json({
+      success: false,
+      message: 'Error during check-out'
+    });
+  }
+  }
+
+

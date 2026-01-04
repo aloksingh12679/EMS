@@ -1,42 +1,18 @@
 import React, { useState } from 'react';
-import { Bell, HelpCircle, Edit3, MoreVertical, MapPin, Phone, Mail, Lock, Trash2 } from 'lucide-react';
+import { Bell, HelpCircle, Edit3, MoreVertical, MapPin, Phone, Mail, Lock, Trash2, Sidebar } from 'lucide-react';
 
 import "../../assets/styles/EmployeeProfileCSS/EmployeeProfile.css"
 
+import AdminSidebar from '../../Components/AdminSidebar';
+// make it responsive 
+// add <Sidebar /> from components then implement responsiveness 
+// take exaple of employeeList Page
 export default function EmployeeProfile() {
   const [activeTab, setActiveTab] = useState('personal-info');
   return (
     <>
       <div className="ems-container">
-        {/* SIDEBAR */}
-        <aside className="sidebar">
-          <div className="sidebar-header">
-            <div className="logo-circle">O</div>
-            <div className="logo-text">
-              <h2>EMS Admin</h2>
-              <p>Enterprise System</p>
-            </div>
-          </div>
-
-          <div className="sidebar-nav">
-            <a className="nav-item" href='#' >📊 Dashboard</a>
-            <a className="nav-item active" href='#'>👥 Employees</a>
-            <a className="nav-item" href='#'>💳 Payroll</a>
-            <a className="nav-item" href='#'>📋 Attendance</a>
-            <a className="nav-item" href='#'>📄 Reports</a>
-          </div>
-
-          <div className="sidebar-footer">
-            <div className="nav-item settings-item">⚙️ Settings</div>
-            <div className="user-profile">
-              <div className="user-avatar">J</div>
-              <div className="user-info">
-                <p className="user-name">James Ross</p>
-                <p className="user-role">Super Admin</p>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <AdminSidebar />
 
         {/* MAIN CONTENT */}
         <main className="main-content">

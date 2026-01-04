@@ -29,7 +29,7 @@ router.get("/dashboard/stats" , getDashboardstats);
 router.route("/employees")
 .get(getAllEmployees)
 .post(createEmployee);
-// .get() todo
+
 
 router.route("/employees/:id")
 .get(getEmployeebyId)

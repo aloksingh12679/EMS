@@ -17,8 +17,33 @@ const intializingBase = async() => {
         console.log("Departments succesfully created");
        });
 
-       
+       const newAdmin = new User({
+        email : "admin@gmail.com",
+        password : "admin123",
+        firstName : "System",
+        lastName : "testing",
+        role : "admin",
+        personalEmail : "admin@gmail.com"
+       })
+
+      //  const newEmployee = new User({
+      //  firstName : "Neha",
+    // lastName : "sharma",
+    // personalEmail: "neha@gmail.com",
+    // contactNumber : "123456789",
+    
+    // department: "Finance",
+    // position : "HR",
+    // salary: 14000,
         
+
+    //    })
+    //     await newEmployee.save();
+      await newAdmin.save().then(res=> {
+        console.log(res)
+      }).catch(err => {
+        console.log("newAdmin err" , err);
+      });
        
     // console.log(departmentData);
 

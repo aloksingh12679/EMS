@@ -63,11 +63,30 @@ personalEmail : {
     trim : true,
     required : true
 },
+dateOfBirth: Date,
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other', 'prefer-not-to-say']
+    },
 //  employment (naukri) information company mai 
 department : {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Department"
 },
+
+ // Leave balance
+    leaveBalance: {
+        casual: { type: Number, default: 12 },
+        sick: { type: Number, default: 10 },
+        annual: { type: Number, default: 15 },
+    },
+
+
+     profilePhoto: {
+        type: String,
+        default  : 'default-avatar.png'
+    },
+
 
 position : {
     type : String,
@@ -114,7 +133,11 @@ address : {
         type: Boolean,
         default: true
     },
-    
+    status: {
+    type: String,
+    enum: ['active', 'inactive', 'on leave'],  
+    default: 'active' 
+  },
     lastLogin: {
         type: Date
     },
@@ -164,3 +187,4 @@ userSchema.methods.comparePassword = async function(enteredCurrPass){
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
+

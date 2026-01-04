@@ -15,7 +15,7 @@ import {
   Umbrella,
 } from "lucide-react";
 
-export default function App() {
+export default function EmployeeAttendance() {
   const [view, setView] = useState("Daily");
   const [clockedIn, setClockedIn] = useState(true);
   const [now, setNow] = useState(new Date());

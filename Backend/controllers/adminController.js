@@ -12,8 +12,14 @@ const getDashboardstats = async (req,res,next) => {
       isActive : true});
 
 
-      let presentToday = activeEmployess;
-// Todo 
+      const presentToday = await Attendance.countDocuments({
+      date: {
+        $gte: today,
+        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // End of today
+      },
+      status: { $in: ['present', 'half-day'] } 
+    });
+
     const pendingLeaves = 0;
 
     const recentEmployees = await User.find({role : 'employee'}).sort({createdAt : -1}).limit(5)
@@ -39,6 +45,26 @@ const getDashboardstats = async (req,res,next) => {
         }
       }
     ]);
+
+     // 5. Salary Overview (simple for now)
+    // const salaryOverview = await User.aggregate([
+    //   {
+    //     $match: {
+    //       role: "employee",
+    //       isActive: true,
+    //       salary: { $gt: 0 }
+    //     }
+    //   },
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       avgSalary: { $avg: "$salary" },
+    //       totalSalary: { $sum: "$salary" },
+    //       minSalary: { $min: "$salary" },
+    //       maxSalary: { $max: "$salary" }
+    //     }
+    //   }
+    // ]);
 
     res.status(status.OK).json({
       success : true,
@@ -83,12 +109,13 @@ const {
 
 } =  req.body;
 
-console.log(firstName);
-if(!firstName && !email && !position){
+
+if(!firstName && !email && !position && !department) {
   return res.status(400).json({
     message : "Please provide necessary details"
   })
 }
+
 // checking personal email
 if(email){
   const existingEmail = await User.findOne({personalEmail : email});
@@ -107,7 +134,7 @@ const generateEmployeeId = async () => {
    let nextNum = 2025;
   if(lastEmployee && lastEmployee.employeeId) { 
     const match = lastEmployee.employeeId.match(/EMP-(\d+)/);
-    console.log(match);
+  
     if(match && match[1]){
       nextNum = parseInt(match[1]) + 1;
     }
@@ -118,6 +145,11 @@ const generateEmployeeId = async () => {
 }
 
  const employeeId = await generateEmployeeId();
+ department.toLowerCase();
+ console.log(department);
+ const departmentInfo = await Department.findOne({name : department});
+ console.log(departmentInfo);
+ 
 
  const employee = new User({
     employeeId,
@@ -126,7 +158,7 @@ const generateEmployeeId = async () => {
     personalEmail: email,
     contactNumber,
     address: address || {},
-    department: department || null,
+    department: departmentInfo._id || null,
     position,
     salary: salary || 0,
     joiningDate: joinningDate || new Date(),
@@ -347,7 +379,67 @@ const createDepartment = async (req,res) => {
 //todo getAllEmployees 
 const getAllEmployees = async(req,res) => {
 
-}
+  try {
+    const { search, department, status, page = 1, limit = 50 } = req.query;
+    
+    // Build filter object
+    const filter = {};
+    
+    // Search filter (searches in name, email, employeeId, position)
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { employeeId: { $regex: search, $options: 'i' } },
+        { position: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Department filter
+    if (department && department !== 'all') {
+      filter.department = { $regex: new RegExp(department, 'i') };
+    }
+    
+    // Status filter
+    if (status && status !== 'all') {
+      let statusValue = status.toLowerCase();
+      // Convert frontend status to backend status
+      if (statusValue === 'on leave') statusValue = 'on_leave';
+      filter.status = statusValue;
+    }
+    
+    // Pagination
+    const skip = (page - 1) * limit;
+    
+    // Execute query
+    filter.role = 'employee';
+    const employees = await User.find(filter)
+      .select('-__v') // Exclude version key
+      .sort({ createdAt: -1 })
+      .populate("department" , "name") // Latest first
+      .limit(parseInt(limit));
+    
+    
+    const total = await User.countDocuments(filter);
+    
+    res.status(200).json({
+      success: true,
+      count: employees.length,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+      data: employees
+    });
+    
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+};
 module.exports = {
     getDashboardstats, 
     getAllEmployees,
