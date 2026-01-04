@@ -26,15 +26,18 @@ export default function Navbar() {
             <a href="#resources">Resources</a>
           </li>
         </ul>
+        <div className="navbar-btn-div">
+          <button className="contact-sales-btn">
+            <a href="#">Contact Sales</a>
+          </button>
 
-        <button className="contact-sales-btn"><a href="#">Contact Sales</a></button>
-
-        <button
-          className="mobile-menu-btn"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          <i class="fa-solid fa-bars"></i>
-        </button>
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
       </div>
     </nav>
   );
