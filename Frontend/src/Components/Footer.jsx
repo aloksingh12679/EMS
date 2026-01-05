@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="footer-container">
         <div className="footer-section">
           <div className="footer-logo">
-            <span className="logo-icon">⊟⊟</span>
+            {/* <span className="logo-icon">⊟⊟</span> */}
             <span>EMS Enterprise</span>
           </div>
           <p>
@@ -14,14 +14,29 @@ export default function Footer() {
             Scalable, secure, and simple to use.
           </p>
           <div className="social-links">
-            <a href="#" title="LinkedIn">
-             <i class="fa-brands fa-linkedin"></i>
+            <a
+              href="https://www.linkedin.com/company/graphura-india-private-limited/"
+              title="LinkedIn"
+            >
+              <i class="fa-brands fa-linkedin"></i>
             </a>
+
             <a href="#" title="Twitter">
               <i className="fa-brands fa-twitter"></i>
             </a>
-            <a href="#" title="Facebook">
+
+            <a
+              href="https://www.facebook.com/share/19nKAMTopZ/"
+              title="Facebook"
+            >
               <i class="fa-brands fa-facebook"></i>
+            </a>
+
+            <a
+              href="https://www.instagram.com/graphura.in?igsh=MXNqNmtidzljNDJlag=="
+              title="Instagram"
+            >
+              <i class="fa-brands fa-instagram"></i>
             </a>
           </div>
         </div>
@@ -35,62 +50,54 @@ export default function Footer() {
             <li>
               <a href="#features">Features</a>
             </li>
-            <li>
+            {/* <li>
               <a href="#">Integrations</a>
-            </li>
+            </li> */}
             <li>
               <a href="#">Pricing</a>
             </li>
-            <li>
+            {/* <li>
               <a href="#">API Documentation</a>
-            </li>
+            </li> */}
           </ul>
         </div>
 
         <div className="footer-section">
-          <h4>Company</h4>
+          <h4>Contact Us</h4>
           <ul>
             <li>
-              <a href="#">About Us</a>
+              <a href="#">
+                <i class="fa-solid fa-location-dot"></i> Located At Gurugram,
+                Haryana
+              </a>
             </li>
             <li>
-              <a href="#">Careers</a>
+              <a href="#">
+                <i class="fa-solid fa-phone"></i> 7378021327
+              </a>
             </li>
-            <li>
-              <a href="#">Contact</a>
-            </li>
-            <li>
-              <a href="#">Partners</a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="footer-section">
-          <h4>Support</h4>
-          <ul>
-            <li>
-              <a href="#">Help Center</a>
-            </li>
-            <li>
+            {/* <li>
               <a href="#">System Status</a>
-            </li>
+            </li> */}
             <li>
-              <a href="#">Security</a>
+              <a href="#">
+                <i class="fa-solid fa-envelope"></i> official@graphura.in
+              </a>
             </li>
-            <li>
+            {/* <li>
               <a href="#">Privacy Policy</a>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
 
       <div className="footer-bottom">
         <p>© 2023 EMS Enterprise Inc. All rights reserved.</p>
-        <div className="footer-links">
+        {/* <div className="footer-links">
           <a href="#">Terms of Service</a>
           <a href="#">Privacy Policy</a>
           <a href="#">Cookie Settings</a>
-        </div>
+        </div> */}
       </div>
     </footer>
   );
