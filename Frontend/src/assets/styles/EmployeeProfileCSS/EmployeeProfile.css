@@ -163,11 +163,12 @@ body {
   flex-direction: column;
   overflow: hidden;
   background: #f5f6fa;
+  margin-left: 256px;
 }
 
 .top-header {
   background: white;
-  padding: 8px 24px;
+  padding: 8px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -219,11 +220,11 @@ body {
 
 /* BREADCRUMB */
 
-.breadcrumb {
+/* .breadcrumb {
   padding: 16px 32px;
-  /* font-size: 13px; */
+  font-size: 13px;
   color: #718096;
-  /* background: white; */
+  background: white;
   border-bottom: 1px solid #e2e8f0;
 }
 
@@ -234,7 +235,7 @@ body {
 .breadcrumb-current {
   color: #2d3748;
   font-weight: 600;
-}
+} */
 
 /* ===== SCROLLABLE CONTENT ===== */
 .scrollable-content {
@@ -263,10 +264,10 @@ body {
 /* ===== PROFILE HEADER CARD ===== */
 .profile-card {
   background: #2d3748;
-  /* border-radius: 12px; */
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  padding: 32px;
+  border-radius: 10px;
+  /* border-top-left-radius: 10px;
+  border-top-right-radius: 10px; */
+  padding: 24px;
   display: flex;
   gap: 24px;
   align-items: flex-start;
@@ -417,9 +418,9 @@ body {
   background: white;
   border-bottom: 2px solid #e2e8f0;
   margin-bottom: 24px;
-  /* border-radius: 10px; */
-  border-bottom-right-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-radius: 10px;
+  /* border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px; */
   /* position: sticky; */
   top: 0;
   z-index: 10;
@@ -483,6 +484,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  background: white;
 }
 
 .card-title {
@@ -778,6 +780,12 @@ body {
 
   .contact-info-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width:1120px) {
+  .main-content{
+    margin-left: 0;
   }
 }
 

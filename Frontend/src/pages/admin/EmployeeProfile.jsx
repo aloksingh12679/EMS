@@ -31,13 +31,13 @@ export default function EmployeeProfile() {
           </header>
 
           {/* BREADCRUMB */}
-          <div className="breadcrumb">
+          {/* <div className="breadcrumb">
             <span>Home</span>
             <span className="breadcrumb-sep">›</span>
             <span>Employees</span>
             <span className="breadcrumb-sep">›</span>
             <span className="breadcrumb-current">Sam Kumari</span>
-          </div>
+          </div> */}
 
           {/* SCROLLABLE CONTENT */}
           <div className="scrollable-content">
@@ -75,7 +75,7 @@ export default function EmployeeProfile() {
             {/* TABS */}
             <div className="tabs-wrapper">
               <div className="tabs">
-                {['Personal Info', 'Attendance', 'Salary & Payroll', 'Leaves', 'Performance', 'Documents'].map((tab) => (
+                {['Personal Info', 'Attendance', 'Salary & Payroll', 'Leaves', 'Performance'].map((tab) => (
                   <button
                     key={tab}
                     className={`tab ${activeTab === tab.toLowerCase().replace(/\s+/g, '-') ? 'active' : ''}`}
@@ -93,18 +93,18 @@ export default function EmployeeProfile() {
               <div className="card">
                 <div className="card-header">
                   <h3 className="card-title">Contact Information</h3>
-                  <button className="edit-link">Edit</button>
+                  {/* <button className="edit-link">Edit</button> */}
                 </div>
 
                 <div className="contact-info-grid">
-                  <div className="info-field">
+                  {/* <div className="info-field">
                     <label className="info-label">Work Email</label>
                     <div className="info-value">
-                      {/* <Mail /> */}
+                      
                       <i class="fa-regular fa-envelope"></i>
                       <span>samkumari@gmail.com</span>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="info-field">
                     <label className="info-label">Phone Number</label>
@@ -170,7 +170,7 @@ export default function EmployeeProfile() {
             <div className="card">
               <div className="card-header">
                 <h3 className="card-title">Employment Details</h3>
-                <button className="edit-link">Edit</button>
+                {/* <button className="edit-link">Edit</button> */}
               </div>
 
               <div className="details-grid">
@@ -205,7 +205,7 @@ export default function EmployeeProfile() {
               <div className="card">
                 <div className="card-header">
                   <h3 className="card-title">Personal Information</h3>
-                  <button className="edit-link">Edit</button>
+                  {/* <button className="edit-link">Edit</button> */}
                 </div>
 
                 <div className="details-grid">
@@ -233,7 +233,7 @@ export default function EmployeeProfile() {
                 <div className="account-actions-section">
                   <div className="action-item">
                     <div className="action-icon">🔐</div>
-                    <div>Reset Password</div>
+                    <div>Delete User</div>
                   </div>
 
                   <div className="action-item danger">
@@ -243,7 +243,7 @@ export default function EmployeeProfile() {
                 </div>
 
                 {/* TEAM MEMBERS */}
-                <div className="team-section">
+                {/* <div className="team-section">
                   <div className="team-header">
                     <h3 className="quick-stats-title">Team Members</h3>
                     <button className="view-all-link">View All</button>
@@ -255,7 +255,7 @@ export default function EmployeeProfile() {
                     <div className="avatar avatar-4">MK</div>
                     <span className="more-count">+3</span>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
