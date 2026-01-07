@@ -5,28 +5,7 @@ import { employeeService } from "../../services/employeeServices.js";
 
 export default function EmployeesList() {
   const navigate = useNavigate();
-  const [employees, setEmployees] = useState([
-    {
-      id: "1",
-      firstName: "Virat",
-      personalEmail: "Virat@gmail.com",
-      employeeId: "EMP-2026",
-      position: "Routine Checkup",
-      department: { name: "Quality Assurance" },
-      status: "active",
-      joiningDate: "2026-01-04"
-    },
-    {
-      id: "2",
-      firstName: "Neha",
-      personalEmail: "Neha@gmail.com",
-      employeeId: "EMP-2025",
-      position: "Sales",
-      department: { name: "Marketing" },
-      status: "active",
-      joiningDate: "2026-01-04"
-    }
-  ]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
@@ -113,7 +92,7 @@ export default function EmployeesList() {
                 onClick={handleAddEmployee}
                 className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors w-full sm:w-auto justify-center"
               >
-                <span className="material-symbols-outlined">add</span>
+                <span className="material-symbols-outlined"></span>
                 Add Employee
               </button>
             </div>

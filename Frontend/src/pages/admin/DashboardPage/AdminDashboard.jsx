@@ -21,7 +21,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen flex bg-[#F6F8FB]">
 
-      {/* SIDEBAR */}
+      
       <AdminSidebar />
       {/* MAIN CONTENT */}
       <main className="flex-1 px-10 py-6">
@@ -29,10 +29,10 @@ const AdminDashboard = () => {
         {/* TOP BAR */}
         <Topbar />
 
-        <StatsCard />
+        {/* <StatsCard /> */}
 
         {/* STATS */}
-        <StatsGrid />
+        {/* <StatsGrid /> */}
 
         {/* ATTENDANCE + RECENT ACTIVITY */}
         <div className="grid grid-cols-3 gap-6 mt-8">

@@ -13,6 +13,8 @@ import EmployeeProfile from "./pages/admin/EmployeeProfile";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import EmployeeAttendance from "./pages/admin/EmployeeAttendance";
 import SalaryManagement from "./pages/admin/SalaryManagement";
+import EmployeeLeave from "./pages/admin/EmployeeLeave";
+import AddEmployee from "./pages/admin/AddEmployee";
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -69,12 +71,19 @@ function App() {
 
           <Route path="/admin/employee/profile" element={<EmployeeProfile/>}/>
 
-
-          <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-
           <Route path="/admin/attendance" element={<EmployeeAttendance />} />
 
            <Route path="/admin/salary" element={< SalaryManagement/>} />
+
+           <Route path="/admin/leaves" element={< EmployeeLeave/>} />
+           <Route path="/admin/add-employee" element={< AddEmployee/>} />
+
+
+{/* one page og employee side */}
+
+          <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+
+
           {/* Protected Admin Routes */}
           {/* <Route 
             path="/admin/dashboard" 

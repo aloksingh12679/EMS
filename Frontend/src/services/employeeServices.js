@@ -8,5 +8,20 @@ export const employeeService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    addEmployee : async(data) => {
+        try{
+const response = await api.post('/admin/employees' , data ,{
+            headers: {
+                'Content-Type': 'multipart/form-data'  // Override default
+            }
+        });
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
     }
 }
+

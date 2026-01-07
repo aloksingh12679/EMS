@@ -12,9 +12,10 @@ export default function EmployeeProfile() {
   return (
     <>
       <div className="ems-container">
-        <AdminSidebar />
+        {/* <AdminSidebar /> */}
 
         {/* MAIN CONTENT */}
+
         <main className="main-content">
           {/* TOP HEADER */}
           <header className="top-header">

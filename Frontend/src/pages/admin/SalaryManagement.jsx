@@ -68,53 +68,9 @@ const SalaryManagement = () => {
 
   return (
     <div className="salary-app-container">
-      <AdminSidebar />
-      {/* Sidebar */}
-      {/* <aside className="salary-sidebar">
-        <div className="salary-sidebar-header">
-          <div className="salary-logo">
-            <div className="salary-logo-icon">EB</div>
-            <div className="salary-logo-text">
-              <div className="salary-logo-title">EMS Portal</div>
-              <div className="salary-logo-subtitle">Enterprise Edition</div>
-            </div>
-          </div>
-        </div>
-
-        <nav className="salary-sidebar-nav">
-          <a href="#" className="salary-nav-item">
-            <span className="salary-nav-icon">📊</span>
-            <span className="salary-nav-text">Dashboard</span>
-          </a>
-          <a href="#" className="salary-nav-item">
-            <span className="salary-nav-icon">👥</span>
-            <span className="salary-nav-text">Employees</span>
-          </a>
-          <a href="#" className="nav-item active">
-            <span className="salary-nav-icon">💰</span>
-            <span className="salary-nav-text">Payroll</span>
-          </a>
-          <a href="#" className="salary-nav-item">
-            <span className="salary-nav-icon">📈</span>
-            <span className="salary-nav-text">Reports</span>
-          </a>
-          <a href="#" className="salary-nav-item">
-            <span className="salary-nav-icon">⚙️</span>
-            <span className="salary-nav-text">Settings</span>
-          </a>
-        </nav>
-
-        <div className="salary-sidebar-footer">
-          <div className="salary-user-profile">
-            <div className="salary-user-avatar">AM</div>
-            <div className="salary-user-info">
-              <div className="salary-user-name">Alex Morgan</div>
-              <div className="salary-user-role">HR Admin</div>
-            </div>
-            <button className="salary-logout-btn">↗</button>
-          </div>
-        </div>
-      </aside> */}
+      {/* <AdminSidebar /> */}
+      
+      
 
       {/* Main Content */}
       <main className="salary-main-content">
@@ -380,6 +336,20 @@ const SalaryManagement = () => {
           )}
         </div>
       </main>
+       {/* <style>{`
+        @media (min-width: 1120px) {
+          .main-content {
+            margin-left: 256px;
+            width: calc(100% - 256px);
+          }
+        }
+        @media (max-width: 1119px) {
+          .main-content {
+            margin-left: 0;
+            width: 100%;
+          }
+        }
+      `}</style> */}
     </div>
   );
 };

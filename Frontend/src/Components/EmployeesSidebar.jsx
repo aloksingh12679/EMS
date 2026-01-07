@@ -36,11 +36,11 @@ const EmployeesSidebar = () => {
     }, []);
 
     const menuItems = [
-        { icon: <MdDashboard />, label: "Dashboard", path: "/admin/dashboard" },
-        { icon: <MdPeople />, label: "Profile", path: "/admin/employees" },
-        { icon: <MdEventAvailable />, label: "My taks", path: "/admin/attendance" },
-        { icon: <MdPeople />, label: "Leaves", path: "/admin/leaves" },
-        { icon: <MdPeople />, label: "Support System", path: "/admin/payroll" }
+        { icon: <MdDashboard />, label: "Dashboard", path: "/employee/dashboard" },
+        { icon: <MdPeople />, label: "Profile", path: "/employee/profile" },
+        { icon: <MdEventAvailable />, label: "My taks", path: "/employee/mytasks" },
+        { icon: <MdPeople />, label: "Leaves", path: "/employee/apply-leave" },
+        { icon: <MdPeople />, label: "Support System", path: "/employee/support-system" }
     ];
 
     const handleLogout = () => {

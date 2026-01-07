@@ -23,7 +23,7 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="flex min-h-screen bg-[#f6f8fb] font-sans flex-col lg:flex-row">
-      {/* SIDEBAR
+{/*       
       <aside className="hidden lg:flex w-[280px] bg-gradient-to-b from-[#0b1220] to-[#020617] text-white flex-col justify-between">
         <div>
           <div className="px-6 py-6">
