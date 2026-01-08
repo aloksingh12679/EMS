@@ -4,27 +4,39 @@ const salarySchema = new mongoose.Schema({
     employee : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'User',
-        required : true
+    },
+    employeeId : {
+      type : String,
+      required : true
     },
     month : {
         type : String,
-        required: true
+         default: () => {
+      const now = new Date();
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                         'July', 'August', 'September', 'October', 'November', 'December'];
+      return monthNames[now.getMonth()];
+    }
     },
-    basicSalary : {
-        type : Number,
+    baseSalary : {
+        type : String,
         required : true
 
     },
 allowances: {
-    type: Number,
-    default: 0
+    type: String,
+    default: '0'
   },
   deductions: {
-    type: Number,
-    default: 0
+    type: String,
+    default: '0'
+  },
+  taxApply : {
+type : String,
+default : '0%'
   },
   netSalary: {
-    type: Number,
+    type: String,
     required: true
   }
 }, {

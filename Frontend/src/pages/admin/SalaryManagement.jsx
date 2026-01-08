@@ -80,7 +80,7 @@ export default function SalaryManagement() {
             <span className="breadcrumb-separator">›</span>
             <span className="breadcrumb-item">Payroll</span>
             <span className="breadcrumb-separator">›</span> */}
-            <span className="breadcrumb-item active">Salary Management</span>
+            {/* <span className="breadcrumb-item active">Salary Management</span> */}
           </nav>
           <div className="header-actions">
             <div className="search-box">
@@ -109,16 +109,6 @@ export default function SalaryManagement() {
               Manage employee roster, adjust bonuses, and process payroll
               cycles.
             </p>
-          </div>
-          <div className="action-buttons">
-            <button className="btn btn-outline">
-              <Download size={16} />
-              <span>Export Report</span>
-            </button>
-            <button className="btn btn-primary">
-              <PlayCircle size={16} />
-              <span>Run Payroll</span>
-            </button>
           </div>
         </div>
 

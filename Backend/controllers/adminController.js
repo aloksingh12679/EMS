@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Department =  require("../models/Department");
 const {status} = require("http-status");
+const Salary = require("../models/Salary");
 
 
 const getDashboardstats = async (req,res,next) => {
@@ -95,30 +96,38 @@ const getDashboardstats = async (req,res,next) => {
 
 const createEmployee = async (req,res,next) => {
   try {
+    console.log(req.body);
+    // console.log(req.file);
 const {
   firstName,
   lastName,
-  email,
+  personalEmail,
   contactNumber,
   address,
   department,
   position,
-  salary,
+  gender,
+  dob,
+  baseSalary,
+  allowances,
+  deductions,
+  taxApply,
   joinningDate,
+  netSalary,
   jobType = 'full-time'
 
 } =  req.body;
 
 
-if(!firstName && !email && !position && !department) {
+if(!firstName && !personalEmail && !position && !department) {
   return res.status(400).json({
     message : "Please provide necessary details"
   })
 }
 
 // checking personal email
-if(email){
-  const existingEmail = await User.findOne({personalEmail : email});
+if(personalEmail){
+  const existingEmail = await User.findOne({personalEmail});
   if(existingEmail){
     return res.status(400).json({
       message : "Email already exists"
@@ -130,38 +139,56 @@ if(email){
 const generateEmployeeId = async () => {
   const lastEmployee = await User.findOne({role : "employee"} , {employeeId :  true} , {sort : {createdAt : -1}});
   //  let intialNum = 2025;
-  console.log(lastEmployee);
+
    let nextNum = 2025;
   if(lastEmployee && lastEmployee.employeeId) { 
-    const match = lastEmployee.employeeId.match(/EMP-(\d+)/);
+    const match = lastEmployee.employeeId.match(/#EMP-(\d+)/);
   
     if(match && match[1]){
       nextNum = parseInt(match[1]) + 1;
     }
   }
 
-  return `EMP-${nextNum}`;
+  return `#EMP-${nextNum}`;
 
 }
 
  const employeeId = await generateEmployeeId();
  department.toLowerCase();
- console.log(department);
- const departmentInfo = await Department.findOne({name : department});
- console.log(departmentInfo);
+ const departmentInfo = await Department.findOne({name : department}).populate("manager" , "name");
+ 
+console.log(departmentInfo);
+
+// saving salary details
+ const salaryDetail = new Salary({
+  employeeId,
+  baseSalary,
+  allowances,
+  deductions,
+  taxApply,
+  netSalary
+ })
+
+ const employeeSalary = await salaryDetail.save();
+ 
+
+ 
  
 
  const employee = new User({
     employeeId,
     firstName,
     lastName,
-    personalEmail: email,
+    personalEmail,
     contactNumber,
     address: address || {},
     department: departmentInfo._id || null,
     position,
-    salary: salary || 0,
-    joiningDate: joinningDate || new Date(),
+    gender,
+    dob,
+    salary : employeeSalary._id,
+    reportingManager : departmentInfo.manager.name,
+    joiningDate: joinningDate,
     jobType,
     role: 'employee',
     isActive: true,
@@ -174,7 +201,16 @@ const generateEmployeeId = async () => {
  await employee.save();
 
 
- const savedEmployee = await User.findById(employee._id).select('password').populate("department" , "name");
+ const savedEmployee = await User.findById(employee._id).select('employeeId');
+//  console.log(savedEmployee);
+  
+// updating salarySchema
+
+  await Salary.findOneAndUpdate({ employeeId},
+        { $set: { employee: savedEmployee._id}}).then(res => {
+          console.log("salary details updated" , res);
+        })
+  
 
  res.status(status.OK).json({
   success : true,

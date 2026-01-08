@@ -1,6 +1,8 @@
 const express = require('express').default || require('express');
 const router = express.Router();
-
+const multer  = require('multer');
+const{storage} = require("../config/cloudConfig.js");
+const upload = multer({storage});
 const {
     getDashboardstats,
     getAllEmployees,
@@ -28,7 +30,7 @@ router.get("/dashboard/stats" , getDashboardstats);
 
 router.route("/employees")
 .get(getAllEmployees)
-.post(createEmployee);
+.post(upload.single('profilePhoto') , createEmployee);
 
 
 router.route("/employees/:id")

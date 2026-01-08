@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     email : {
         type : String,
         required : function(){
-            return this.role === 'admin';
+            return this.role === 'Admin';
         },
         unique : true,
         sparse : true,
@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     password : {
         type :  String,
         required : function(){
-            return this.role === 'admin';
+            return this.role === 'Admin';
         },
         unique : true,
         sparse : true,
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
         select : false
     } ,
 
-
+   
     // for employee
 
     employeeId : {
@@ -56,14 +56,18 @@ const userSchema = new mongoose.Schema({
 
 contactNumber : {
     type : Number,
-    trim:true
+     required : function(){
+            return this.role === 'employee'
+        },
 },
 personalEmail : {
     type : String,
     trim : true,
-    required : true
+     required : function(){
+            return this.role === 'employee'
+        },
 },
-dateOfBirth: Date,
+dob: Date,
     gender: {
         type: String,
         enum: ['male', 'female', 'other', 'prefer-not-to-say']
@@ -90,13 +94,17 @@ department : {
 
 position : {
     type : String,
-    trim: true
+    trim: true,
+    default : function(){
+        if(this.role == "Admin"){
+          return "manager"
+        }
+    }
 },
 
 salary : {
-    type : Number,
-    default : 0,
-    min : [0]
+    type : mongoose.Schema.Types.ObjectId,
+    ref : 'Salary'
 }, 
  
 joiningDate : {
@@ -125,10 +133,14 @@ address : {
 //    others credentials - system needs
     role : {
         type : String,
-        enum : ['admin' , 'employee'],
+        enum : ['Admin' , 'employee'],
         required : true
     },
-
+    reportingManager : {
+        type : String,
+        default : "not alloted"
+    }
+,
     isActive: {
         type: Boolean,
         default: true
@@ -161,20 +173,22 @@ address : {
 })
 
 
-userSchema.pre('save', async function() {
-   
-    if (!this.isModified('password')) {
-        return;
-    }
-    
-    try {
+userSchema.pre('save', async function(next) {
+  try {
+  
+    if (this.password) {
+     
+      const isAlreadyHashed = this.password.startsWith('$2b$');
+      
+      if (!isAlreadyHashed) {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
-    
-    } catch (error) {
-        
-        throw error;
+      }
     }
+    return;
+  } catch (error) {
+    throw error;
+  }
 });
 
 userSchema.methods.comparePassword = async function(enteredCurrPass){

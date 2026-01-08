@@ -64,18 +64,6 @@ export default function EmployeesList() {
       {/* Main Content Area */}
       <div className="main-content w-full">
         {/* Top Navigation */}
-        <header className="bg-white border-b px-4 py-3">
-          <div className="flex justify-end">
-            <div className="flex items-center gap-3">
-              <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
-              <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
-                <span className="material-symbols-outlined">help</span>
-              </button>
-            </div>
-          </div>
-        </header>
 
         {/* Main Content */}
         <main className="p-4 md:p-6">
@@ -88,13 +76,16 @@ export default function EmployeesList() {
                   {loading ? "Loading..." : `${filteredEmployees.length} employees found`}
                 </p>
               </div>
-              <button 
+              <div className="flex items-center gap-3 ml-auto">
+             <button 
                 onClick={handleAddEmployee}
                 className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors w-full sm:w-auto justify-center"
               >
                 <span className="material-symbols-outlined"></span>
                 Add Employee
               </button>
+            </div>
+              
             </div>
           </div>
 
@@ -171,7 +162,7 @@ export default function EmployeesList() {
                       <tr 
                         key={employee.id}
                         className="hover:bg-gray-50 cursor-pointer"
-                        onClick={() => handleEmployeeClick(employee.id)}
+                        onClick={() => handleEmployeeClick(employee._id)}
                       >
                         <td className="p-4 pl-6">
                           <div className="flex items-center gap-3">

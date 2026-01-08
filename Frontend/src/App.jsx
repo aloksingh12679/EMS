@@ -13,8 +13,9 @@ import EmployeeProfile from "./pages/admin/EmployeeProfile";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import EmployeeAttendance from "./pages/admin/EmployeeAttendance";
 import SalaryManagement from "./pages/admin/SalaryManagement";
-import EmployeeLeave from "./pages/admin/EmployeeLeave";
 import AddEmployee from "./pages/admin/AddEmployee";
+import LeaveRecord from "./pages/admin/LeaveRecord";
+import EmployeeEdit from "./pages/admin/EmployeeEdit";
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -69,16 +70,16 @@ function App() {
 
           <Route path="/admin/employees" element={<EmployeesList />} />
 
-          <Route path="/admin/employee/profile" element={<EmployeeProfile/>}/>
+          <Route path="/admin/employee/:id" element={<EmployeeProfile/>}/>
 
           <Route path="/admin/attendance" element={<EmployeeAttendance />} />
 
            <Route path="/admin/salary" element={< SalaryManagement/>} />
 
-           <Route path="/admin/leaves" element={< EmployeeLeave/>} />
-           <Route path="/admin/add-employee" element={< AddEmployee/>} />
+           <Route path="/admin/leaves" element={< LeaveRecord/>} />
+           <Route path="/admin/employee/add" element={< AddEmployee/>} />
 
-
+<Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} />
 {/* one page og employee side */}
 
           <Route path="/employee/dashboard" element={<EmployeeDashboard />} />

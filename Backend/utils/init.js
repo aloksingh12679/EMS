@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const Department = require("../models/Department");
 const {departmentData} = require("./departmentData");
+const {adminData} = require("./adminData.js");
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
 
@@ -11,41 +12,51 @@ const intializingBase = async() => {
         const conn = await mongoose.connect(process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017/ems_database');
         console.log(`mongodb(database) connected successfully`);
 
+         // Clear existing data
+        await User.deleteMany({});
         await Department.deleteMany({});
+        const createdAdmins = [];
+        
+       for (const admin of adminData) {
+  const user = new User(admin);
+  const res = await user.save(); // ✅ Triggers pre-save hook
+  createdAdmins.push(res);
+}
 
-       await Department.insertMany(departmentData).then( () => {
-        console.log("Departments succesfully created");
-       });
-
-       const newAdmin = new User({
-        email : "admin@gmail.com",
-        password : "admin123",
-        firstName : "System",
-        lastName : "testing",
-        role : "admin",
-        personalEmail : "admin@gmail.com"
-       })
-
-      //  const newEmployee = new User({
-      //  firstName : "Neha",
-    // lastName : "sharma",
-    // personalEmail: "neha@gmail.com",
-    // contactNumber : "123456789",
-    
-    // department: "Finance",
-    // position : "HR",
-    // salary: 14000,
+console.log("admin data inserted succesfully");
         
 
-    //    })
-    //     await newEmployee.save();
-      await newAdmin.save().then(res=> {
-        console.log(res)
-      }).catch(err => {
-        console.log("newAdmin err" , err);
-      });
-       
-    // console.log(departmentData);
+        // for (let i = 0; i < createdAdmins.length; i++) {
+        //     const admin = createdAdmins[i];
+        //     const deptName = departmentData[i].name;
+        //     const manager = `${createdAdmins[i].firstName} ${createdAdmins[i].lastName}`;
+            
+        //     await Department.findOneAndUpdate(
+        //          manager,
+        //         { 
+        //             manager: ,
+        //             isActive: true 
+        //         }
+        //     );
+        // }
+      
+
+        departmentData.forEach((dep) => {
+          for (let i = 0; i < createdAdmins.length; i++) {
+             const manager = `${createdAdmins[i].firstName} ${createdAdmins[i].lastName}`;
+
+            if(dep.manager === manager){
+              dep.manager = createdAdmins[i]._id;
+            }
+          }
+        })
+        
+        await Department.insertMany(departmentData).then(res => {
+          console.log("department inserted");
+        });
+
+
+
 
     
     
