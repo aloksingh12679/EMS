@@ -15,6 +15,39 @@ export default function EmployeeDashboard() {
   const [clockedIn, setClockedIn] = useState(true);
   const [clockInTime, setClockInTime] = useState(new Date());
   const [attendance] = useState(92);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const openSidebar = () => {
+    setSidebarOpen(true);
+    setTimeout(() => {
+      const wrapper = document.querySelector('div.fixed.inset-y-0.left-0.z-50');
+      if (!wrapper) return;
+      const aside = wrapper.querySelector('aside');
+      if (aside) {
+        aside.classList.add('translate-x-0');
+        aside.classList.remove('-translate-x-full');
+        aside.style.transform = 'translateX(0)';
+      }
+      const innerToggle = wrapper.querySelector('button.fixed.top-4.left-4');
+      if (innerToggle) innerToggle.style.display = 'none';
+    }, 20);
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+    setTimeout(() => {
+      const wrapper = document.querySelector('div.fixed.inset-y-0.left-0.z-50');
+      if (!wrapper) return;
+      const aside = wrapper.querySelector('aside');
+      if (aside) {
+        aside.classList.remove('translate-x-0');
+        aside.classList.add('-translate-x-full');
+        aside.style.transform = '';
+      }
+      const innerToggle = wrapper.querySelector('button.fixed.top-4.left-4');
+      if (innerToggle) innerToggle.style.display = '';
+    }, 20);
+  };
 
   const toggleClock = () => {
     if (!clockedIn) setClockInTime(new Date());
@@ -22,40 +55,60 @@ export default function EmployeeDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#f6f8fb] font-sans flex-col lg:flex-row">
-{/*       
-      <aside className="hidden lg:flex w-[280px] bg-gradient-to-b from-[#0b1220] to-[#020617] text-white flex-col justify-between">
-        <div>
-          <div className="px-6 py-6">
-            <div className="text-lg font-semibold">TechCorp EMS</div>
-            <div className="text-xs text-gray-400">Employee Portal</div>
-          </div>
-          <nav className="px-4 space-y-1">
-            <NavItem icon={<LayoutDashboard size={18} />} label="Dashboard" active />
-            <NavItem icon={<FileText size={18} />} label="Payslips" />
-            <NavItem icon={<Calendar size={18} />} label="Leaves" />
-            <NavItem icon={<ClipboardList size={18} />} label="Tasks" />
-            <NavItem icon={<Settings size={18} />} label="Settings" />
-          </nav>
-        </div>
-        <div className="flex items-center gap-3 p-4 border-t border-white/10">
-          <img src="https://i.pravatar.cc/100?img=47" className="h-9 w-9 rounded-full" />
-          <div>
-            <div className="text-sm font-medium">Sarah Miller</div>
-            <div className="text-xs text-gray-400">Product Designer</div>
-          </div>
-        </div>
-      </aside> */}
+    <div className="min-h-screen bg-[#f6f8fb] font-sans">
+      <div
+        className={`
+    fixed inset-y-0 left-0 z-50
+    min-[1112px]:block
+    ${sidebarOpen ? "block" : "hidden"}
+  `}
+      >
+        <EmployeesSidebar />
+      </div>
 
-      {/* MAIN */}
-      <EmployeesSidebar />
-      <main className="flex-1 p-4 sm:p-6 lg:p-10 space-y-8">
+      {/* ===== OVERLAY (mobile only) ===== */}
+      {sidebarOpen && (
+        <div
+          onClick={closeSidebar}
+          className="fixed inset-0 bg-black/40 z-40 min-[1112px]:hidden"
+        />
+      )}
+
+      <main className="flex-1 p-4 sm:p-6 lg:p-10 space-y-8 min-[1112px]:ml-[280px]">
+
         <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 className="text-[28px] font-semibold text-gray-900">Welcome back, Sarah</h1>
-            <p className="text-gray-500 mt-1">It's Tuesday, October 24, 2023</p>
+          <div className="flex items-center gap-3">
+
+            {/* HAMBURGER (≤ 1111px only) */}
+            <button
+              onClick={openSidebar}
+              className="min-[1112px]:hidden p-2 rounded-lg border border-slate-200 bg-white shadow-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-700"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+
+
+            <div>
+              <h1 className="text-[28px] font-semibold text-gray-900">
+                Welcome back, Sarah
+              </h1>
+              <p className="text-gray-500 mt-1">
+                It's Tuesday, October 24, 2023
+              </p>
+            </div>
           </div>
-          <button
+
+          {/* <button
             onClick={toggleClock}
             className={`flex items-center gap-2 px-4 py-2 rounded-full w-full sm:w-auto justify-center text-sm font-medium shadow-sm ${clockedIn ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"
               }`}
@@ -64,11 +117,11 @@ export default function EmployeeDashboard() {
             {clockedIn
               ? `Clocked In: ${clockInTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
               : "Clock In"}
-          </button>
+          </button> */}
         </header>
 
         {/* STATS */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* Attendance */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[160px] relative overflow-hidden group">
 
@@ -120,7 +173,7 @@ export default function EmployeeDashboard() {
         </section>
 
         {/* SALARY + TASKS */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <SalaryHistory />
           <MyTasks />
         </section>
@@ -183,9 +236,9 @@ const TaskItem = ({ title, priority, color, due }) => {
 
   return (
     <div className="group flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all cursor-pointer">
-      <div className="pt-0.5">
+      {/* <div className="pt-0.5">
         <input className="w-5 h-5 rounded border-slate-200 text-primary focus:ring-primary/20" type="checkbox" />
-      </div>
+      </div> */}
       <div className="flex-1">
         <p className="text-sm font-medium text-slate-900 group-hover:text-primary transition-colors">{title}</p>
         <div className="flex items-center gap-2 mt-1">
@@ -199,9 +252,9 @@ const TaskItem = ({ title, priority, color, due }) => {
 
 const TaskDone = ({ title }) => (
   <div className="group flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all cursor-pointer">
-    <div className="pt-0.5">
+    {/* <div className="pt-0.5">
       <input checked readOnly className="w-5 h-5 rounded border-slate-200 text-primary focus:ring-primary/20" type="checkbox" />
-    </div>
+    </div> */}
     <div className="flex-1 opacity-60">
       <p className="text-sm font-medium text-slate-900 line-through">{title}</p>
       <div className="flex items-center gap-2 mt-1">
