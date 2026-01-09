@@ -3,12 +3,17 @@ import { Bell, HelpCircle, Edit3, MoreVertical, Calendar, DollarSign, FileText, 
 import "../../assets/styles/EmployeeProfileCSS/EmployeeProfile.css"
 import AdminSidebar from '../../Components/AdminSidebar';
 import { employeeService } from '../../services/employeeServices';
-import { useParams } from 'react-router-dom';
+import { useParams , useNavigate} from 'react-router-dom';
 import { capitalize } from '../../utils/helper';
 import { Link } from 'react-router-dom';
+import {  MdClose } from "react-icons/md";
+
+
 
 export default function EmployeeProfile() {
         const {id} = useParams();
+          const navigate = useNavigate();
+  const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
   const [activeTab, setActiveTab] = useState('personal-info');
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -18,6 +23,12 @@ export default function EmployeeProfile() {
   const [profile , setProfile] = useState({});
   //  const salaryData = [];
 
+   const showToast = (message, type = "error") => {
+        setToast({ show: true, message, type });
+        setTimeout(() => {
+            setToast({ show: false, message: "", type: "" });
+        }, 3000);
+    };
   const [taskForm, setTaskForm] = useState({
     name: '',
     description: '',
@@ -30,7 +41,7 @@ export default function EmployeeProfile() {
       try {
         const result = await employeeService.getDetailsbyId(id);
 
-        console.log("result", result.data);
+        // console.log("result", result.data);
 
         const employeeDetail = {
           name : `${result.data.firstName} ${result.data.lastName}`,
@@ -73,10 +84,28 @@ fetchData();
    },[id]);
 
 
-  const handleDeleteUser = (e) => {
+  const handleDeleteUser = async(e) => {
     e.preventDefault();
-    // Add your delete user logic here
-    console.log('Deleting user with password:', deletePassword);
+    try{
+    
+      const result = await employeeService.deleteEmployee(id ,deletePassword , showDeleteModal , profile?.status);
+      if(result.success){
+        console.log(result);
+        showToast(result.message);
+        setTimeout(()=>{
+      navigate(`/admin/employees`);
+
+    },1500);
+      }
+      
+      
+    }catch(err){
+      const {response} = err;
+      console.log("delete user error " , err);
+showToast(response.data.message);
+
+    }
+    
     setShowDeleteModal(false);
     setDeletePassword('');
   };
@@ -141,7 +170,38 @@ fetchData();
     <>
       <div className="ems-container">
         <AdminSidebar />
-
+  {toast.show && (
+                        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-lg animate-slideLeft ${
+                            toast.type === "error" 
+                                ? "bg-red-500 text-white" 
+                                : "bg-green-500 text-white"
+                        } max-w-xs sm:max-w-md w-full sm:w-auto`}>
+                            <div className="flex-1 text-sm sm:text-base font-medium">
+                                {toast.message}
+                            </div>
+                            <button 
+                                onClick={() => setToast({ show: false, message: "", type: "" })}
+                                className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+                            >
+                                <MdClose size={20} />
+                            </button>
+                        </div>
+                    )}
+                    <style>{`
+                        @keyframes slideLeft {
+                            from {
+                                opacity: 0;
+                                transform: translateX(100%);
+                            }
+                            to {
+                                opacity: 1;
+                                transform: translateX(0);
+                            }
+                        }
+                        .animate-slideLeft {
+                            animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                        }
+                    `}</style>
         {/* MAIN CONTENT */}
         <main className="main-content">
           {/* TOP HEADER */}
@@ -343,10 +403,19 @@ fetchData();
                         <div className="action-icon">🔐</div>
                         <div>Delete Employee</div>
                       </div>
-                      <div className="action-item danger">
+                      {profile?.status === "active" ?  <div className="action-item danger"
+                      onClick={handleDeleteUser}
+                      >
                         <div className="action-icon">⛔</div>
                         <div>Deactivate Employee</div>
-                      </div>
+                      </div> :  <div className="action-item active"
+                      onClick={handleDeleteUser}
+                      style={{ color: 'green' }}
+                      >
+                        <div className="action-icon">✅</div>
+                        <div>Activate Employee</div>
+                      </div>}
+                     
                     </div>
                   </div>
                 </div>

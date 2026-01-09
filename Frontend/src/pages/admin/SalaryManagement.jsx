@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import {
   Search,
   Bell,
@@ -8,66 +8,37 @@ import {
   MoreVertical,
 } from "lucide-react";
 import "../../assets/styles/SalaryManagementStyles/SalaryManagement.css";
+import { Calendar} from 'lucide-react';
+
 import AdminSidebar from "../../Components/AdminSidebar";
+import { salaryService } from "../../services/salaryServices";
+import { capitalize } from "../../utils/helper";
 
 export default function SalaryManagement() {
-  const [selectedEmployee, setSelectedEmployee] = useState({
-    name: "Sarah Smith",
-    id: "#EMP-042",
-    role: "Sr. Product Designer",
-    dept: "Design Dept.",
-    type: "Full Time",
-    status: "ACTIVE",
-    baseSalary: 8500.0,
-    bonus: 500,
-    deductions: 150,
-    netPay: 7150.00,
-    taxDeductions: 1850.0,
-    avatar: "👩‍🦰",
-  });
+  const [selectedEmployee, setSelectedEmployee] = useState({});
 
-  const employees = [
-    {
-      name: "Sarah Smith",
-      id: "#EMP-042",
-      role: "Sr. Product Designer",
-      baseSalary: 8500.0,
-      netPay: 7150.0,
-      status: "Pending",
-      avatar: "👩‍🦰",
-      dept: "Design Dept.",
-    },
-    {
-      name: "Michael Brown",
-      id: "#EMP-043",
-      role: "Engineering Lead",
-      baseSalary: 10200.0,
-      netPay: 8450.0,
-      status: "Paid",
-      avatar: "👨‍💼",
-      dept: "Engineering",
-    },
-    {
-      name: "Jason Doe",
-      id: "#EMP-045",
-      role: "Marketing Manager",
-      baseSalary: 7800.0,
-      netPay: 6450.0,
-      status: "Pending",
-      avatar: "👨",
-      dept: "Marketing",
-    },
-    {
-      name: "Emily Blunt",
-      id: "#EMP-048",
-      role: "HR Specialist",
-      baseSalary: 6500.0,
-      netPay: 5250.0,
-      status: "Paid",
-      avatar: "👩",
-      dept: "HR",
-    },
-  ];
+const [employees , setEmployees] = useState([]);
+
+
+   useEffect(() => {
+      fetchEmployeesSalary();
+    }, []);
+  
+    const fetchEmployeesSalary = async () => {
+      try {
+        
+        const result = await salaryService.getEmployeesSalary();
+        console.log(result);
+        if (result && result.data && result.success) {
+          setEmployees(result.data);
+          setSelectedEmployee(result.data[0]);
+        }
+        // setLoading(false);
+      } catch (error) {
+        console.error("Error:", error);
+        
+      }
+    };
 
   return (
     <div className="salary-management">
@@ -147,42 +118,46 @@ export default function SalaryManagement() {
                     <th>BASE SALARY</th>
                     <th>NET PAY</th>
                     <th>STATUS</th>
-                    <th>ACTION</th>
+                  
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map((emp, idx) => (
+                  {employees.map((emp) => (
                     <tr
-                      key={idx}
+                      key={emp.employee._id}
                       className={
-                        selectedEmployee.id === emp.id ? "selected" : ""
+                        selectedEmployee.employee.id === emp.employee.id ? "selected" : ""
                       }
                       onClick={() =>
                         setSelectedEmployee({
-                          ...emp,
-                          type: "Full Time",
-                          status: "ACTIVE",
-                          bonus: emp.name === "Sarah Smith" ? 500 : 300,
-                          deductions: emp.name === "Sarah Smith" ? 150 : 200,
-                          taxDeductions:
-                            emp.baseSalary -
-                            emp.netPay -
-                            (emp.name === "Sarah Smith" ? 500 : 300) +
-                            (emp.name === "Sarah Smith" ? 150 : 200),
-                        })
+  ...emp,
+  type: emp?.employee?.jobType || "Full time",
+  status: emp?.employee?.status,
+  allowances: emp?.allowances,
+  deductions: emp?.deductions,
+  netSalary: (
+    (parseFloat(emp?.baseSalary) || 0) +
+    (parseFloat(emp?.allowances) || 0) -
+    (parseFloat(emp?.deductions) || 0) -
+    ((parseFloat(emp?.baseSalary) || 0) * (parseFloat(emp?.taxApply) || 0) / 100)
+  ).toFixed(2)
+})
                       }
                     >
                       <td>
                         <div className="employee-info">
-                          <div className="employee-avatar">{emp.avatar}</div>
+                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                              {capitalize(selectedEmployee?.employee?.firstName?.charAt(0)) || 'E'}
+                            </div>
                           <div className="employee-details">
-                            <div className="name">{emp.name}</div>
-                            <div className="id">ID: {emp.id}</div>
+                            
+                            <div className="name">{capitalize(emp?.employee?.firstName + " " + emp?.employee?.lastName)}</div>
+                            <div className="id">ID: {emp.employeeId}</div>
                           </div>
                         </div>
                       </td>
                       <td>
-                        <div className="role-text">{emp.role}</div>
+                        <div className="role-text">{emp.employee.position}</div>
                       </td>
                       <td>
                         <div className="salary-text">
@@ -191,25 +166,21 @@ export default function SalaryManagement() {
                       </td>
                       <td>
                         <div className="salary-text">
-                          ${emp.netPay.toLocaleString()}
+                          ${emp?.netSalary.toLocaleString() || 0}
                         </div>
                       </td>
                       <td>
                         <span
                           className={`status-badge ${
-                            emp.status === "Paid"
-                              ? "status-paid"
-                              : "status-pending"
+                            emp?.Status === "due"
+                              ? "status-pending"
+                              : "status-paid"
                           }`}
                         >
-                          {emp.status}
+                          {capitalize(emp?.Status)}
                         </span>
                       </td>
-                      <td>
-                        <button className="action-btn">
-                          <MoreVertical size={20} />
-                        </button>
-                      </td>
+                      
                     </tr>
                   ))}
                 </tbody>
@@ -217,77 +188,65 @@ export default function SalaryManagement() {
             </div>
 
             {/* Pagination */}
-            <div className="pagination">
+            {/* <div className="pagination">
               <div className="pagination-info">Showing 1-4 of 48 employees</div>
               <div className="pagination-buttons">
                 <button className="pagination-btn">Prev</button>
                 <button className="pagination-btn">Next</button>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Employee Detail Panel */}
           <div className="card">
+            {employees.length ===  0 ? <div className="bg-white rounded-lg shadow-md border border-gray-200 p-12 text-center">
+                <div className="flex flex-col items-center justify-center">
+                  <Calendar className="w-16 h-16 text-gray-300 mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No payroll record</h3>
+                  <p className="text-gray-500">There are currently no payroll  to display.</p>
+                </div>
+              </div>  : 
+
             <div className="detail-panel">
               {/* Employee Header */}
               <div className="employee-header">
                 <div className="employee-header-info">
-                  <div className="employee-header-avatar">
-                    {selectedEmployee.avatar}
-                  </div>
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                              {capitalize(selectedEmployee?.employee?.firstName?.charAt(0) || 'E')}
+                            </div>
                   <div className="employee-header-details">
-                    <h3>{selectedEmployee.name}</h3>
+                    <h3>{capitalize(selectedEmployee?.employee?.firstName + " " + selectedEmployee?.employee?.lastName)}</h3>
                     <p>
-                      {selectedEmployee.dept} • {selectedEmployee.type}
+                      {capitalize(selectedEmployee?.employee?.position)} • {capitalize(selectedEmployee?.employee?.jobType)}
                     </p>
                   </div>
                 </div>
-                <span className="status-active">{selectedEmployee.status}</span>
+                <span className="status-active">{capitalize(selectedEmployee?.employee?.status)}</span>
               </div>
 
               {/* Adjustments */}
               <div className="adjustments-section">
-                <h4 className="section-title">Adjustments (Oct 2023)</h4>
+                <h4 className="section-title">Adjustments ({selectedEmployee?.month} 2026)</h4>
                 <div className="adjustment-grid">
                   <div className="adjustment-field">
-                    <label>Bonus</label>
+                    <label>Allowances</label>
                     <div className="adjustment-input-wrapper">
-                      <span className="currency-symbol positive">$</span>
-                      <input
-                        type="number"
-                        value={selectedEmployee.bonus}
-                        className="adjustment-input positive"
-                        onChange={(e) =>
-                          setSelectedEmployee({
-                            ...selectedEmployee,
-                            bonus: Number(e.target.value),
-                          })
-                        }
-                      />
+                      <span className="currency-symbol positive">$ {selectedEmployee?.allowances}</span>
+                
                     </div>
                   </div>
                   <div className="adjustment-field">
                     <label>Deductions</label>
                     <div className="adjustment-input-wrapper">
-                      <span className="currency-symbol negative">$</span>
-                      <input
-                        type="number"
-                        value={selectedEmployee.deductions}
-                        className="adjustment-input negative"
-                        onChange={(e) =>
-                          setSelectedEmployee({
-                            ...selectedEmployee,
-                            deductions: Number(e.target.value),
-                          })
-                        }
-                      />
+                      <span className="currency-symbol negative">$ {selectedEmployee?.deductions}
+</span>
+            
                     </div>
                   </div>
                 </div>
               </div>
 
               <button className="update-btn">
-                <Download size={16} />
                 <span>Update Salary Details</span>
               </button>
 
@@ -310,8 +269,7 @@ export default function SalaryManagement() {
                       <p>PAYSLIP RECEIPT</p>
                     </div>
                     <div className="payslip-date">
-                      <p>Oct 01 - Oct 31</p>
-                      <p>2023</p>
+                      <p>{selectedEmployee?.month || "no data"}</p>
                     </div>
                   </div>
 
@@ -319,19 +277,20 @@ export default function SalaryManagement() {
                     <div className="payslip-row">
                       <span className="payslip-label">Base Salary</span>
                       <span className="payslip-value base">
-                        ${selectedEmployee.baseSalary.toLocaleString()}
+                        ${selectedEmployee?.baseSalary?.toLocaleString() || 0}
                       </span>
                     </div>
                     <div className="payslip-row">
-                      <span className="payslip-label">Bonus & Overtime</span>
+                      <span className="payslip-label">Bonus & Allowances</span>
                       <span className="payslip-value positive">
-                        +${selectedEmployee.bonus.toLocaleString()}
+                        +${selectedEmployee?.allowances?.toLocaleString() || 0}
                       </span>
                     </div>
                     <div className="payslip-row">
                       <span className="payslip-label">Tax & Deductions</span>
                       <span className="payslip-value negative">
-                        -${selectedEmployee.taxDeductions.toLocaleString()}
+                        $ {-((parseFloat(selectedEmployee?.baseSalary) || 0) * (parseFloat(selectedEmployee?.taxApply) || 0) / 100).toFixed(2) + (selectedEmployee?.deductions || 0)},
+
                       </span>
                     </div>
                   </div>
@@ -340,19 +299,20 @@ export default function SalaryManagement() {
                     <div className="net-pay-row">
                       <span className="net-pay-label">NET PAY</span>
                       <span className="net-pay-amount">
-                        ${selectedEmployee.netPay.toLocaleString()}
+                        ${selectedEmployee?.netSalary?.toLocaleString() || 0}
                       </span>
                     </div>
                     <div className="processing-badge">
-                      <span>PROCESSING</span>
+                      <span>$ {capitalize(selectedEmployee?.Status || "no data")}</span>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </div>}
           </div>
         </div>
       </main>
+
        {/* <style>{`
         @media (min-width: 1120px) {
           .main-content {
@@ -368,5 +328,6 @@ export default function SalaryManagement() {
         }
       `}</style> */}
     </div>
+       
   );
 }

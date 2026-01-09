@@ -56,6 +56,23 @@ return response.data;
         }catch(error){
          throw error;
         }
+    },
+
+    deleteEmployee : async(id ,password ,hardDelete , status) => {
+        
+   try{
+const response = await api.delete(`/admin/employee/${id}` , {
+    headers: {
+        'X-Password': password,
+        'X-Hard-Delete': hardDelete,
+        'X-Status' : status
     }
+});
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    },
 }
 

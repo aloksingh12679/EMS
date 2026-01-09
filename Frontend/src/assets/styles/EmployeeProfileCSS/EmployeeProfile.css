@@ -759,6 +759,16 @@ body {
   background: #fed7d7;
   border-color: #fc8181;
 }
+.action-item.active {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #16a34a;
+}
+
+.action-item.active:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
 
 .action-icon {
   width: 20px;

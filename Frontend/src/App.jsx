@@ -37,12 +37,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if(!localStorage.getItem('token')) {
     
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin-login" replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
   
-    if (user.role === 'admin') {
+    if (user.role === 'Admin') {
       return <Navigate to="/admin/dashboard" replace />;
     } else {
       return <Navigate to="/employee/dashboard" replace />;
@@ -66,7 +66,7 @@ function App() {
 
 
          
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           <Route path="/admin/employees" element={<EmployeesList />} />
 
@@ -79,40 +79,85 @@ function App() {
            <Route path="/admin/leaves" element={< LeaveRecord/>} />
            <Route path="/admin/employee/add" element={< AddEmployee/>} />
 
-<Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} />
+<Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} /> */}
 {/* one page og employee side */}
 
           <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
 
 
           {/* Protected Admin Routes */}
-          {/* <Route 
+          <Route 
             path="/admin/dashboard" 
             element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['Admin']}>
                 <AdminDashboard />
               </ProtectedRoute>
             } 
-          /> */}
+          />
 
           
-          {/* <Route 
+          <Route 
             path="/admin/employees" 
             element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['Admin']}>
                 <EmployeesList />
               </ProtectedRoute>
             } 
-          /> */}
+          />
 
-          {/* <Route 
-            path="/admin/employee/:id" 
+          <Route 
+            path="/admin/employees/:id" 
             element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['Admin']}>
                 <EmployeeProfile />
               </ProtectedRoute>
             } 
-          /> */}
+          /> 
+
+          <Route 
+            path="/admin/employees/add" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <AddEmployee />
+              </ProtectedRoute>
+            } 
+          /> 
+
+           <Route 
+            path="/admin/employees/:id/edit" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <EmployeeEdit/>
+              </ProtectedRoute>
+            } 
+          /> 
+           <Route 
+            path="/admin/employees/leaves" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <LeaveRecord />
+              </ProtectedRoute>
+            } 
+          /> 
+           <Route 
+            path="/admin/employees/attendance" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <EmployeeAttendance />
+              </ProtectedRoute>
+            } 
+          /> 
+
+          <Route 
+            path="/admin/employees/salary" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <SalaryManagement />
+              </ProtectedRoute>
+            } 
+          /> 
+
+        
 
           {/* <Route 
             path="/employee/dashboard" 

@@ -80,7 +80,7 @@ department : {
 
  // Leave balance
     leaveBalance: {
-        casual: { type: Number, default: 12 },
+        personal: { type: Number, default: 12 },
         sick: { type: Number, default: 10 },
         annual: { type: Number, default: 15 },
     },
@@ -119,13 +119,8 @@ jobType : {
 }, 
 
 address : {
-    city : String,
-    state : String,
-    country : {
-        type : String,
-        default : 'india'
-    },
-    pincode : String
+ type : String,
+ default  : "India"
     
 }, 
 

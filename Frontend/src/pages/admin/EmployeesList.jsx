@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../Components/AdminSidebar.jsx";
 import { employeeService } from "../../services/employeeServices.js";
+import { capitalize } from "../../utils/helper.js";
 
 export default function EmployeesList() {
   const navigate = useNavigate();
@@ -50,11 +51,11 @@ export default function EmployeesList() {
   };
 
   const handleAddEmployee = () => {
-    navigate("/admin/employee/add");
+    navigate("/admin/employees/add");
   };
 
   const handleEmployeeClick = (employeeId) => {
-    navigate(`/admin/employee/${employeeId}`);
+    navigate(`/admin/employees/${employeeId}`);
   };
 
   return (
@@ -170,7 +171,7 @@ export default function EmployeesList() {
                               {employee.firstName?.charAt(0) || 'E'}
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900">{employee.firstName}</p>
+                              <p className="font-medium text-gray-900">{capitalize(employee?.firstName)}</p>
                               <p className="text-xs text-gray-500 mt-1">{employee.personalEmail}</p>
                             </div>
                           </div>
@@ -185,9 +186,17 @@ export default function EmployeesList() {
                           </div>
                         </td>
                         <td className="p-4">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            {employee.status === 'active' ? 'Active' : employee.status}
-                          </span>
+                        <span 
+  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+    employee.status === 'active' 
+      ? 'bg-green-100 text-green-800' 
+      : employee.status === 'inactive'
+      ? 'bg-red-100 text-red-800'
+      : 'bg-yellow-100 text-yellow-800'
+  }`}
+>
+  {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
+</span>
                         </td>
                         <td className="p-4 pr-6">
                           <span className="text-gray-700">

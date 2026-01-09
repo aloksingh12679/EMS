@@ -11,7 +11,8 @@ const {
     updateEmployee,
     deleteEmployee,
     getAlldepartments,
-    createDepartment
+    createDepartment,
+    getleavesDetail
 } = require("../controllers/adminController.js");
 
 const { protect} = require('../middleware/auth');
@@ -33,11 +34,14 @@ router.route("/employees")
 .post(upload.single('profilePhoto') , createEmployee);
 
 
-router.route("/employees/:id")
+router.route("/employee/:id")
 .get(getEmployeebyId)
-.put(updateEmployee)
+.put(upload.single('profilePhoto'),updateEmployee)
 .delete(deleteEmployee);
 
+
+// leaves detail
+router.get("/leaves" , getleavesDetail);
 
 
 // Department management routes

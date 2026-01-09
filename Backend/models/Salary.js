@@ -38,6 +38,11 @@ default : '0%'
   netSalary: {
     type: String,
     required: true
+  },
+  Status : {
+    type :String,
+enum : ['processing' , 'paid' ,'due'],
+default : 'due'
   }
 }, {
   timestamps: true

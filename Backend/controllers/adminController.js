@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Department =  require("../models/Department");
+const Leave = require("../models/Leave");
 const {status} = require("http-status");
 const Salary = require("../models/Salary");
 
@@ -155,7 +156,7 @@ const generateEmployeeId = async () => {
 
  const employeeId = await generateEmployeeId();
  department.toLowerCase();
- const departmentInfo = await Department.findOne({name : department}).populate("manager" , "name");
+ const departmentInfo = await Department.findOne({name : department}).populate("manager" , "firstName lastName");
  
 console.log(departmentInfo);
 
@@ -186,8 +187,8 @@ console.log(departmentInfo);
     position,
     gender,
     dob,
+    reportingManager : `${departmentInfo.manager.firstName} ${departmentInfo.manager.lastName}`,
     salary : employeeSalary._id,
-    reportingManager : departmentInfo.manager.name,
     joiningDate: joinningDate,
     jobType,
     role: 'employee',
@@ -231,7 +232,8 @@ console.log(departmentInfo);
 
 const getEmployeebyId = async(req,res,next) => {
   try {
-    const employee = await User.findById(req.params.id).select("-password +resetPasswordToken").populate("department" , "name code").populate("createdBy" , "firstName lastName");
+    console.log(req.params);
+    const employee = await User.findById(req.params.id).select("+resetPasswordToken").populate("department" , "name manager code").populate("createdBy" , "firstName lastName").populate("salary");
 
     if(!employee){
       return res.status(status.NOT_FOUND).json({
@@ -248,7 +250,7 @@ const getEmployeebyId = async(req,res,next) => {
     }
 
     res.status(200).json({
-      success : false,
+      success : true,
       data : employee
     })
   }catch(err){
@@ -275,11 +277,19 @@ const updateEmployee = async(req,res) => {
   const {id} = req.params;
   const updatedData = req.body;
 
+  const {department} = updatedData;
+  
+ const departmentInfo = await Department.findOne({name : department}).populate("manager" , "firstName lastName");
 
-  const employee = await User.findByIdAndUpdate(id , { ...updatedData , updatedBy : req.user._id} , {new :true , runValidators : true})
+// updatedBy : req.user._id
+
+  const employee = await User.findByIdAndUpdate(id , { ...updatedData , department : departmentInfo._id , 
+        reportingManager : `${departmentInfo.manager.firstName} ${departmentInfo.manager.lastName}`,
+
+  } , {new :true , runValidators : true})
   .select('-password').populate('department' , 'name');
 
-
+console.log(employee);
   if(!employee){
     return res.status(status.NOT_FOUND).json({
                 success: false,
@@ -290,7 +300,6 @@ const updateEmployee = async(req,res) => {
    res.status(status.OK).json({
             success: true,
             message: 'Employee updated successfully',
-            data: employee
         });
  }catch(err){
 
@@ -418,7 +427,7 @@ const getAllEmployees = async(req,res) => {
   try {
     const { search, department, status, page = 1, limit = 50 } = req.query;
     
-    // Build filter object
+   
     const filter = {};
     
     // Search filter (searches in name, email, employeeId, position)
@@ -450,9 +459,9 @@ const getAllEmployees = async(req,res) => {
     // Execute query
     filter.role = 'employee';
     const employees = await User.find(filter)
-      .select('-__v') // Exclude version key
+      .select('-__v')
       .sort({ createdAt: -1 })
-      .populate("department" , "name") // Latest first
+      .populate("department" , "name")
       .limit(parseInt(limit));
     
     
@@ -462,8 +471,6 @@ const getAllEmployees = async(req,res) => {
       success: true,
       count: employees.length,
       total,
-      page: parseInt(page),
-      pages: Math.ceil(total / limit),
       data: employees
     });
     
@@ -476,6 +483,48 @@ const getAllEmployees = async(req,res) => {
     });
   }
 };
+
+
+const getleavesDetail = async (req,res) => {
+  try{
+      const employeeLeaves = await Leave.find({}).populate("employee" , "firstName employeeId");
+      // console.log(employeeLeaves);
+
+      return res.status(200).json({
+        message : "working",
+        success : true,
+        data : employeeLeaves
+            })
+    
+
+  }catch(error){
+ console.error('Error fetching employees leave detail:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
     getDashboardstats, 
     getAllEmployees,
@@ -484,5 +533,6 @@ module.exports = {
     updateEmployee,
     deleteEmployee,
     getAlldepartments,
-    createDepartment
+    createDepartment,
+    getleavesDetail
 }
