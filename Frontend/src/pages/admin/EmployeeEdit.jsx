@@ -154,7 +154,7 @@ export default function EmployeeEdit() {
         showToast(`Employee Updated Successfully` , "success");
       }
     setTimeout(()=>{
-      navigate(`/admin/employee/${id}`);
+      navigate(`/admin/employees/${id}`);
 
     },1500);
     } catch (err) {
@@ -477,7 +477,7 @@ export default function EmployeeEdit() {
                 <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
                   <button
                     type="button"
-                    onClick={() => navigate(`/admin/employee/${id}`)}
+                    onClick={() => navigate(`/admin/employees/${id}`)}
                     className="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
                   >
                     Cancel

@@ -37,7 +37,9 @@ export const authService = {
 
     getToken : () => {
         return localStorage.getItem('token');
-    }
+    },
+
+    
 };
 
 export default authService;

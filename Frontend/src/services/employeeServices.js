@@ -34,6 +34,16 @@ return response.data;
         }
     },
 
+    addTask : async(id , tasksData) => {
+try{
+const response = await api.post(`/admin/employee/${id}/addtask` , tasksData);
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    },
+
     getLeavesdetails : async() => {
          try{
 const response = await api.get(`/admin/leaves`);

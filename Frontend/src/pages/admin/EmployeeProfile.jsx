@@ -7,11 +7,14 @@ import { useParams , useNavigate} from 'react-router-dom';
 import { capitalize } from '../../utils/helper';
 import { Link } from 'react-router-dom';
 import {  MdClose } from "react-icons/md";
+import { useAuth } from '../../context/AuthContext';
 
 
 
 export default function EmployeeProfile() {
         const {id} = useParams();
+        const { user } = useAuth();
+
           const navigate = useNavigate();
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
@@ -21,7 +24,10 @@ export default function EmployeeProfile() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [profile , setProfile] = useState({});
-  //  const salaryData = [];
+  const [owner , setOwner] = useState();
+    const [tasksData, setTasksData] = useState([]);
+
+
 
    const showToast = (message, type = "error") => {
         setToast({ show: true, message, type });
@@ -30,7 +36,7 @@ export default function EmployeeProfile() {
         }, 3000);
     };
   const [taskForm, setTaskForm] = useState({
-    name: '',
+    taskName: '',
     description: '',
     dueDate: '',
     priority: 'Medium'
@@ -39,9 +45,11 @@ export default function EmployeeProfile() {
    useEffect(() => {
   const fetchData = async () => {
       try {
+          setOwner(user.firstName + " " +  user.lastName);
+
         const result = await employeeService.getDetailsbyId(id);
 
-        // console.log("result", result.data);
+        console.log("result", result);
 
         const employeeDetail = {
           name : `${result.data.firstName} ${result.data.lastName}`,
@@ -67,6 +75,7 @@ export default function EmployeeProfile() {
         }
         setProfile(employeeDetail);
 
+              setTasksData(result.tasks);
 
 
              setSalaryData((prev) => {
@@ -126,11 +135,6 @@ showToast(response.data.message);
     { id: 3, period: 'Nov 10 - Nov 11, 2024', type: 'Earned Leave', status: 'Rejected', reason: 'Family function' },
   ];
 
-  const [tasksData, setTasksData] = useState([
-    { id: 1, name: 'Q1 Product Roadmap', description: 'Plan and document Q1 product features', dueDate: '2025-02-15', priority: 'High' },
-    { id: 2, name: 'User Research Analysis', description: 'Analyze user feedback from last sprint', dueDate: '2025-01-20', priority: 'Medium' },
-    { id: 3, name: 'Sprint Planning Meeting', description: 'Prepare agenda for next sprint planning', dueDate: '2025-01-12', priority: 'Low' },
-  ]);
 
   const getStatusColor = (Status) => {
     switch(Status.toLowerCase()) {
@@ -150,16 +154,29 @@ showToast(response.data.message);
     }
   };
 
-  const handleTaskSubmit = (e) => {
+  const handleTaskSubmit = async(e) => {
     e.preventDefault();
-    const newTask = {
+       const newTask = {
       id: tasksData.length + 1,
       ...taskForm
     };
-    setTasksData([...tasksData, newTask]);
+              setTasksData([...tasksData, newTask]);
+
+    try{
+        
+      
+
+           const result = await employeeService.addTask(id , newTask);
+           console.log(result);
+    }catch(err){
+         
+      console.log("task err" , err);
+
+    }
+   
     setShowTaskModal(false);
     setTaskForm({
-      name: '',
+      taskName: '',
       description: '',
       dueDate: '',
       priority: 'Medium'
@@ -234,7 +251,7 @@ showToast(response.data.message);
               </div>
 
               <div className="profile-actions">
-                <Link to={`/admin/employee/${id}/edit`} className="edit-btn">
+                <Link to={`/admin/employees/${id}/edit`} className="edit-btn">
   <Edit3 size={16} />
   Edit Profile
 </Link>
@@ -247,7 +264,7 @@ showToast(response.data.message);
             {/* TABS */}
             <div className="tabs-wrapper">
               <div className="tabs">
-                {['Personal Info', 'Attendance', 'Salary & Payroll', 'Leaves', 'Assign Tasks'].map((tab) => (
+                {['Personal Info', 'Attendance', 'Salary & Payroll', 'Leaves', 'Assigned Tasks'].map((tab) => (
                   <button
                     key={tab}
                     className={`tab ${activeTab === tab.toLowerCase().replace(/\s+/g, '-') ? 'active' : ''}`}
@@ -676,31 +693,33 @@ showToast(response.data.message);
             )}
 
             {/* ASSIGN TASKS TAB */}
-            {activeTab === 'assign-tasks' && (
+            {activeTab === 'assigned-tasks' && (
               <div className="card">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-bold text-gray-900">Assigned Tasks</h3>
-                  <button
-                    onClick={() => setShowTaskModal(true)}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                  >
-                    <Plus size={18} />
-                    Add Task
-                  </button>
+                  {owner === profile?.reportingManager && (
+  <button
+    onClick={() => setShowTaskModal(true)}
+    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+  >
+    <Plus size={18} />
+    Add Task
+  </button>
+)}
                 </div>
                 <div className="space-y-4">
                   {tasksData.map((task) => (
-                    <div key={task.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:shadow-md transition-all cursor-pointer">
+                    <div key={task._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:shadow-md transition-all cursor-pointer">
                       <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-base font-semibold text-gray-900">{task.name}</h4>
+                        <h4 className="text-base font-semibold text-gray-900">{task?.taskName}</h4>
                         <span
                           className="px-3 py-1 text-xs font-bold rounded-full uppercase"
                           style={{
-                            backgroundColor: getPriorityColor(task.priority) + '20',
-                            color: getPriorityColor(task.priority)
+                            backgroundColor: getPriorityColor(task?.priority) + '20',
+                            color: getPriorityColor(task?.priority)
                           }}
                         >
-                          {task.priority}
+                          {task?.priority}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mb-3 leading-relaxed">{task.description}</p>
@@ -738,8 +757,8 @@ showToast(response.data.message);
                 <input
                   type="text"
                   required
-                  value={taskForm.name}
-                  onChange={(e) => setTaskForm({...taskForm, name: e.target.value})}
+                  value={taskForm?.taskName}
+                  onChange={(e) => setTaskForm({...taskForm, taskName: e.target.value})}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   placeholder="Enter task name"
                 />
