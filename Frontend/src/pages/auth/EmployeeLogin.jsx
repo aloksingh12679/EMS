@@ -1,6 +1,89 @@
+import React, { useState } from "react";
+import { User, ArrowRight, Lock, Grid3x3 } from "lucide-react";
+import { useAuth } from '../../context/AuthContext';
+
 export default function EmployeeLogin() {
+  const [employeeId, setEmployeeId] = useState("");
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: '' });
+const {login}  = useAuth();
+
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: '', type: '' }), 4000);
+  };
+
+  // Form validation
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!employeeId.trim()) {
+      newErrors.employeeId = "Employee ID is required";
+    } else if (employeeId.trim().length < 3) {
+      newErrors.employeeId = "Employee ID must be at least 3 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate form
+    if (!validateForm()) {
+      showToast("Please enter a valid Employee ID", "error");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      
+      const response = await login(false , false , employeeId);
+      console.log(response);
+     if(response.success){
+             
+           showToast('Login succesfully Redirecting!' , 'success');
+           setTimeout(() => {
+        window.location.href = "/employee/dashboard";
+                }, 1500); 
+          }
+
+      
+      // showToast("Login successful! Redirecting...", "success");
+      
+     
+      // setTimeout(() => {
+      //   window.location.href = "/employee/dashboard";
+      //   console.log("Redirecting to dashboard with ID:", employeeId);
+      // }, 1000);
+
+    } catch (error) {
+      console.error("Login error:", error);
+      showToast(error.message || "Invalid Employee ID. Please try again.", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-[#f6f7f8] font-[Inter]">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`fixed top-6 right-6 z-50 animate-slideIn ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[280px] max-w-md`}>
+          <div className={`w-2 h-2 rounded-full ${toast.type === 'error' ? 'bg-red-300' : 'bg-green-300'}`}></div>
+          <span className="font-medium">{toast.message}</span>
+          <button 
+            onClick={() => setToast({ show: false, message: '', type: '' })} 
+            className="ml-auto text-white/80 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* LEFT SIDE */}
       <div className="hidden lg:flex w-1/2 relative text-white">
@@ -13,7 +96,7 @@ export default function EmployeeLogin() {
 
         <div className="relative z-10 p-12 flex flex-col justify-between w-full">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined">grid_view</span>
+            <Grid3x3 size={24} />
             <span className="font-bold">Enterprise EMS</span>
           </div>
 
@@ -67,25 +150,55 @@ export default function EmployeeLogin() {
             Securely access your dashboard using your unique ID.
           </p>
 
-          <label className="block mb-4">
-            <span className="text-sm font-semibold">Employee ID</span>
-            <div className="relative mt-2">
-              <span className="material-symbols-outlined absolute left-3 top-3 text-slate-400">
-                badge
-              </span>
-              <input
-                placeholder="Ex: 884-210"
-                className="w-full h-12 pl-10 pr-4 border rounded-xl outline-none focus:ring-2 focus:ring-[#0f1729]/20"
-              />
-            </div>
-          </label>
+          <form onSubmit={handleSubmit}>
+            <label className="block mb-4">
+              <span className="text-sm font-semibold">Employee ID</span>
+              <div className="relative mt-2">
+                <User 
+                  className="absolute left-3 top-3 text-slate-400" 
+                  size={20}
+                />
+                <input
+                  type="text"
+                  placeholder="Ex: #EMP-001"
+                  value={employeeId}
+                  onChange={(e) => {
+                    setEmployeeId(e.target.value);
+                    
+                    if (errors.employeeId) {
+                      setErrors({ ...errors, employeeId: '' });
+                    }
+                  }}
+                  className={`w-full h-12 pl-10 pr-4 border rounded-xl outline-none focus:ring-2 focus:ring-[#0f1729]/20 ${
+                    errors.employeeId ? 'border-red-500 focus:ring-red-500/20' : ''
+                  }`}
+                />
+              </div>
+              {errors.employeeId && (
+                <p className="text-red-500 text-xs mt-1">{errors.employeeId}</p>
+              )}
+            </label>
 
-          <button className="w-full h-12 bg-[#0f1729] hover:bg-slate-800 text-white rounded-xl font-semibold flex items-center justify-center gap-2">
-            Secure Login
-            <span className="material-symbols-outlined">arrow_forward</span>
-          </button>
+            <button 
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-12 bg-[#0f1729] hover:bg-slate-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                <>
+                  Secure Login
+                  <ArrowRight size={20} />
+                </>
+              )}
+            </button>
+          </form>
 
-          <p className="text-center text-sm text-slate-500 mt-4">
+          <p className="text-center text-sm text-slate-500 mt-4 cursor-pointer hover:text-slate-700">
             Forgot ID?
           </p>
 
@@ -104,7 +217,7 @@ export default function EmployeeLogin() {
           </div>
 
           <div className="mt-6 text-xs text-slate-400 flex justify-center items-center gap-1">
-            <span className="material-symbols-outlined text-sm">lock</span>
+            <Lock size={14} />
             Protected by Enterprise Grade Security
           </div>
         </div>

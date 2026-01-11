@@ -137,7 +137,7 @@ showToast(response.data.message);
 
 
   const getStatusColor = (Status) => {
-    switch(Status.toLowerCase()) {
+    switch(Status.toLowerCase() || " " ) {
       case 'paid': return '#48bb78';
       case 'processing': return '#ed8936';
       case 'due': return '#f56565';
@@ -145,6 +145,18 @@ showToast(response.data.message);
     }
   };
 
+    const taskStatusColor = (status) => {
+  switch (status?.toLowerCase() || " ") {
+    case 'completed':
+      return '#10b981'; // green
+    case 'in progress':
+      return '#3b82f6'; // blue
+    case 'pending':
+      return '#f59e0b'; // amber
+    default:
+      return '#6b7280'; // gray
+  }
+    };
   const getPriorityColor = (priority) => {
     switch(priority.toLowerCase()) {
       case 'high': return '#f56565';
@@ -153,6 +165,22 @@ showToast(response.data.message);
       default: return '#718096';
     }
   };
+  function getCurrentDate() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const year = now.getFullYear();
+  
+  return `${year}-${month}-${day}`;
+}
+  const validateNewtaskForm = (newTask) => {
+    console.log(newTask.dueDate + " " + getCurrentDate());
+    const currentDate = getCurrentDate();
+    if(newTask.dueDate < currentDate){
+      return false
+    }
+    return true
+  }
 
   const handleTaskSubmit = async(e) => {
     e.preventDefault();
@@ -160,14 +188,25 @@ showToast(response.data.message);
       id: tasksData.length + 1,
       ...taskForm
     };
-              setTasksData([...tasksData, newTask]);
 
     try{
         
-      
+    if(validateNewtaskForm(newTask)){
+ const result = await employeeService.addTask(id , newTask);
+                         setTasksData([...tasksData, newTask]);
+                         showToast("New task Submitted" , "success");
 
-           const result = await employeeService.addTask(id , newTask);
            console.log(result);
+    }else{
+
+       showToast("Enter valid Due date" , "error");
+    
+ 
+  
+  return
+    }
+
+          
     }catch(err){
          
       console.log("task err" , err);
@@ -183,6 +222,18 @@ showToast(response.data.message);
     });
   };
 
+  const gettaskStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'completed':
+      return '#10b981'; // green
+    case 'in progress':
+      return '#3b82f6'; // blue
+    case 'pending':
+      return '#f59e0b'; // amber
+    default:
+      return '#6b7280'; // gray
+  }
+};
   return (
     <>
       <div className="ems-container">
@@ -707,29 +758,42 @@ showToast(response.data.message);
   </button>
 )}
                 </div>
-                <div className="space-y-4">
-                  {tasksData.map((task) => (
-                    <div key={task._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:shadow-md transition-all cursor-pointer">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-base font-semibold text-gray-900">{task?.taskName}</h4>
-                        <span
-                          className="px-3 py-1 text-xs font-bold rounded-full uppercase"
-                          style={{
-                            backgroundColor: getPriorityColor(task?.priority) + '20',
-                            color: getPriorityColor(task?.priority)
-                          }}
-                        >
-                          {task?.priority}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">{task.description}</p>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar size={16} />
-                        <span>Due: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+               <div className="space-y-4">
+  {tasksData.map((task) => (
+    <div key={task._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:shadow-md transition-all cursor-pointer">
+      <div className="flex justify-between items-start mb-2">
+        <h4 className="text-base font-semibold text-gray-900">{task?.taskName}</h4>
+        <div className="flex items-center gap-2">
+          {/* Status Badge */}
+          <span
+            className="px-3 py-1 text-xs font-bold rounded-full uppercase"
+            style={{
+              backgroundColor: getStatusColor(task?.status) + '20',
+              color: taskStatusColor(task?.status)
+            }}
+          >
+            {task?.status}
+          </span>
+          {/* Priority Badge */}
+          <span
+            className="px-3 py-1 text-xs font-bold rounded-full uppercase"
+            style={{
+              backgroundColor: getPriorityColor(task?.priority) + '20',
+              color: getPriorityColor(task?.priority)
+            }}
+          >
+            {task?.priority}
+          </span>
+        </div>
+      </div>
+      <p className="text-sm text-gray-600 mb-3 leading-relaxed">{task.description}</p>
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <Calendar size={16} />
+        <span>Due: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+      </div>
+    </div>
+  ))}
+</div>
               </div>
             )}
           </div>

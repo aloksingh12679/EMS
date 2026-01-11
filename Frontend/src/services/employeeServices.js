@@ -84,5 +84,38 @@ return response.data;
          throw error;
         }
     },
+
+    getEmployeedashboardStats :  async() => {
+        
+   try{
+const response = await api.get(`/employee/dashboard`);
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    },
+
+    getTasks :  async() => {
+        
+   try{
+const response = await api.get(`/employee/tasks`);
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    }
+    ,
+    updateTask : async(taskId) => {
+        try{
+const response = await api.post(`/employee/tasks`,{ taskId} );
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    }
+
 }
 

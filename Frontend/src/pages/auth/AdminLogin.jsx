@@ -96,8 +96,8 @@ const {login}  = useAuth();
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0F1729] to-[#0F1729]/80"></div>
 
                 {/* Header - Responsive */}
-                <header className="px-4 sm:px-6 md:px-8 py-4 md:py-6 w-full max-w-7xl mx-auto">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                {/* <header className="px-4 sm:px-6 md:px-8 py-4 md:py-6 w-full max-w-7xl mx-auto">
+                    <div className="flex flex-col  items-center sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#0F1729] rounded-full flex items-center justify-center text-white shadow-lg">
                                 <MdGridView className="text-lg sm:text-xl" />
@@ -111,12 +111,9 @@ const {login}  = useAuth();
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-600 text-sm font-semibold ml-0 sm:ml-auto mt-2 sm:mt-0">
-                            <PiHeadset className="text-lg" />
-                            <span className="hidden sm:inline">Contact Support</span>
-                        </div>
+                       
                     </div>
-                </header>
+                </header> */}
 
                 {/* Main Content - Responsive */}
                 <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12 relative z-10">
@@ -200,17 +197,11 @@ const {login}  = useAuth();
                                 Secure Login
                             </button>
 
-                            <div className="text-center text-xs text-slate-400 font-semibold uppercase tracking-wider py-2">
-                                Or continue with
-                            </div>
-
-                            <button type="button" className="w-full h-11 sm:h-12 border border-slate-200 rounded-lg font-bold text-slate-700 hover:bg-slate-50 transition-colors">
-                                Single Sign-On (SSO)
-                            </button>
+                            
                         </form>
 
                         {/* Trust Section */}
-                        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-100 flex flex-col items-center gap-3">
+                        <div className="mt-3 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-100 flex flex-col items-center gap-3">
                             <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
                                 <CiLock className="text-base text-green-700" />
                                 Protected by Enterprise Grade Security

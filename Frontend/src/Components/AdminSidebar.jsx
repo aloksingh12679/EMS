@@ -15,7 +15,7 @@ const AdminSidebar = () => {
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const { logout } = useAuth();
+    const { logout ,  user} = useAuth();
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -118,10 +118,10 @@ const AdminSidebar = () => {
                 <div className="p-4 border-t border-gray-200 space-y-3 bg-gradient-to-b from-gray-50 to-slate-50">
                     <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                         <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
-                            <span className="text-white font-bold text-sm">AM</span>
+                            <span className="text-white font-bold text-sm">{user?.firstName.charAt(0) + user?.lastName.charAt(0)}</span>
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-sm font-semibold text-gray-900 truncate">Alex Morgan</p>
+                            <p className="text-sm font-semibold text-gray-900 truncate">{user?.firstName + " " + user?.lastName}</p>
                             <p className="text-xs text-gray-500 font-medium">Super Admin</p>
                         </div>
                     </div>

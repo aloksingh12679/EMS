@@ -9,20 +9,19 @@ import {
     MdClose
 } from "react-icons/md";
 import { useAuth } from '../context/AuthContext';
+import { capitalize } from "../utils/helper";
 
 const EmployeesSidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
 
     useEffect(() => {
         const checkScreenSize = () => {
             const mobile = window.innerWidth < 1120;
             setIsMobile(mobile);
-            // On mobile, sidebar starts closed
-            // On desktop, sidebar starts open
             if (!mobile) {
                 setIsOpen(true);
             } else {
@@ -38,7 +37,7 @@ const EmployeesSidebar = () => {
     const menuItems = [
         { icon: <MdDashboard />, label: "Dashboard", path: "/employee/dashboard" },
         { icon: <MdPeople />, label: "Profile", path: "/employee/profile" },
-        { icon: <MdEventAvailable />, label: "My taks", path: "/employee/mytasks" },
+        { icon: <MdEventAvailable />, label: "My tasks", path: "/employee/mytasks" },
         { icon: <MdPeople />, label: "Leaves", path: "/employee/apply-leave" },
         { icon: <MdPeople />, label: "Support System", path: "/employee/support-system" }
     ];
@@ -53,33 +52,33 @@ const EmployeesSidebar = () => {
 
     return (
         <>
-            {/* Mobile Hamburger Button - Always show on mobile */}
+            {/* Mobile Hamburger Button */}
             {isMobile && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed top-4 left-4 z-50 p-3 bg-white border border-gray-200 shadow-md text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+                    className="fixed top-4 left-4 z-50 p-3 bg-white border border-blue-200 shadow-md text-blue-600 rounded-xl hover:bg-blue-50 transition-colors"
                 >
                     {isOpen ? <MdClose size={18} /> : <MdMenu size={18} />}
-                </button>
+                </button>   
             )}
 
             {/* Sidebar */}
             <aside 
                 className={`
-                    fixed w-64 min-h-screen bg-white border-r border-gray-200 text-gray-800 flex flex-col
+                    fixed w-64 min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 border-r border-blue-200 text-gray-800 flex flex-col
                     transform transition-transform duration-300 ease-in-out z-40
                     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                     ${!isMobile ? 'lg:translate-x-0' : ''}
                 `}
             >
                 {/* LOGO */}
-                <div className="px-6 py-5 border-b border-gray-200 bg-white">
-                    <h1 className="text-lg font-bold text-gray-900">EMS Portal</h1>
-                    <p className="text-xs text-gray-500">Enterprise Employee</p>
+                <div className="px-6 py-5 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-blue-700">
+                    <h1 className="text-lg font-bold text-white">EMS Portal</h1>
+                    <p className="text-xs text-blue-100">Enterprise Employee</p>
                 </div>
 
                 {/* MENU */}
-                <nav className="flex-1 px-3 py-4 space-y-1 bg-white">
+                <nav className="flex-1 px-3 py-4 space-y-1">
                     {menuItems.map((item, index) => (
                         <MenuItem
                             key={index}
@@ -95,18 +94,21 @@ const EmployeesSidebar = () => {
                 </nav>
 
                 {/* USER CARD & LOGOUT */}
-                <div className="p-4 border-t border-gray-200 space-y-4 bg-gray-50">
-                    <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                        <div>
-                            <p className="text-sm font-medium text-gray-900">Alex Morgan</p>
-                            <p className="text-xs text-gray-500">Employee</p>
+                <div className="p-4 border-t border-blue-200 space-y-3 bg-gradient-to-b from-blue-100 to-blue-200">
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
+                            <span className="text-white font-bold text-sm">{capitalize(user?.firstName.charAt(0) + user?.lastName.charAt(0))}</span>
+                        </div>
+                        <div className="overflow-hidden">
+                            <p className="text-sm font-semibold text-gray-900 truncate">{capitalize(user?.firstName + " " + user?.lastName || "E")}</p>
+                            <p className="text-xs text-blue-600 font-medium">Employee</p>
                         </div>
                     </div>
 
                     {/* Logout Button */}
                     <button
                         onClick={handleLogout}
-                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-gray-900 text-white hover:bg-gray-800 active:scale-[0.98] transition-all duration-200 font-medium text-sm shadow-sm"
+                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
                     >
                         <MdLogout size={18} />
                         <span>Logout</span>
@@ -114,7 +116,7 @@ const EmployeesSidebar = () => {
                 </div>
             </aside>
 
-            {/* Overlay for mobile when sidebar is open */}
+            {/* Overlay for mobile */}
             {isMobile && isOpen && (
                 <div 
                     className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30" 
@@ -124,18 +126,15 @@ const EmployeesSidebar = () => {
 
             {/* CSS for responsive behavior */}
             <style>{`
-                /* On screens 1120px and above, sidebar is always visible */
                 @media (min-width: 1120px) {
                     aside {
                         transform: translateX(0) !important;
                     }
-                    /* Hide hamburger button on desktop */
                     button.fixed.top-4.left-4 {
                         display: none !important;
                     }
                 }
                 
-                /* On screens below 1120px */
                 @media (max-width: 1119px) {
                     aside {
                         transform: translateX(-100%);
@@ -153,9 +152,9 @@ const MenuItem = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer
-            ${active ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600 font-semibold" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`}
+            ${active ? "bg-white text-blue-600 border-l-4 border-blue-600 font-semibold shadow-sm" : "text-gray-700 hover:bg-white/50 hover:text-blue-600"}`}
     >
-        <div className={`${active ? "text-blue-600" : "text-gray-500"}`}>
+        <div className={`${active ? "text-blue-600" : "text-gray-600"}`}>
             {icon}
         </div>
         <span className="text-sm">{label}</span>

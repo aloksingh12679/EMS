@@ -8,6 +8,27 @@ export const salaryService = {
               } catch (error) {
                   throw error;
               }
+    },
+
+    updateEmployeeSalary :  async (updateData) => {
+        try {
+                  const response = await api.post(`/admin/employees/salary` ,{
+                    updateData : updateData
+                  });
+                  return response.data;
+              } catch (error) {
+                  throw error;
+              }
+    }
+
+    ,
+    runEmployeePayroll : async() => {
+         try {
+                  const response = await api.post(`/admin/employees/salary/run-payroll`);
+                  return response.data;
+              } catch (error) {
+                  throw error;
+              }
     }
 
 

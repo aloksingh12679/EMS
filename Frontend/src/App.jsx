@@ -16,6 +16,7 @@ import SalaryManagement from "./pages/admin/SalaryManagement";
 import AddEmployee from "./pages/admin/AddEmployee";
 import LeaveRecord from "./pages/admin/LeaveRecord";
 import EmployeeEdit from "./pages/admin/EmployeeEdit";
+import MyTasks from "./pages/employee/MyTasks";
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -82,7 +83,7 @@ function App() {
 <Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} /> */}
 {/* one page og employee side */}
 
-          <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+          {/* <Route path="/employee/dashboard" element={<EmployeeDashboard />} /> */}
 
 
           {/* Protected Admin Routes */}
@@ -159,23 +160,23 @@ function App() {
 
         
 
-          {/* <Route 
+          <Route 
             path="/employee/dashboard" 
             element={
               <ProtectedRoute allowedRoles={['employee']}>
                 <EmployeeDashboard />
               </ProtectedRoute>
             } 
-          /> */}
+          />
 
-          {/* <Route 
-            path="/employee/attendance" 
+          <Route 
+            path="/employee/mytasks" 
             element={
               <ProtectedRoute allowedRoles={['employee']}>
-                <EmployeeAttendance />
+                <MyTasks />
               </ProtectedRoute>
             } 
-          /> */}
+          />
 
 
         </Routes>
