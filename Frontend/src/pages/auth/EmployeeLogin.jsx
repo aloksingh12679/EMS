@@ -53,13 +53,7 @@ const {login}  = useAuth();
           }
 
       
-      // showToast("Login successful! Redirecting...", "success");
-      
-     
-      // setTimeout(() => {
-      //   window.location.href = "/employee/dashboard";
-      //   console.log("Redirecting to dashboard with ID:", employeeId);
-      // }, 1000);
+  
 
     } catch (error) {
       console.error("Login error:", error);

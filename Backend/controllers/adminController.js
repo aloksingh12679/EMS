@@ -3,6 +3,7 @@ const Department =  require("../models/Department");
 const Leave = require("../models/Leave");
 const {status} = require("http-status");
 const Salary = require("../models/Salary");
+const Task = require("../models/tasks");
 
 
 const getDashboardstats = async (req,res,next) => {
@@ -98,7 +99,8 @@ const getDashboardstats = async (req,res,next) => {
 const createEmployee = async (req,res,next) => {
   try {
     console.log(req.body);
-    // console.log(req.file);
+    console.log(req.file);
+    
 const {
   firstName,
   lastName,
@@ -119,7 +121,7 @@ const {
 
 } =  req.body;
 
-
+console.log(address);
 if(!firstName && !personalEmail && !position && !department) {
   return res.status(400).json({
     message : "Please provide necessary details"
@@ -182,7 +184,7 @@ console.log(departmentInfo);
     lastName,
     personalEmail,
     contactNumber,
-    address: address || {},
+    address: address,
     department: departmentInfo._id || null,
     position,
     gender,
@@ -232,8 +234,9 @@ console.log(departmentInfo);
 
 const getEmployeebyId = async(req,res,next) => {
   try {
-    console.log(req.params);
+    // console.log(req.params);
     const employee = await User.findById(req.params.id).select("+resetPasswordToken").populate("department" , "name manager code").populate("createdBy" , "firstName lastName").populate("salary");
+
 
     if(!employee){
       return res.status(status.NOT_FOUND).json({
@@ -248,10 +251,13 @@ const getEmployeebyId = async(req,res,next) => {
         message : "User is not an Employee"
             })
     }
+    const employeeTasks = await Task.find({employee : req.params.id});
+   
 
     res.status(200).json({
       success : true,
-      data : employee
+      data : employee,
+       tasks : employeeTasks
     })
   }catch(err){
 
@@ -325,24 +331,84 @@ console.log(employee);
 
 const deleteEmployee = async(req,res) => {
   try{
-    const {id} = req.params;
-    const {hardDelete = false} = req.query;
-    if(hardDelete === 'true'){
-       const employee = await User.findByIdAndDelete(id);
+    const { id } = req.params;
+    console.log(id);
+    const password = req.headers['x-password'];
+    const hardDelete = req.headers['x-hard-delete'];
+    const status = req.headers['x-status'];
+   
+    
+    if(hardDelete){
+     
+        const user = req.user;
+       const Admin = await User.findOne({_id : user._id}).select("+password");
+               const isPasswordValid = await Admin.comparePassword(password);
+              
+
+        if(isPasswordValid){
+          console.log(isPasswordValid);
+         
+
+ const employee = await User.findByIdAndDelete(id);
+          await Salary.findByIdAndDelete(employee.salary);
+
        if(!employee){
-        return res.status(NOT_FOUND).json({
+        return res.status(400).json({
+          success : false,
+          message : "Employee Not found"
+        });
+
+       }
+               return res.status(200).json({
+                success: true,
+                message: 'Employee permanently deleted'
+            });
+       }else if(isPasswordValid === false){
+         return res.status(400).json({
+          success : false,
+          message : "Wrong password can't Delete Employee"
+        });}
+
+      
+    }else{
+      if(status === "active"){
+ const employee = await User.findByIdAndUpdate(id , {
+        status : "inactive",
+        isActive : false
+      });
+       if(!employee){
+        return res.status(400).json({
           success : false,
           message : "Employee Not found"
         });
        }
+       return res.status(200).json({
+        success : true,
+         message : "Employee Account deactivated succesfully"
+       })
+      }else{
+        const employee = await User.findByIdAndUpdate(id , {
+        status : "active",
+        isActive : true
+      });
+       if(!employee){
+        return res.status(400).json({
+          success : false,
+          message : "Employee Not found"
+        });
+       }
+       return res.status(200).json({
+        success : true,
+         message : "Employee Activated succesfully"
+       })
 
-       return res.status(status.OK).json({
-                success: true,
-                message: 'Employee permanently deleted'
-            });
+      }
+
+     
+
     }
    }catch(err){
-    console.log("delete employee error" , deleteEmployee);
+    console.log("delete employee error" , err);
     if (err.name === 'CastError') {
             return res.status(400).json({
                 success: false,
@@ -510,6 +576,152 @@ const getleavesDetail = async (req,res) => {
 
 
 
+const getEmployeesSalary = async (req,res) => {
+  try{
+      const employeesSalary = await Salary.find({}).populate("employee" , "firstName lastName position jobType status");
+      // console.log(employeeLeaves);
+
+      return res.status(200).json({
+        message : "working",
+        success : true,
+        data : employeesSalary
+            })
+    
+
+  }catch(error){
+ console.error('Error fetching employees salary details :', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+}
+
+const updateSalary = async(req,res) => {
+   try{
+  const {updateData} = req.body;
+  console.log(updateData);
+  if(!updateData){
+     return res.status(400).json({
+        message : "Fill the fields properly",
+        success : false,
+       
+            })
+  }
+
+      const updatedSalary = await Salary.findByIdAndUpdate(updateData.id, {
+        baseSalary : updateData.baseSalary,
+        allowances : updateData.allowances,
+        taxApply : updateData.taxApply,
+        deductions : updateData.deductions,
+        netSalary : updateData.netSalary
+      });
+
+       if(!updatedSalary){
+     return res.status(400).json({
+        message : "no salary data of this employee",
+        success : false,
+       
+            })
+  }
+      console.log(updatedSalary);
+
+      return res.status(200).json({
+        message : "Salary updated succesfully",
+        success : true,
+      
+            })
+    
+
+  }catch(error){
+ console.error('Error updating salary details :', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+}
+
+
+const runPayroll = async(req,res) => {
+   try{
+   
+
+const updatedSalaries = await Salary.updateMany(
+  { Status: "due" }, 
+  { $set: { Status: "processing" } }
+);
+       if(!updatedSalaries){
+     return res.status(400).json({
+        message : "no salary data to run payroll",
+        success : false,
+       
+            })
+  }
+      console.log(updatedSalaries);
+
+      return res.status(200).json({
+        message : "succesfully executed payroll",
+        success : true,
+      
+            })
+    
+
+  }catch(error){
+ console.error('payroll error :', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+}
+
+
+
+const addTask = async(req,res) => {
+  try{
+      const {id} = req.params;
+      // console.log(req.body);
+      const {taskName , description , dueDate , priority} = req.body;
+      
+      
+      const newTask = new Task({
+
+        employee : id,
+        taskName,
+        description,
+        dueDate,
+        priority,
+        startDate : Date.now()
+      });
+
+     const task = await newTask.save();
+ 
+
+
+
+      return res.status(200).json({
+        message : "working",
+        success : true,
+       
+            })
+    
+
+  }catch(error){
+ console.error('Error fetching employees salary details :', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+}
+
+
+
 
 
 
@@ -534,5 +746,9 @@ module.exports = {
     deleteEmployee,
     getAlldepartments,
     createDepartment,
-    getleavesDetail
+    getleavesDetail,
+    getEmployeesSalary,
+    updateSalary,
+    addTask,
+    runPayroll
 }

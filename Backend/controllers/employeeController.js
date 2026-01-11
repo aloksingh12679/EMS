@@ -1,7 +1,12 @@
 const User = require("../models/user");
 const Department =  require("../models/Department");
+const Task =  require("../models/tasks.js");
+
+
 const {status} = require("http-status");
 const Attendance = require("../models/Attendance");
+const Salary = require("../models/Salary");
+
 
 
 const getEmployeedashboard = async(req,res) => {
@@ -9,47 +14,132 @@ const getEmployeedashboard = async(req,res) => {
       const employeeId = req.user.id;
 
       const employee = await User.findById(employeeId)
-      .select('firstName lastName personalEmail employeeId position department joiningDate salary')
+      .select('firstName lastName personalEmail employeeId position department joiningDate leaveBalance')
       .populate('department', 'name code');
-      
-      const today = new Date();
-      today.setHours(0,0,0,0); // set time raat ke 12 vje
- 
-      const todayAttendance = await Attendance.findOne({ //aaj ki attendance ka record
-        employee : employeeId,
-        date : {
-            $gte : today, 
-            $lt : new Date(today.getTime() + + 24 * 60 * 60 * 1000) 
-        }
-      });
 
-    //   const startOfmonth = new Date(today.getFullYear() , today.getMonth() , 1); // iss saal ka current month ka 1 day; (2026 , january , 1);
-    //   const monthlyAttendance = await Attendance.aggregate([
-    //     {
-    //         $match : {
-    //             employee : employeeId,
-    //             date : {$gte : startOfmonth},
-    //             status : {$in : ["present" , "half-day" , "absent"]}
-    //         }
-    //     },
-    //     {
-    //         $group : {
-    //             _id : 
-    //         }
-    //     }
-    //   ])
-
+      if(!employee){
+        return res.status(400).json({
+          success : false,
+          message : "Employee Not found"
+        });
+      }
+      const salaryDetails = await Salary.find({employee : employeeId});
+      const taskDetails = await Task.find({employee : employeeId});
+   
+      return res.status(200).json({
+                success: true,
+                data : {
+                  employee,
+                  salaryDetails,
+                  taskDetails
+                }
+            });
 
 
 
 
 
     }catch(err){
-
+console.log("get employee dashboard error" , err);
+  
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting employee'
+        });
         
 
     }
 }
+
+
+
+const getTasks = async(req,res) => {
+    try{
+      const employeeId = req.user.id;
+
+      const taskDetails = await Task.find({employee : employeeId});
+
+
+      if(!taskDetails){
+        return res.status(400).json({
+          success : false,
+          message : "no tasks"
+        });
+      }
+
+   
+      return res.status(200).json({
+                success: true,
+                data : {
+                  taskDetails
+                }
+            });
+
+
+
+
+
+    }catch(err){
+console.log("get tasks error" , err);
+  
+        res.status(500).json({
+            success: false,
+            message: 'Error getting tasks'
+        });
+        
+
+    }
+}
+
+
+
+
+const updateTask = async(req,res) => {
+    try{
+      const {taskId} = req.body;
+console.log(taskId);
+      const taskDetails = await Task.findByIdAndUpdate(taskId , {
+        status : "completed"
+      });
+      
+
+
+      if(!taskDetails){
+        return res.status(400).json({
+          success : false,
+          message : "no tasks"
+        });
+      }
+
+   
+      return res.status(200).json({
+                success: true,
+                data : {
+                  taskDetails
+                }
+            });
+
+
+
+
+
+    }catch(err){
+console.log("updating task error" , err);
+  
+        res.status(500).json({
+            success: false,
+            message: 'Error updating tasks'
+        });
+        
+
+    }
+}
+
+
+
+
+
+
 
 // Employee check-in
 // route   POST /api/employee/checkin
@@ -170,3 +260,9 @@ const checkOut = async(req,res) => {
   }
 
 
+module.exports = {
+    getEmployeedashboard, 
+    getTasks,
+    updateTask
+    
+}

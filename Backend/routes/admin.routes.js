@@ -12,13 +12,17 @@ const {
     deleteEmployee,
     getAlldepartments,
     createDepartment,
-    getleavesDetail
+    getleavesDetail,
+    getEmployeesSalary,
+    addTask,
+    updateSalary,
+    runPayroll
 } = require("../controllers/adminController.js");
 
 const { protect} = require('../middleware/auth');
 
 
-// router.use(protect);
+router.use(protect);
 
 
 
@@ -38,6 +42,19 @@ router.route("/employee/:id")
 .get(getEmployeebyId)
 .put(upload.single('profilePhoto'),updateEmployee)
 .delete(deleteEmployee);
+
+
+router.post("/employee/:id/addtask", addTask);
+
+
+router.route("/employees/salary")
+.get(getEmployeesSalary)
+.post(updateSalary);
+
+
+router.post("/employees/salary/run-payroll" , runPayroll);
+// router.get("/employees/salary" ,getEmployeesSalary);
+// router.post("/employees/salary/" , updateSalary);
 
 
 // leaves detail

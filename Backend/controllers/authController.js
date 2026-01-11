@@ -10,8 +10,8 @@ try {
     if(!email && !employeeId){
         return res.status(400).json({"message" : "please fill all given fields"});
     }
-console.log(email);
-console.log(password);
+// console.log(email);
+// console.log(password);
 console.log(employeeId);
  let currUser;
  let loginType;
@@ -28,7 +28,7 @@ console.log(employeeId);
         return res.status(404).json({"message" : "Wrong email or Password"});
         }
          
-        if(currUser.role !== 'admin'){
+        if(currUser.role !== 'Admin'){
         return res.status(403).json({"message" : "Access Denied ! only admin can login"});
 
         }
@@ -46,7 +46,7 @@ console.log(employeeId);
         loginType = 'employeeId' ; 
 
         if(!currUser) {
-        return res.status(status.NOT_FOUND).json({"message" : "Invalid Employee ID"});
+        return res.status(400).json({"message" : "Invalid Employee ID"});
         }
 
         if(currUser.role !== "employee") {
@@ -78,7 +78,7 @@ console.log(employeeId);
         {expiresIn : tokenExpiry}
     );
 
-    const redirectTo = currUser.role === 'admin' ? '/admin/dashboard' : '/employee/dashboard';
+    const redirectTo = currUser.role === 'Admin' ? '/admin/dashboard' : '/employee/dashboard';
 
     const userResponse = {
         id : currUser._id,

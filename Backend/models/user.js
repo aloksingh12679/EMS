@@ -78,6 +78,7 @@ department : {
     ref: "Department"
 },
 
+
  // Leave balance
     leaveBalance: {
         personal: { type: Number, default: 12 },
@@ -123,7 +124,6 @@ address : {
  default  : "India"
     
 }, 
-
 
 //    others credentials - system needs
     role : {
@@ -193,7 +193,13 @@ userSchema.methods.comparePassword = async function(enteredCurrPass){
     }
         return await bcrypt.compare(enteredCurrPass,this.password);
 };
+
+
+
+
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
+
+
 
