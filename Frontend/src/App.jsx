@@ -75,6 +75,8 @@ function App() {
 
           <Route path="/admin/attendance" element={<EmployeeAttendance />} />
 
+          <Route path="/support" element={<Support />} />
+
            <Route path="/admin/salary" element={< SalaryManagement/>} />
 
            <Route path="/admin/leaves" element={< LeaveRecord/>} />
