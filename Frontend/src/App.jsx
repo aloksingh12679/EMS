@@ -13,6 +13,7 @@ import EmployeeProfile from "./pages/admin/EmployeeProfile";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import EmployeeAttendance from "./pages/admin/EmployeeAttendance";
 import SalaryManagement from "./pages/admin/SalaryManagement";
+import Support from "./pages/SupportSystem/Support.jsx"
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -73,6 +74,8 @@ function App() {
           <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
 
           <Route path="/admin/attendance" element={<EmployeeAttendance />} />
+
+          <Route path="/support" element={<Support />} />
 
            <Route path="/admin/salary" element={< SalaryManagement/>} />
           {/* Protected Admin Routes */}
