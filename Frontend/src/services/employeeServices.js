@@ -1,6 +1,23 @@
 import api from './api';
 
 export const employeeService = {
+    getTickets : async () => {
+        try {
+            const response = await api.get('/admin/tickets');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+    ,
+    getAdminDashboardStats : async () => {
+        try {
+            const response = await api.get('/admin/dashboard/stats');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
     getAllEmployees : async() => {
        try {
             const response = await api.get('/admin/employees');
@@ -46,7 +63,7 @@ return response.data;
 
     getLeavesdetails : async() => {
          try{
-const response = await api.get(`/admin/leaves`);
+const response = await api.get(`/admin/employees/leaves`);
 return response.data;
 
         }catch(error){
@@ -116,6 +133,25 @@ return response.data;
          throw error;
         }
     }
+,
+updateTicket : async(ticketId) => {
+        try{
+const response = await api.patch(`/admin/support-tickets/${ticketId}/mark-read`,{ ticketId} );
+return response.data;
 
+        }catch(error){
+         throw error;
+        }
+    }
+    ,
+    getProfile : async(ticketId) => {
+        try{
+const response = await api.get(`/employee/me`);
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    }
 }
 

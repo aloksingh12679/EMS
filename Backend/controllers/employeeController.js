@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Department =  require("../models/Department");
 const Task =  require("../models/tasks.js");
+const Leave = require("../models/Leave.js");
 
 
 const {status} = require("http-status");
@@ -135,8 +136,103 @@ console.log("updating task error" , err);
     }
 }
 
+const getProfile =  async(req,res) => {
+  try{
+        const id = req.user.id;
+        const profile = await User.findById(id).populate("department" , "name description");
+        if(!profile){
+           return res.status(400).json({
+          message : "no employee with this id",
+          success : false
+              })
+        }
+
+         return res.status(200).json({
+          
+          success : true,
+          data : profile
+              })
+
+  }catch(error){
+console.error('Error fetching employee profile:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server Error',
+        error: error.message
+      });
+  }
+}
 
 
+const getAppliedLeave = async(req,res) => {
+   try{
+    const id = req.user.id;
+        const employeeLeaves = await Leave.find({employee : id}).populate("employee" , "firstName employeeId");
+        const leaveBalance = await User.findById(id).select("leaveBalance");
+        
+        console.log(employeeLeaves);
+  
+        return res.status(200).json({
+          message : "working",
+          success : true,
+          data : {employeeLeaves,
+          leaveBalance}
+              })
+      
+  
+    }catch(error){
+   console.error('Error fetching employees leave detail:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server Error',
+        error: error.message
+      });
+    }
+}
+
+const applyLeave = async(req,res) => {
+    try{
+      const {leaveData} = req.body;
+
+    
+      const appliedLeave = new Leave({
+        
+        leaveType : leaveData.leaveType,
+        startDate : leaveData.fromDate,
+        endDate : leaveData.toDate,
+        reason : leaveData.reason,
+        employee : req.user.id
+      })
+     
+      
+              await appliedLeave.save().then((res) => {
+                console.log(res);
+              });
+
+
+     
+
+   
+      return res.status(200).json({
+                success: true,
+                message : "leave applied succesfully"
+            });
+
+
+
+
+
+    }catch(err){
+console.log("apply leave  error" , err);
+  
+        res.status(500).json({
+            success: false,
+            message: 'Error applying leave'
+        });
+        
+
+    }
+} 
 
 
 
@@ -259,10 +355,14 @@ const checkOut = async(req,res) => {
   }
   }
 
+  
 
 module.exports = {
     getEmployeedashboard, 
     getTasks,
-    updateTask
+    updateTask,
+    applyLeave,
+    getAppliedLeave,
+    getProfile
     
 }

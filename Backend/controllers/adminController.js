@@ -4,10 +4,12 @@ const Leave = require("../models/Leave");
 const {status} = require("http-status");
 const Salary = require("../models/Salary");
 const Task = require("../models/tasks");
+const SupportTicket = require("../models/supportTicket");
 
 
 const getDashboardstats = async (req,res,next) => {
   try {
+    let Admin = await User.findOne({_id : req.user._id});
     let totalEmployees = await User.countDocuments({role : "employee"});
     let totalDepartments =  await Department.countDocuments({isActive : true});
     let activeEmployess =  await User.countDocuments({
@@ -15,73 +17,23 @@ const getDashboardstats = async (req,res,next) => {
       isActive : true});
 
 
-      const presentToday = await Attendance.countDocuments({
-      date: {
-        $gte: today,
-        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // End of today
-      },
-      status: { $in: ['present', 'half-day'] } 
-    });
+const pendingLeaves = await Leave.countDocuments({
+      status : "pending",
+      });
+  
 
-    const pendingLeaves = 0;
-
-    const recentEmployees = await User.find({role : 'employee'}).sort({createdAt : -1}).limit(5)
-    .select('firstname lastname employeeId department position joiningDate')
-    .populate('department' , 'name');
-
-    // check later (updated info or not)
-    // departments stats
-
-    const departmentStats = await Department.aggregate([
-      {
-        $lookup : {
-          from : "users",
-          localField : "_id",
-          foreignField : "_department",
-          as : "employees"
-        }
-      },
-      {
-        $project : {
-          name : 1,
-          employeeCount : {$size : '$employees'}
-        }
-      }
-    ]);
-
-     // 5. Salary Overview (simple for now)
-    // const salaryOverview = await User.aggregate([
-    //   {
-    //     $match: {
-    //       role: "employee",
-    //       isActive: true,
-    //       salary: { $gt: 0 }
-    //     }
-    //   },
-    //   {
-    //     $group: {
-    //       _id: null,
-    //       avgSalary: { $avg: "$salary" },
-    //       totalSalary: { $sum: "$salary" },
-    //       minSalary: { $min: "$salary" },
-    //       maxSalary: { $max: "$salary" }
-    //     }
-    //   }
-    // ]);
-
-    res.status(status.OK).json({
+    res.status(200).json({
       success : true,
       data : {
         stats : {
+          Admin,
           totalEmployees,
           activeEmployess,
           totalDepartments,
-          presentToday,
+         
           pendingLeaves,
           
         },
-        recentEmployees,
-        departmentStats
       }
     })
 
@@ -98,9 +50,18 @@ const getDashboardstats = async (req,res,next) => {
 
 const createEmployee = async (req,res,next) => {
   try {
-    console.log(req.body);
+ let url = null;
+    let filename = null;
     console.log(req.file);
+    if (req.file) {
+      url = req.file.path;
+      filename = req.file.filename;
+    }
+   
+ 
     
+    
+ 
 const {
   firstName,
   lastName,
@@ -117,6 +78,7 @@ const {
   taxApply,
   joinningDate,
   netSalary,
+ 
   jobType = 'full-time'
 
 } =  req.body;
@@ -194,7 +156,12 @@ console.log(departmentInfo);
     joiningDate: joinningDate,
     jobType,
     role: 'employee',
+    profilePhoto: req.file ? {
+    url: url || null,
+    filename: filename || null
+} : null,
     isActive: true,
+
    
 
 
@@ -252,12 +219,14 @@ const getEmployeebyId = async(req,res,next) => {
             })
     }
     const employeeTasks = await Task.find({employee : req.params.id});
+    const employeeLeave = await Leave.find({employee : req.params.id});
    
 
     res.status(200).json({
       success : true,
       data : employee,
-       tasks : employeeTasks
+       tasks : employeeTasks,
+leaves : employeeLeave
     })
   }catch(err){
 
@@ -287,10 +256,17 @@ const updateEmployee = async(req,res) => {
   
  const departmentInfo = await Department.findOne({name : department}).populate("manager" , "firstName lastName");
 
-// updatedBy : req.user._id
+let profilePhoto;
+    if (typeof req.file != "undefined") {
+        let url = req.file.path;
+        let filename = req.file.filename;
+       profilePhoto = { url, filename };
+    }
+
 
   const employee = await User.findByIdAndUpdate(id , { ...updatedData , department : departmentInfo._id , 
         reportingManager : `${departmentInfo.manager.firstName} ${departmentInfo.manager.lastName}`,
+        profilePhoto
 
   } , {new :true , runValidators : true})
   .select('-password').populate('department' , 'name');
@@ -350,7 +326,10 @@ const deleteEmployee = async(req,res) => {
          
 
  const employee = await User.findByIdAndDelete(id);
-          await Salary.findByIdAndDelete(employee.salary);
+          await Salary.deleteMany({employee : employee._id});
+          await Task.deleteMany({ employee: employee._id });
+          await Leave.deleteMany({employee : employee._id});
+          await SupportTicket.deleteMany({employee : employee._id});
 
        if(!employee){
         return res.status(400).json({
@@ -573,7 +552,55 @@ const getleavesDetail = async (req,res) => {
   }
 }
 
+const leaveAction = async (req,res) => {
+  try{
+    const {Leaveid , action} = req.body;
+    console.log(Leaveid);
+      const updatedLeave = await Leave.findByIdAndUpdate(
+  Leaveid, 
+  { status: action },
+  { new: true }
+).populate('employee', 'leaveBalance');
 
+if (action === 'Approved' || action === 'approved') {
+  // Get the employee's current leave balance
+  const employee = await User.findById(updatedLeave.employee).select('leaveBalance');
+  
+  if (employee) {
+
+    const leaveType = updatedLeave.leaveType; // 'personal', 'annual', or 'sick'
+    const daysToDeduct = updatedLeave.duration || updatedLeave.totalDays;
+  
+    if (employee.leaveBalance[leaveType] >= daysToDeduct) {
+      employee.leaveBalance[leaveType] -= daysToDeduct;
+      
+      await employee.save();
+      
+      console.log(`Deducted ${daysToDeduct} days from ${leaveType} leave`);
+     
+    
+    } else {
+      throw new Error(`Insufficient ${leaveType} leave balance`);
+    }
+  }
+}
+console.log(updatedLeave);
+ return res.status(200).json({
+        message : `succesfully ${action} leave`,
+        success : true,
+       
+            })
+      
+
+  }catch(error){
+ console.error('Error action on leave', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+}
 
 
 const getEmployeesSalary = async (req,res) => {
@@ -750,5 +777,6 @@ module.exports = {
     getEmployeesSalary,
     updateSalary,
     addTask,
-    runPayroll
+    runPayroll,
+    leaveAction
 }

@@ -16,10 +16,12 @@ const {
     getEmployeesSalary,
     addTask,
     updateSalary,
-    runPayroll
+    runPayroll,
+    leaveAction
 } = require("../controllers/adminController.js");
 
 const { protect} = require('../middleware/auth');
+const { getAdminTickets, updateTicket } = require('../controllers/supportTicketController.js');
 
 
 router.use(protect);
@@ -29,7 +31,8 @@ router.use(protect);
 // Dashboard routes
 
 router.get("/dashboard/stats" , getDashboardstats);
-
+router.get("/tickets" ,getAdminTickets);
+router.patch("/support-tickets/:id/mark-read",updateTicket);
 
 // Employee management routes
 
@@ -58,7 +61,10 @@ router.post("/employees/salary/run-payroll" , runPayroll);
 
 
 // leaves detail
-router.get("/leaves" , getleavesDetail);
+router.route("/employees/leaves")
+.get(getleavesDetail)
+.post(leaveAction)
+
 
 
 // Department management routes

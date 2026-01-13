@@ -3,12 +3,17 @@ import { Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
 import AdminSidebar from '../../Components/AdminSidebar';
 import { employeeService } from '../../services/employeeServices';
 import { capitalize } from '../../utils/helper';
+import { leaveService } from '../../services/leaveServive';
 
 const LeaveRecord = () => {
   const [leaves, setLeaves] = useState([]);
 
  useEffect(() => {
-  const fetchData = async () => {
+ 
+  fetchData();
+ },[]);
+
+ const fetchData = async () => {
 try{
  const result = await employeeService.getLeavesdetails();
  console.log(result.data);
@@ -18,24 +23,40 @@ try{
 console.log("leave err " , err);
 }
   }
-  fetchData();
- },[]);
 
- useEffect(() => {
-  console.log(leaves);
- },[leaves]);
-
-
-  const handleApprove = (id) => {
-    setLeaves(leaves.map(leave => 
-      leave.id === id ? { ...leave, status: 'approved' } : leave
+  const handleApprove = async(id , Lid) => {
+    try{
+      console.log(id);
+    const response = await leaveService.leaveAction(Lid , "approved");
+    console.log(response);
+   setLeaves(leaves.map(leave => 
+      leave?._id === Lid ? { ...leave, status: 'approved' } : leave
     ));
+fetchData();
+
+    
+
+    }catch(err){
+console.log("leave approving err" , err);
+    }
+ 
   };
 
-  const handleReject = (id) => {
-    setLeaves(leaves.map(leave => 
-      leave.id === id ? { ...leave, status: 'rejected' } : leave
+ const handleReject = async(id , Lid) => {
+    try{
+      console.log(id);
+    const response = await leaveService.leaveAction(Lid , "rejected");
+    console.log(response);
+   setLeaves(leaves.map(leave => 
+      leave?._id === Lid ? { ...leave, status: 'rejected' } : leave
     ));
+fetchData();
+    
+
+    }catch(err){
+console.log("leave rejecting err" , err);
+    }
+ 
   };
 
   const formatDate = (dateString) => {
@@ -106,7 +127,7 @@ console.log("leave err " , err);
                       </thead>
                       <tbody className="divide-y divide-gray-200">
                         {leaves.map((leave) => (
-                          <tr key={leave.employee._id} className="hover:bg-gray-50">
+                          <tr key={leave?._id} className="hover:bg-gray-50">
                             <td className="px-4 lg:px-6 py-3 md:py-4">
                               <div className="min-w-max">
                                 <div className="font-medium text-gray-900 text-xs md:text-sm">{capitalize(leave?.employee?.firstName)}</div>
@@ -146,14 +167,14 @@ console.log("leave err " , err);
                               {leave.status === 'pending' ? (
                                 <div className="flex gap-2 min-w-max">
                                   <button
-                                    onClick={() => handleApprove(leave?.id)}
+                                    onClick={() => handleApprove(leave?.employee?._id , leave?._id )}
                                     className="flex items-center justify-center gap-1 px-2 md:px-3 py-1.5 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors whitespace-nowrap"
                                   >
                                     <CheckCircle className="w-3 h-3 flex-shrink-0" />
                                     <span>Approve</span>
                                   </button>
                                   <button
-                                    onClick={() => handleReject(leave?.id)}
+                                    onClick={() => handleReject(leave?.employee?._id , leave?._id)}
                                     className="flex items-center justify-center gap-1 px-2 md:px-3 py-1.5 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors whitespace-nowrap"
                                   >
                                     <XCircle className="w-3 h-3 flex-shrink-0" />
@@ -174,7 +195,7 @@ console.log("leave err " , err);
                 {/* Mobile Card View - Visible only on mobile */}
                 <div className="md:hidden space-y-4">
                   {leaves.map((leave) => (
-                    <div key={leave?.id} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+                    <div key={leave?._id} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
                       {/* Card Header */}
                       <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-3 border-b border-gray-200">
                         <div className="flex items-center justify-between">
@@ -227,14 +248,14 @@ console.log("leave err " , err);
                       {leave.status === 'pending' && (
                         <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex gap-2">
                           <button
-                            onClick={() => handleApprove(leave?.id)}
+                            onClick={() => handleApprove(leave?.employee._id)}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 active:scale-95 transition-all"
                           >
                             <CheckCircle className="w-4 h-4" />
                             <span>Approve</span>
                           </button>
                           <button
-                            onClick={() => handleReject(leave?.id)}
+                            onClick={() => handleReject(leave?.employee?._id)}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 active:scale-95 transition-all"
                           >
                             <XCircle className="w-4 h-4" />

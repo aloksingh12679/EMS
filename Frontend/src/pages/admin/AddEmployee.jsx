@@ -9,6 +9,9 @@ export default function AddEmployee() {
     const [toast, setToast] = useState({ show: false, message: "", type: "" });
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [profilePhotoPreview, setProfilePhotoPreview] = useState(null);
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+const [photoUploadError, setPhotoUploadError] = useState("");
+const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         // Step 1 - Personal
         firstName: "",
@@ -43,30 +46,30 @@ export default function AddEmployee() {
         });
     };
 
-    const handlePhotoChange = (e) => {
-        const file = e.target.files[0];
-      if (file) {
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                showToast('Please select an image file');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('File size should be less than 5MB');
-                return;
-            }
-
-            setProfilePhoto(file);
-
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfilePhotoPreview(reader.result);
-            };
-            
-            reader.readAsDataURL(file);
+   const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            showToast('Please select an image file', 'error');
+            return;
         }
-    };
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('File size should be less than 5MB', 'error');
+            return;
+        }
+
+        setProfilePhoto(file);
+        setPhotoUploadError("");
+
+        // Create preview only - no upload yet
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfilePhotoPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
     const showToast = (message, type = "error") => {
         setToast({ show: true, message, type });
@@ -144,66 +147,81 @@ export default function AddEmployee() {
             setCurrentStep(currentStep - 1);
         }
     };
-    const handleSubmit = async(e) => {
-e.preventDefault();
+   const handleSubmit = async(e) => {
+    e.preventDefault();
 
-        if (validateStep(3)) {
-           try{
-             const data = new FormData();
-        
-        // Append all text fields
-        data.append('firstName', formData.firstName);
-        data.append('lastName', formData.lastName);
-        data.append('personalEmail', formData.personalEmail);
-        data.append('contactNumber', formData.contactNumber);
-        data.append('dob', formData.dob);
-        data.append('gender', formData.gender);
-        data.append('address', formData.address);
-        data.append('department', formData.department);
-        data.append('jobType', formData.jobType);
-        data.append('position', formData.position);
-        data.append('joiningDate', formData.joiningDate);
-        data.append('baseSalary', formData.baseSalary);
-        data.append('taxApply', formData.taxApply);
-        data.append('allowances', formData.allowances);
-        data.append('deductions', formData.deductions);
-        
-        const baseSalary = parseFloat(formData.baseSalary) || 0;
-const allowances = parseFloat(formData.allowances) || 0;
-const deductions = parseFloat(formData.deductions) || 0;
-const taxApply = parseFloat(formData.taxApply) || 0;
-
-const netSalary = (
-    baseSalary + 
-    allowances - 
-    deductions -
-    (baseSalary * taxApply / 100)
-).toFixed(2);
-
-data.append('netSalary' , netSalary);
-
+    if (validateStep(3)) {
+        setIsSubmitting(true);
         if (profilePhoto) {
-            data.append('profilePhoto', profilePhoto);
+            setIsUploadingPhoto(true);
         }
+        
+        try {
+            const data = new FormData();
+    
+            // Append all text fields
+            data.append('firstName', formData.firstName);
+            data.append('lastName', formData.lastName);
+            data.append('personalEmail', formData.personalEmail);
+            data.append('contactNumber', formData.contactNumber);
+            data.append('dob', formData.dob);
+            data.append('gender', formData.gender);
+            data.append('address', formData.address);
+            data.append('department', formData.department);
+            data.append('jobType', formData.jobType);
+            data.append('position', formData.position);
+            data.append('joiningDate', formData.joiningDate);
+            data.append('baseSalary', formData.baseSalary);
+            data.append('taxApply', formData.taxApply);
+            data.append('allowances', formData.allowances);
+            data.append('deductions', formData.deductions);
+    
+            const baseSalary = parseFloat(formData.baseSalary) || 0;
+            const allowances = parseFloat(formData.allowances) || 0;
+            const deductions = parseFloat(formData.deductions) || 0;
+            const taxApply = parseFloat(formData.taxApply) || 0;
 
-                const result = await employeeService.addEmployee(data);
-                setEmployeeId(result.data.employeeId);
-                console.log(result);
-                console.log(employeeId);
-                setIsSubmitted(true);
-                if(result.success){
-                    showToast(result.message , 'success');
-                }
-               
-           }catch(err){
-           showToast(`${err.message}` , 'error');
-           }
+            const netSalary = (
+                baseSalary + 
+                allowances - 
+                deductions -
+                (baseSalary * taxApply / 100)
+            ).toFixed(2);
+
+            data.append('netSalary', netSalary);
+
+            if (profilePhoto) {
+                data.append('profilePhoto', profilePhoto);
+            }
+
+            const result = await employeeService.addEmployee(data);
             
+            setIsUploadingPhoto(false);
+            setIsSubmitting(false);
+            
+            if (result.success) {
+                setEmployeeId(result.data.employeeId);
+                setIsSubmitted(true);
+                showToast(result.message, 'success');
+            }
+           
+        } catch(err) {
+            setIsUploadingPhoto(false);
+            setIsSubmitting(false);
+            
+           
+            if (err.message === 'Network Error' || !err.response) {
+                setPhotoUploadError("Network connection weak. Please try again.");
+                showToast('Upload failed. Network connection weak. Please check your internet.', 'error');
+            } else {
+                showToast(err.response?.data?.message || err.message || 'Failed to add employee', 'error');
+            }
         }
-    };
+    }
+};
 
     const handleEmailEmployee = () => {
-        alert(`Email sent to ${formData.email}`);
+        showToast(`Email sent to ${formData.email}` , "success");
     };
 
     const handleAddAnother = () => {
@@ -843,17 +861,67 @@ data.append('netSalary' , netSalary);
                                         <span>←</span>
                                         Previous
                                     </button>
-                                    <button
-                                        onClick={handleSubmit}
-                                        className="w-full sm:w-auto px-8 py-3 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-md"
-                                    >
-                                        Submit Employee
-                                        <span>✓</span>
-                                    </button>
+                                   <button
+    onClick={handleSubmit}
+    disabled={isSubmitting}
+    className={`w-full sm:w-auto px-8 py-3 text-sm font-medium text-white rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md ${
+        isSubmitting 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-green-600 hover:bg-green-700'
+    }`}
+>
+    {isSubmitting ? (
+        <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            {isUploadingPhoto ? 'Uploading Photo...' : 'Submitting...'}
+        </>
+    ) : (
+        <>
+            Submit Employee
+            <span>✓</span>
+        </>
+    )}
+</button>
                                 </div>
                             </div>
                         )}
                     </div>
+                    {isSubmitting && (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {isUploadingPhoto ? 'Uploading Photo...' : 'Submitting Employee Data...'}
+            </h3>
+            <p className="text-sm text-gray-500">
+                Please wait, this may take a moment
+            </p>
+        </div>
+    </div>
+)}
+<style>{`
+    @keyframes slideLeft {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    .animate-slideLeft {
+        animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+`}</style>
                 </main>
             </div>
         </>

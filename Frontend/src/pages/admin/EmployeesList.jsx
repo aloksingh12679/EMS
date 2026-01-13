@@ -55,7 +55,10 @@ export default function EmployeesList() {
   };
 
   const handleEmployeeClick = (employeeId) => {
+    setTimeout(() => {
     navigate(`/admin/employees/${employeeId}`);
+
+    },500);
   };
 
   return (
@@ -167,9 +170,19 @@ export default function EmployeesList() {
                       >
                         <td className="p-4 pl-6">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                              {employee.firstName?.charAt(0) || 'E'}
-                            </div>
+                            {employee?.profilePhoto?.url && employee.profilePhoto?.url !== '' ? (
+  <div className="w-10 h-10 rounded-full overflow-hidden">
+    <img 
+      src={employee?.profilePhoto?.url} 
+      alt={`${employee.firstName} ${employee.lastName}`}
+      className="w-full h-full object-cover"
+    />
+  </div>
+) : (
+  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+    {capitalize(employee.firstName?.charAt(0)) || 'E'}
+  </div>
+)}
                             <div>
                               <p className="font-medium text-gray-900">{capitalize(employee?.firstName)}</p>
                               <p className="text-xs text-gray-500 mt-1">{employee.personalEmail}</p>

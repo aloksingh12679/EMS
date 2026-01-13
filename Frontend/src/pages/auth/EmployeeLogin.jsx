@@ -42,9 +42,9 @@ const {login}  = useAuth();
 
     try {
       
-      const response = await login(false , false , employeeId);
-      console.log(response);
-     if(response.success){
+      const result = await login(false , false , employeeId);
+      console.log(result);
+     if(result.success){
              
            showToast('Login succesfully Redirecting!' , 'success');
            setTimeout(() => {
@@ -57,7 +57,10 @@ const {login}  = useAuth();
 
     } catch (error) {
       console.error("Login error:", error);
-      showToast(error.message || "Invalid Employee ID. Please try again.", "error");
+      if(error.response.status === 403){
+             return showToast(`${error.response.data.message}` , "error");
+             }
+      showToast(`${error.response.data.message}` || "Invalid Employee ID. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }

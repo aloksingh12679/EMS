@@ -144,35 +144,26 @@ setTasks(response.data.taskDetails);
   return (
     <div className="min-h-screen bg-[#f6f8fb] font-sans">
       {/* Sidebar placeholder */}
-      <div className="fixed inset-y-0 left-0 z-50 min-[1112px]:block hidden">
-        <EmployeesSidebar />
-      
+    
+ 
+  
+    <EmployeesSidebar />
+  
+
+  {/* Main Content - Shifts right on desktop to accommodate sidebar */}
+  <main className="min-h-screen p-4 sm:p-6 lg:p-10 min-[1112px]:ml-64">
+    {/* Header */}
+    <div className="mb-8">
+      <div className="flex items-center gap-3 mb-2">
+        {/* Mobile Menu Button */}
+        
+        
+        <h1 className="text-2xl text-center sm:text-3xl ml-10 font-bold text-gray-900">My Tasks</h1>
       </div>
-
-     
-
-      <main className="flex-1 p-4 sm:p-6 lg:p-10 min-[1112px]:ml-[280px]">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="min-[1112px]:hidden p-2 rounded-lg border border-slate-200 bg-white shadow-sm"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-700"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
-          </div>
-          <p className="text-gray-500">Manage and track your assigned tasks</p>
-        </div>
+      <p className="text-sm sm:text-base text-gray-500 ml-0 min-[1112px]:ml-0">
+        Manage and track your assigned tasks
+      </p>
+    </div>
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6">

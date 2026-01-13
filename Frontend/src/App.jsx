@@ -7,7 +7,7 @@ import "./index.css";
 import EmployeeLogin from "./pages/auth/EmployeeLogin";
 import EmployeesList from "./pages/admin/EmployeesList";
 import AdminLogin from "./pages/auth/AdminLogin";
-import AdminDashboard from "./pages/admin/DashboardPage/AdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import HomePage from "./pages/common/HomePage";
 import EmployeeProfile from "./pages/admin/EmployeeProfile";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
@@ -17,6 +17,9 @@ import AddEmployee from "./pages/admin/AddEmployee";
 import LeaveRecord from "./pages/admin/LeaveRecord";
 import EmployeeEdit from "./pages/admin/EmployeeEdit";
 import MyTasks from "./pages/employee/MyTasks";
+import Support from "./pages/employee/SupportSystem";
+import EmployeeLeave from "./pages/employee/ApplyLeave/EmployeeLeave";
+import MyProfile from "./pages/employee/MyProfile";
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -38,7 +41,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if(!localStorage.getItem('token')) {
     
-    return <Navigate to="/admin-login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
@@ -161,7 +164,7 @@ function App() {
           /> 
 
         
-
+{/* employes protected route */}
           <Route 
             path="/employee/dashboard" 
             element={
@@ -180,6 +183,41 @@ function App() {
             } 
           />
 
+          
+          <Route 
+            path="/employee/support-system" 
+            element={
+              <ProtectedRoute allowedRoles={['employee']}>
+                <Support/>
+              </ProtectedRoute>
+            } 
+          />
+ <Route 
+            path="/employee/apply-leave" 
+            element={
+              <ProtectedRoute allowedRoles={['employee']}>
+                <EmployeeLeave/>
+              </ProtectedRoute>
+            } 
+          />
+
+           <Route 
+            path="/employee/support-system" 
+            element={
+              <ProtectedRoute allowedRoles={['employee']}>
+                <Support/>
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/employee/profile" 
+            element={
+              <ProtectedRoute allowedRoles={['employee']}>
+                <MyProfile/>
+              </ProtectedRoute>
+            } 
+          />
 
         </Routes>
       </Router>

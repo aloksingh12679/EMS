@@ -26,6 +26,7 @@ export default function EmployeeProfile() {
   const [profile , setProfile] = useState({});
   const [owner , setOwner] = useState();
     const [tasksData, setTasksData] = useState([]);
+    const [leavesData, setLeavesData] = useState();
 
 
 
@@ -60,6 +61,7 @@ export default function EmployeeProfile() {
           gender : result.data.gender,
           personalEmail : result.data.personalEmail,
           department : result.data.department.name,
+          profilePhoto : result.data.profilePhoto,
           dob : new Date(result.data.dob).toLocaleDateString('en-GB', {
   day: 'numeric',
   month: 'long',
@@ -82,7 +84,7 @@ export default function EmployeeProfile() {
           const newSalary = [...prev, result.data.salary];
           return newSalary;
         });
-
+setLeavesData(result.leaves);
 
     console.log(salaryData);
       } catch (err) {
@@ -90,7 +92,7 @@ export default function EmployeeProfile() {
       }
     };
 fetchData();
-   },[id]);
+   },[]);
 
 
   const handleDeleteUser = async(e) => {
@@ -100,7 +102,7 @@ fetchData();
       const result = await employeeService.deleteEmployee(id ,deletePassword , showDeleteModal , profile?.status);
       if(result.success){
         console.log(result);
-        showToast(result.message);
+        showToast(result.message , "success");
         setTimeout(()=>{
       navigate(`/admin/employees`);
 
@@ -129,11 +131,11 @@ showToast(response.data.message);
 
  
 
-  const leavesData = [
-    { id: 1, period: 'Jan 15 - Jan 17, 2025', type: 'Sick Leave', status: 'Approved', reason: 'Medical emergency' },
-    { id: 2, period: 'Dec 24 - Dec 26, 2024', type: 'Casual Leave', status: 'Approved', reason: 'Personal work' },
-    { id: 3, period: 'Nov 10 - Nov 11, 2024', type: 'Earned Leave', status: 'Rejected', reason: 'Family function' },
-  ];
+  // const leavesData = [
+  //   { id: 1, period: 'Jan 15 - Jan 17, 2025', type: 'Sick Leave', status: 'Approved', reason: 'Medical emergency' },
+  //   { id: 2, period: 'Dec 24 - Dec 26, 2024', type: 'Casual Leave', status: 'Approved', reason: 'Personal work' },
+  //   { id: 3, period: 'Nov 10 - Nov 11, 2024', type: 'Earned Leave', status: 'Rejected', reason: 'Family function' },
+  // ];
 
 
   const getStatusColor = (Status) => {
@@ -273,10 +275,10 @@ showToast(response.data.message);
         {/* MAIN CONTENT */}
         <main className="main-content">
           {/* TOP HEADER */}
-          <header className="top-header text-left">
-   <span className="text-xl font-semibold text-gray-900 lg:text-left text-center w-full lg:w-auto">
-   Employee Management
-  </span>
+    <header className="top-header flex justify-end items-center py-4">
+  <h1 className="text-xl font-semibold text-gray-900 border-l-4 border-blue-600 pl-4">
+    Employee Profile
+  </h1>
 </header>
 
           {/* SCROLLABLE CONTENT */}
@@ -285,8 +287,8 @@ showToast(response.data.message);
             <div className="profile-card">
               <div className="profile-avatar-section">
                 <img
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
-                  alt="Alexandra Chen"
+                  src={profile?.profilePhoto?.url || "profilePhoto"}
+                  alt={profile?.name}
                   className="profile-img"
                 />
                 <div className="status-indicator"></div>
@@ -453,7 +455,7 @@ showToast(response.data.message);
 
                       <div className="detail-item" style={{ gridColumn: '1 / -1' }}>
                         <label className="detail-label">Current Address</label>
-                        <p className="detail-value"><i className="fa-solid fa-location-dot"></i>{profile?.address}</p>
+                        <p className="detail-value"><i className="fa-solid fa-location-dot"></i>{profile?.address || "India"}</p>
                       </div>
                     </div>
                   </div>
@@ -705,97 +707,127 @@ showToast(response.data.message);
 )}
 
          {/* LEAVES TAB */}
-               {activeTab === 'leaves' && (
-              <div className="card">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-gray-900">Leave Records</h3>
-                  <FileText size={20} className="text-blue-600" />
-                </div>
-                <div className="space-y-4">
-                  {leavesData.map((leave) => (
-                    <div key={leave.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-2">
-                          <Calendar size={18} className="text-blue-600" />
-                          <span className="font-semibold text-gray-900">{leave.type}</span>
-                        </div>
-                        <span
-                          className="px-3 py-1 text-xs font-semibold rounded-full inline-flex items-center gap-1"
-                          style={{
-                            backgroundColor: leave.status === 'Approved' ? '#d4edda' : '#f8d7da',
-                            color: leave.status === 'Approved' ? '#155724' : '#721c24'
-                          }}
-                        >
-                          {leave.status === 'Approved' ? <CheckCircle size={14} /> : <XCircle size={14} />}
-                          {leave.status}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
-                        <Clock size={16} />
-                        <span>{leave.period}</span>
-                      </div>
-                      <div className="text-sm text-gray-700">
-                        <span className="font-semibold">Reason:</span> {leave.reason}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+               {/* LEAVES TAB */}
+{activeTab === 'leaves' && (
+  <div className="card">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-lg font-bold text-gray-900">Leave Records</h3>
+      <FileText size={20} className="text-blue-600" />
+    </div>
+    
+    {leavesData && leavesData.length > 0 ? (
+      <div className="space-y-4">
+        {leavesData.map((leave) => (
+          <div key={leave.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex items-center gap-2">
+                <Calendar size={18} className="text-blue-600" />
+                <span className="font-semibold text-gray-900">{leave?.leaveType}</span>
               </div>
-            )}
+              <span
+                className="px-3 py-1 text-xs font-semibold rounded-full inline-flex items-center gap-1"
+                style={{
+                  backgroundColor: leave.status === 'approved' ? '#d4edda' : '#f8d7da',
+                  color: leave.status === 'approved' ? '#155724' : '#721c24'
+                }}
+              >
+                {leave.status === 'approved' ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                {leave.status}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
+              <Clock size={16} />
+              <span>
+                {new Date(leave?.startDate).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })} - {new Date(leave?.endDate).toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <FileText size={48} className="text-gray-300 mb-4" />
+        <h4 className="text-lg font-semibold text-gray-900 mb-2">No Leave Records</h4>
+        <p className="text-sm text-gray-500">This employee hasn't taken any leaves yet.</p>
+      </div>
+    )}
+  </div>
+)}
 
             {/* ASSIGN TASKS TAB */}
-            {activeTab === 'assigned-tasks' && (
-              <div className="card">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-gray-900">Assigned Tasks</h3>
-                  {owner === profile?.reportingManager && (
-  <button
-    onClick={() => setShowTaskModal(true)}
-    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-  >
-    <Plus size={18} />
-    Add Task
-  </button>
-)}
-                </div>
-               <div className="space-y-4">
-  {tasksData.map((task) => (
-    <div key={task._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:shadow-md transition-all cursor-pointer">
-      <div className="flex justify-between items-start mb-2">
-        <h4 className="text-base font-semibold text-gray-900">{task?.taskName}</h4>
-        <div className="flex items-center gap-2">
-          {/* Status Badge */}
-          <span
-            className="px-3 py-1 text-xs font-bold rounded-full uppercase"
-            style={{
-              backgroundColor: getStatusColor(task?.status) + '20',
-              color: taskStatusColor(task?.status)
-            }}
-          >
-            {task?.status}
-          </span>
-          {/* Priority Badge */}
-          <span
-            className="px-3 py-1 text-xs font-bold rounded-full uppercase"
-            style={{
-              backgroundColor: getPriorityColor(task?.priority) + '20',
-              color: getPriorityColor(task?.priority)
-            }}
-          >
-            {task?.priority}
-          </span>
-        </div>
-      </div>
-      <p className="text-sm text-gray-600 mb-3 leading-relaxed">{task.description}</p>
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Calendar size={16} />
-        <span>Due: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-      </div>
+           {activeTab === 'assigned-tasks' && (
+  <div className="card">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-lg font-bold text-gray-900">Assigned Tasks</h3>
+      {owner === profile?.reportingManager && (
+        <button
+          onClick={() => setShowTaskModal(true)}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+        >
+          <Plus size={18} />
+          Add Task
+        </button>
+      )}
     </div>
-  ))}
-</div>
+    
+    {tasksData && tasksData.length > 0 ? (
+      <div className="space-y-4">
+        {tasksData.map((task) => (
+          <div key={task._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:shadow-md transition-all cursor-pointer">
+            <div className="flex justify-between items-start mb-2">
+              <h4 className="text-base font-semibold text-gray-900">{task?.taskName}</h4>
+              <div className="flex items-center gap-2">
+                {/* Status Badge */}
+                <span
+                  className="px-3 py-1 text-xs font-bold rounded-full uppercase"
+                  style={{
+                    backgroundColor: getStatusColor(task?.status) + '20',
+                    color: taskStatusColor(task?.status)
+                  }}
+                >
+                  {task?.status}
+                </span>
+                {/* Priority Badge */}
+                <span
+                  className="px-3 py-1 text-xs font-bold rounded-full uppercase"
+                  style={{
+                    backgroundColor: getPriorityColor(task?.priority) + '20',
+                    color: getPriorityColor(task?.priority)
+                  }}
+                >
+                  {task?.priority}
+                </span>
               </div>
-            )}
+            </div>
+            <p className="text-sm text-gray-600 mb-3 leading-relaxed">{task.description}</p>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Calendar size={16} />
+              <span>Due: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <FileText size={32} className="text-gray-400" />
+        </div>
+        <h4 className="text-lg font-semibold text-gray-900 mb-2">No Tasks Assigned</h4>
+        <p className="text-sm text-gray-500 text-center max-w-sm mb-4">
+          This employee doesn't have any assigned tasks yet.
+        </p>
+      </div>
+    )}
+  </div>
+)}
           </div>
         </main>
       </div>

@@ -56,7 +56,7 @@ const EmployeesSidebar = () => {
             {isMobile && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed top-4 left-4 z-50 p-3 bg-white border border-blue-200 shadow-md text-blue-600 rounded-xl hover:bg-blue-50 transition-colors"
+                    className="fixed top-3 left-4 z-50 p-2 bg-white border border-blue-200 shadow-md text-black rounded-xl hover:bg-blue-50 transition-colors"
                 >
                     {isOpen ? <MdClose size={18} /> : <MdMenu size={18} />}
                 </button>   

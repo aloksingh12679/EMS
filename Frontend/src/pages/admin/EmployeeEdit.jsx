@@ -50,8 +50,8 @@ export default function EmployeeEdit() {
           dob: employee.dob ? employee.dob.split('T')[0] : "",
           gender: employee.gender || "",
           address: employee.address || "",
-          position: employee.position || ""
-        //   currentProfilePhoto: employee.profilePhoto || null
+          position: employee.position || "",
+          currentProfilePhoto: employee.profilePhoto || null
         });
 
         // Set initial profile photo preview
@@ -129,40 +129,51 @@ export default function EmployeeEdit() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // If there's a new profile photo, you'll need to handle file upload
-      // You might need to use FormData for file upload
-      const updateData = { ...formData };
-      
-      if (profilePhotoFile) {
-        // Handle file upload here
-        // const formDataWithFile = new FormData();
-        // formDataWithFile.append('profilePhoto', profilePhotoFile);
-        // Object.keys(formData).forEach(key => {
-        //   formDataWithFile.append(key, formData[key]);
-        // });
-        // await employeeService.updateEmployee(id, formDataWithFile);
-        console.log("New profile photo to upload:", profilePhotoFile);
-      }
-      
-      console.log("Updating employee:", updateData);
-     const result = await employeeService.updateEmployee(id, updateData);
-      console.log("result" , result);
-      if(result.success){
-        showToast(`Employee Updated Successfully` , "success");
-      }
-    setTimeout(()=>{
-      navigate(`/admin/employees/${id}`);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    let result;
 
-    },1500);
-    } catch (err) {
-      console.error("Error updating employee:", err);
-        showToast(`${err.message}` , "error");
-
+    // If there's a profile photo, use FormData
+    if (profilePhotoFile) {
+      const formDataWithFile = new FormData();
+      
+      // Append the profile photo file
+      formDataWithFile.append('profilePhoto', profilePhotoFile);
+      
+      // Append all other form fields
+      Object.keys(formData).forEach(key => {
+        // Handle nested objects (like leaveBalance)
+        if (typeof formData[key] === 'object' && formData[key] !== null) {
+          formDataWithFile.append(key, JSON.stringify(formData[key]));
+        } else {
+          formDataWithFile.append(key, formData[key]);
+        }
+      });
+      
+      // Send with FormData
+      result = await employeeService.updateEmployee(id, formDataWithFile);
+    } else {
+      // No profile photo, send regular JSON data
+      result = await employeeService.updateEmployee(id, formData);
     }
-  };
+    
+    console.log("result", result);
+    
+    if (result.success) {
+      showToast(`Employee Updated Successfully`, "success");
+      setTimeout(() => {
+        navigate(`/admin/employees/${id}`);
+      }, 1500);
+    }
+  } catch (err) {
+    console.error("Error updating employee:", err);
+    showToast(
+      err.response?.data?.message || err.message || "Failed to update employee",
+      "error"
+    );
+  }
+};
 
   if (loading) {
     return (

@@ -88,8 +88,8 @@ department : {
 
 
      profilePhoto: {
-        type: String,
-        default  : 'default-avatar.png'
+        url : String,
+        filename : String,
     },
 
 
