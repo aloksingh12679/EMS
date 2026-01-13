@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import EmployeesSidebar from '../../../Components/EmployeesSidebar'
 import LeaveSummaryGrid from './LeaveSummaryGrid'
 import LeaveCard from './LeaveCard'
@@ -12,35 +12,35 @@ const EmployeeLeave = () => {
     const [reason, setReason] = useState("");
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: '' });
-    const[leaveDetails , setLeaveDetails] = useState();
-    const [leaveBalance , setLeaveBalance] = useState();
+    const [leaveDetails, setLeaveDetails] = useState();
+    const [leaveBalance, setLeaveBalance] = useState();
 
     const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
         setTimeout(() => setToast({ show: false, message: '', type: '' }), 4000);
     };
 
-      useEffect(() => {
+    useEffect(() => {
         fetchEmployeeLeaves();
-      }, [])
-    
-      const fetchEmployeeLeaves = async () => {
+    }, [])
+
+    const fetchEmployeeLeaves = async () => {
         try {
-         
-          const result = await leaveService.getAppliedLeave();
-          console.log(result);
-         if(result.success && result){
-setLeaveDetails(result.data.employeeLeaves);
-setLeaveBalance(result.data.leaveBalance);
 
-         }
+            const result = await leaveService.getAppliedLeave();
+            console.log(result);
+            if (result.success && result) {
+                setLeaveDetails(result.data.employeeLeaves);
+                setLeaveBalance(result.data.leaveBalance);
 
-          
+            }
+
+
         } catch (error) {
-          console.error("error fetching requested leave : ", error);
-          
+            console.error("error fetching requested leave : ", error);
+
         }
-      };
+    };
 
 
 
@@ -48,15 +48,15 @@ setLeaveBalance(result.data.leaveBalance);
     // Calculate duration between two dates
     const calculateDuration = () => {
         if (!fromDate || !toDate) return 0;
-        
+
         const from = new Date(fromDate);
         const to = new Date(toDate);
-        
+
         if (to < from) return 0;
-        
+
         const diffTime = Math.abs(to - from);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both days
-        
+
         return diffDays;
     };
 
@@ -103,21 +103,21 @@ setLeaveBalance(result.data.leaveBalance);
                 fromDate,
                 toDate,
                 reason: reason.trim(),
-                
+
             };
 
             const response = await leaveService.applyLeave(leaveData);
 
             if (response.success) {
                 showToast("Leave request submitted successfully!", "success");
-fetchEmployeeLeaves();
+                fetchEmployeeLeaves();
                 // Reset form
                 setLeaveType("sick");
                 setFromDate("");
                 setToDate("");
                 setReason("");
 
-                
+
             }
         } catch (err) {
             console.error("Error submitting leave request:", err);
@@ -175,7 +175,7 @@ fetchEmployeeLeaves();
                         </div>
 
                         {/* <LeaveCard /> */}
-                        <LeaveSummaryGrid leaveBalanceDetails = {leaveBalance}/>
+                        <LeaveSummaryGrid leaveBalanceDetails={leaveBalance} />
                     </div>
                     <div className="right-main-2 md:mx-[17px] md:flex">
 
@@ -292,7 +292,7 @@ fetchEmployeeLeaves();
                         </div>
 
                         <div className='right-right m-[15px] md:w-[50%]'>
-                            <RequestHistory requestedLeaves = {leaveDetails}/>
+                            <RequestHistory requestedLeaves={leaveDetails} />
                         </div>
 
                     </div>
