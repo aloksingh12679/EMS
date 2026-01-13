@@ -70,7 +70,7 @@ function App() {
 
 
          
-          {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           <Route path="/admin/employees" element={<EmployeesList />} />
 
@@ -85,14 +85,16 @@ function App() {
            <Route path="/admin/leaves" element={< LeaveRecord/>} />
            <Route path="/admin/employee/add" element={< AddEmployee/>} />
 
-<Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} /> */}
+<Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} />
+<Route path="/employee/apply-leave" element={<EmployeeLeave />} />
+
 {/* one page og employee side */}
 
           {/* <Route path="/employee/dashboard" element={<EmployeeDashboard />} /> */}
 
 
           {/* Protected Admin Routes */}
-          <Route 
+          {/* <Route 
             path="/admin/dashboard" 
             element={
               <ProtectedRoute allowedRoles={['Admin']}>
@@ -161,11 +163,11 @@ function App() {
                 <SalaryManagement />
               </ProtectedRoute>
             } 
-          /> 
+          />  */}
 
         
 {/* employes protected route */}
-          <Route 
+          {/* <Route 
             path="/employee/dashboard" 
             element={
               <ProtectedRoute allowedRoles={['employee']}>
@@ -217,7 +219,7 @@ function App() {
                 <MyProfile/>
               </ProtectedRoute>
             } 
-          />
+          /> */}
 
         </Routes>
       </Router>
