@@ -12,13 +12,24 @@ const Support = () => {
   const [priority, setPriority] = useState("Medium");
   const [description, setDescription] = useState("");
   const [expandedFaq, setExpandedFaq] = useState(null);
-  const [toast, setToast] = useState({ show: false, message: '', type: '' });
+  const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [loading, setLoading] = useState(false);
-  
-  const showToast = (message, type = 'success') => {
+
+  const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: '' }), 4000);
+    setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
   };
+
+  const [activate, setActivate] = useState("type");
+  const links = [
+    {
+      id: "type",
+      label: "Types & Reason",
+    },
+    { id: "date", label: "Date" },
+    { id: "days", label: "Days" },
+    { id: "status", label: "Status" },
+  ];
 
   const contacts = [
     {
@@ -78,7 +89,6 @@ const Support = () => {
       if (response.success) {
         showToast("Support ticket submitted successfully!", "success");
 
-       
         setSubject("");
         setCategory("");
         setPriority("Medium");
@@ -103,34 +113,45 @@ const Support = () => {
     setPriority("Medium");
     setDescription("");
   };
-//  useEffect(() => {
-//      fetchTickets();
-//    }, []);
- 
-//    const fetchTickets = async () => {
-//      try {
-//       //  setLoading(true);
-//        const result = await employeeService.getTickets();
-//       console.log(result);
-       
-//      } catch (error) {
-//        console.error("tickets Error:", error);
-      
-//      }
-//    };
+  //  useEffect(() => {
+  //      fetchTickets();
+  //    }, []);
+
+  //    const fetchTickets = async () => {
+  //      try {
+  //       //  setLoading(true);
+  //        const result = await employeeService.getTickets();
+  //       console.log(result);
+
+  //      } catch (error) {
+  //        console.error("tickets Error:", error);
+
+  //      }
+  //    };
   return (
     <>
       {/* Toast Notification */}
       {toast.show && (
-        <div className={`fixed top-6 right-6 z-50 animate-slideIn ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[280px] max-w-md`}>
-          <div className={`w-2 h-2 rounded-full ${toast.type === 'error' ? 'bg-red-300' : 'bg-green-300'}`}></div>
+        <div
+          className={`fixed top-6 right-6 z-50 animate-slideIn ${
+            toast.type === "error" ? "bg-red-500" : "bg-green-500"
+          } text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[280px] max-w-md`}
+        >
+          <div
+            className={`w-2 h-2 rounded-full ${
+              toast.type === "error" ? "bg-red-300" : "bg-green-300"
+            }`}
+          ></div>
           <span className="font-medium">{toast.message}</span>
-          <button onClick={() => setToast({ show: false, message: '', type: '' })} className="ml-auto text-white/80 hover:text-white">
+          <button
+            onClick={() => setToast({ show: false, message: "", type: "" })}
+            className="ml-auto text-white/80 hover:text-white"
+          >
             ✕
           </button>
         </div>
       )}
-      
+
       <EmployeesSidebar />
       <div className="support-center">
         <div className="support-header">
@@ -154,7 +175,7 @@ const Support = () => {
                 </svg>
                 Knowledge Base
               </button>
-              <button className="support-btn-secondary">
+              {/* <button className="support-btn-secondary">
                 <svg
                   width="20"
                   height="20"
@@ -166,7 +187,7 @@ const Support = () => {
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
                 My Tickets
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -199,7 +220,9 @@ const Support = () => {
                   >
                     <option value="">Select a category...</option>
                     <option value="Technical Issue">Technical Issue</option>
-                    <option value="Payroll & Compensation">Payroll & Compensation</option>
+                    <option value="Payroll & Compensation">
+                      Payroll & Compensation
+                    </option>
                     <option value="Benefits">Benefits</option>
                     <option value="Access Control">Access Control</option>
                     <option value="HR Policy Inquiry">HR Policy Inquiry</option>
@@ -208,7 +231,7 @@ const Support = () => {
 
                 <div className="support-form-group">
                   <label>Priority Level</label>
-                  <select 
+                  <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
                   >
@@ -233,7 +256,7 @@ const Support = () => {
                 </div>
               </div>
 
-              <div className="support-form-group">
+              {/* <div className="support-form-group">
                 <label>Attachments (Optional)</label>
                 <div className="support-upload-area">
                   <svg
@@ -251,17 +274,17 @@ const Support = () => {
                   <p>Click to upload or drag and drop</p>
                   <span>SVG, PNG, JPG or PDF (max. 10MB)</span>
                 </div>
-              </div>
+              </div> */}
 
               <div className="support-form-actions">
-                <button 
+                <button
                   className="support-btn-cancel"
                   onClick={handleCancel}
                   disabled={loading}
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   className="support-btn-submit"
                   onClick={handleSubmit}
                   disabled={loading}
@@ -364,61 +387,28 @@ const Support = () => {
             </div>
 
             <div className="support-sidebar-section">
-              <h3>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                Common Questions
-              </h3>
-
-              <div className="support-faq-list">
-                {faqs.map((faq) => (
-                  <div key={faq.id} className="support-faq-item">
-                    <button
-                      className="support-faq-question"
-                      onClick={() =>
-                        setExpandedFaq(expandedFaq === faq.id ? null : faq.id)
-                      }
+              <h3>Request History</h3>
+              <p>Your Recent Support History</p>
+              <div className="quick-links">
+                <ul>
+                  {links.map((link) => (
+                    <li
+                      key={link.id}
+                      onClick={() => setActivate(link.id)}
+                      className={`link ${
+                        activate === link.id ? "activate" : ""
+                      }`}
                     >
-                      {faq.question}
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className={expandedFaq === faq.id ? "rotated" : ""}
-                      >
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+                      {link.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="support-history-data">
+                <h1>No Data found </h1>
               </div>
 
-              <button className="support-view-all-btn">
-                View all FAQs
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
+
             </div>
           </div>
         </div>

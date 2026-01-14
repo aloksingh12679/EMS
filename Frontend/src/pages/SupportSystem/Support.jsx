@@ -39,7 +39,7 @@ const Support = () => {
 
         <div className="support-header">
           <div className="support-header-child1">
-            <h1>Support Center</h1>
+            {/* <h1>Support Center</h1> */}
             <p className="support-subtitle">How can we help you today?</p>
           </div>
           <div className="support-header-child2">
@@ -133,25 +133,7 @@ const Support = () => {
                 </div>
               </div>
 
-              <div className="support-form-group">
-                <label>Attachments (Optional)</label>
-                <div className="support-upload-area">
-                  <svg
-                    width="40"
-                    height="40"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                  </svg>
-                  <p>Click to upload or drag and drop</p>
-                  <span>SVG, PNG, JPG or PDF (max. 10MB)</span>
-                </div>
-              </div>
+              <h1>Hii Everyone</h1>
 
               <div className="support-form-actions">
                 <button className="support-btn-cancel">Cancel</button>
@@ -315,11 +297,6 @@ const Support = () => {
 
         <footer className="support-footer">
           <p>© 2024 Enterprise EMS. All rights reserved.</p>
-          {/* <div className="support-footer-links">
-            <a href="#privacy">Privacy Policy</a>
-            <a href="#terms">Terms of Service</a>
-            <a href="#help">Help Center</a>
-          </div> */}
         </footer>
       </div>
     </>

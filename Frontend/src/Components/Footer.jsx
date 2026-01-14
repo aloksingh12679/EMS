@@ -7,12 +7,19 @@ export default function Footer() {
         <div className="footer-section">
           <div className="footer-logo">
             {/* <span className="logo-icon">⊟⊟</span> */}
-            <span>EMS Enterprise</span>
+            <img
+              src="Graphura-logo-white.png"
+              alt=""
+              className="footer-logo-img"
+            />
           </div>
-          <p>
-            The leading employee management platform for modern enterprises.
-            Scalable, secure, and simple to use.
-          </p>
+          <div className="footer-para">
+            <p>
+              The leading employee management platform for modern enterprises.
+              Scalable, secure, and simple to use.
+            </p>
+            <p></p>
+          </div>
           <div className="social-links">
             <a
               href="https://www.linkedin.com/company/graphura-india-private-limited/"
@@ -40,6 +47,9 @@ export default function Footer() {
             </a>
           </div>
         </div>
+
+        {/* <div className="footer-section"></div>
+        <div className="footer-section"></div> */}
 
         <div className="footer-section">
           <h4>Platform</h4>
