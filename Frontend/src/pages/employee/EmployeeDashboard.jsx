@@ -22,12 +22,12 @@ export default function EmployeeDashboard() {
   const [me, setMe] = useState();
   const [salarydetails, setSalaryDetails] = useState([]);
   const [taskdetails, setTaskDetails] = useState([]);
-   const getCurrentDate = () => {
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+  const getCurrentDate = () => {
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     };
     return new Date().toLocaleDateString('en-US', options);
   };
@@ -84,9 +84,9 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f6f8fb] font-sans">
-      
-        <EmployeesSidebar />
-     
+
+      <EmployeesSidebar />
+
 
       {/* ===== OVERLAY (mobile only) =====
       {sidebarOpen && (
@@ -98,33 +98,30 @@ export default function EmployeeDashboard() {
 
       <main className="flex-1 p-4 sm:p-6 lg:p-10 space-y-8 min-[1112px]:ml-[280px]">
         <header className=" gap-4 flex-row items-center">
-          
-           
-
-            
-          <div
-  className="relative overflow-hidden rounded-2xl shadow-lg"
-  style={{
-    backgroundColor: "#0B1220", // deep navy from logo base
-  }}
->
-  {/* Subtle brand gradient overlay */}
-  <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-sky-500/20 to-indigo-500/20"></div>
-
-  {/* Content */}
-  <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-14 text-white">
-    <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-      Welcome back, {capitalize(me?.firstName) || "Employee"}
-    </h1>
-
-    <p className="text-base sm:text-lg text-white/80">
-      {getCurrentDate()}
-    </p>
-  </div>
-</div>
 
 
-          
+
+
+          <div className="relative overflow-hidden rounded-2xl shadow-lg 
+    bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600">
+
+            {/* Optional soft glow overlay */}
+            <div className="absolute inset-0 bg-white/5"></div>
+
+            {/* Content */}
+            <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-14 text-white">
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+                Welcome back, {capitalize(me?.firstName) || "Employee"}
+              </h1>
+
+              <p className="text-base sm:text-lg text-white/80">
+                {getCurrentDate()}
+              </p>
+            </div>
+          </div>
+
+
+
         </header>
 
         {/* STATS */}
@@ -240,7 +237,7 @@ const MyTasks = ({ taskdetails }) => {
                 key={task._id || task.id}
                 title={task?.taskName}
                 priority={task?.priority}
-                color={task?.priority === "Low" ? "amber" : task?.priority === "High" ? "blue" : "red" }
+                color={task?.priority === "Low" ? "amber" : task?.priority === "High" ? "blue" : "red"}
                 due={task?.dueDate}
               />
             )
@@ -266,17 +263,17 @@ const TaskItem = ({ title, priority, color, due }) => {
   // Format due date
   const formatDueDate = (dueDate) => {
     if (!dueDate) return "No due date";
-    
+
     const date = new Date(dueDate);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     // Reset time parts for comparison
     today.setHours(0, 0, 0, 0);
     tomorrow.setHours(0, 0, 0, 0);
     date.setHours(0, 0, 0, 0);
-    
+
     if (date.getTime() === today.getTime()) {
       return "Due Today";
     } else if (date.getTime() === tomorrow.getTime()) {
@@ -406,7 +403,7 @@ const SalaryHistory = ({ salarydetails }) => {
   );
 };
 
-const SalaryRow = ({ month, year, baseSalary, taxApply ,deduction, net, status }) => (
+const SalaryRow = ({ month, year, baseSalary, taxApply, deduction, net, status }) => (
   <tr className="border-b last:border-none">
     <td className="py-4">
       <div>{month}</div>
@@ -414,14 +411,13 @@ const SalaryRow = ({ month, year, baseSalary, taxApply ,deduction, net, status }
     </td>
     <td className="text-center">${parseFloat(baseSalary || 0).toLocaleString()}</td>
     <td className="text-center text-red-500">`$-${((parseFloat(baseSalary) || 0) * (parseFloat(taxApply) || 0) / 100 + (parseFloat(deduction) || 0)).toFixed(2)}`
-</td>
+    </td>
     <td className="text-center font-semibold">${parseFloat(net || 0).toLocaleString()}</td>
     <td className="text-center">
-      <span className={`px-3 py-1 rounded-full text-xs ${
-        status === 'paid' ? 'bg-green-100 text-green-700' : 
-        status === 'processing' ? 'bg-blue-100 text-blue-700' : 
-        'bg-yellow-100 text-yellow-700'
-      }`}>
+      <span className={`px-3 py-1 rounded-full text-xs ${status === 'paid' ? 'bg-green-100 text-green-700' :
+          status === 'processing' ? 'bg-blue-100 text-blue-700' :
+            'bg-yellow-100 text-yellow-700'
+        }`}>
         {capitalize(status || 'pending')}
       </span>
     </td>
@@ -435,11 +431,10 @@ const MobileSalaryCard = ({ month, year, base, deduction, net, status }) => (
         <p className="font-semibold text-slate-900">{month}</p>
         <p className="text-xs text-gray-400">{year}</p>
       </div>
-      <span className={`px-3 py-1 rounded-full text-xs ${
-        status === 'paid' ? 'bg-green-100 text-green-700' : 
-        status === 'processing' ? 'bg-blue-100 text-blue-700' : 
-        'bg-yellow-100 text-yellow-700'
-      }`}>
+      <span className={`px-3 py-1 rounded-full text-xs ${status === 'paid' ? 'bg-green-100 text-green-700' :
+          status === 'processing' ? 'bg-blue-100 text-blue-700' :
+            'bg-yellow-100 text-yellow-700'
+        }`}>
         {capitalize(status || 'pending')}
       </span>
     </div>

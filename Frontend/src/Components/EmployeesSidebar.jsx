@@ -59,12 +59,12 @@ const EmployeesSidebar = () => {
                     className="fixed top-3 left-4 z-50 p-2 bg-white border border-blue-200 shadow-md text-black rounded-xl hover:bg-blue-50 transition-colors"
                 >
                     {isOpen ? <MdClose size={18} /> : <MdMenu size={18} />}
-                </button>   
+                </button>
             )}
 
             {/* Sidebar */}
-            <aside 
-    className={`
+            <aside
+                className={`
         fixed w-64 min-h-screen
         bg-[#F9FAFB]
         border-r border-gray-200
@@ -73,25 +73,22 @@ const EmployeesSidebar = () => {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         ${!isMobile ? 'lg:translate-x-0' : ''}
     `}
->
+            >
 
                 {/* LOGO */}
-               <div className="px-6 py-6 border-b border-gray-200 bg-white">
-    <img
-        src="/logo.png"
-        alt="Company Logo"
-        className="h-12 mx-auto object-contain"
-    />
-    <p className="text-xs text-gray-500 text-center mt-2 tracking-wide">
-        Enterprise Employee
-    </p>
-</div>
+                <div className="px-6 py-6 border-b border-gray-200 bg-white">
+                    <img
+                        src="/logo.png"
+                        alt="Company Logo"
+                        className="h-16 mx-auto object-contain"
+                    />
+                </div>
 
 
 
 
                 {/* MENU */}
-               <nav className="flex-1 px-4 py-6 space-y-2">
+                <nav className="flex-1 px-4 py-6 space-y-2">
                     {menuItems.map((item, index) => (
                         <MenuItem
                             key={index}
@@ -120,25 +117,23 @@ const EmployeesSidebar = () => {
 
                     {/* Logout Button */}
                     <button
-    onClick={handleLogout}
-    className="
-        flex items-center justify-center gap-2 w-full py-3
-        rounded-xl bg-blue-600 text-white
-        hover:bg-blue-700 active:scale-95
-        transition font-semibold shadow-md
-    "
->
-    <MdLogout size={18} />
-    <span>Logout</span>
-</button>
+                        onClick={handleLogout}
+                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl 
+    bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 
+    text-white hover:from-indigo-700 hover:via-blue-700 hover:to-purple-700 
+    active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
+                    >
+                        <MdLogout size={18} />
+                        <span>Logout</span>
+                    </button>
 
                 </div>
             </aside>
 
             {/* Overlay for mobile */}
             {isMobile && isOpen && (
-                <div 
-                    className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30" 
+                <div
+                    className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30"
                     onClick={() => setIsOpen(false)}
                 />
             )}
