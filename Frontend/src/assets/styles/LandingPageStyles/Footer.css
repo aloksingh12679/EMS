@@ -120,9 +120,12 @@
 }
 
 @media (max-width: 850px) {
-  .footer-container{
+  /* .footer-container{
     margin-bottom: 500px;
-  }
+  } */
+   .footer-bottom{
+    margin-bottom: 500px;
+   }
 }
 
 /* Responsive */
@@ -185,7 +188,7 @@
   .footer-bottom {
     flex-direction: column;
     text-align: center;
-    margin-bottom: 300px;
+    margin-bottom: 400px;
   }
 
   .footer-links {
