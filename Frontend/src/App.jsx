@@ -20,6 +20,7 @@ import MyTasks from "./pages/employee/MyTasks";
 import Support from "./pages/employee/SupportSystem";
 import EmployeeLeave from "./pages/employee/ApplyLeave/EmployeeLeave";
 import MyProfile from "./pages/employee/MyProfile";
+import Register from "./pages/auth/Register";
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -68,7 +69,7 @@ function App() {
 
 
 
-
+{/* 
          
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
@@ -84,17 +85,20 @@ function App() {
 
            <Route path="/admin/leaves" element={< LeaveRecord/>} />
            <Route path="/admin/employee/add" element={< AddEmployee/>} />
+           
 
 <Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} />
-<Route path="/employee/apply-leave" element={<EmployeeLeave />} />
+<Route path="/employee/apply-leave" element={<EmployeeLeave />} /> */}
 
 {/* one page og employee side */}
 
           {/* <Route path="/employee/dashboard" element={<EmployeeDashboard />} /> */}
 
+          <Route path="/register" element={<Register />} />
 
           {/* Protected Admin Routes */}
-          {/* <Route 
+
+          <Route 
             path="/admin/dashboard" 
             element={
               <ProtectedRoute allowedRoles={['Admin']}>
@@ -163,11 +167,11 @@ function App() {
                 <SalaryManagement />
               </ProtectedRoute>
             } 
-          />  */}
+          /> 
 
         
 {/* employes protected route */}
-          {/* <Route 
+          <Route 
             path="/employee/dashboard" 
             element={
               <ProtectedRoute allowedRoles={['employee']}>
@@ -219,7 +223,7 @@ function App() {
                 <MyProfile/>
               </ProtectedRoute>
             } 
-          /> */}
+          />
 
         </Routes>
       </Router>
