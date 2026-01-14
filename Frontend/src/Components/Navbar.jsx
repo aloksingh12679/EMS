@@ -9,23 +9,13 @@ export default function Navbar() {
           <img src="logo.png" alt="Graphura Logo" className="logo" />
         </div>
 
-        <div className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
-          <button className="contact-sales-btn">
-            <a href="#features">
-               Home
-            </a>
-          </button>
-          <button className="contact-sales-btn">
-            <a href="#features">
-               Admin Login
-            </a>
-          </button>
-          <button className="contact-sales-btn">
-            <a href="#solutions">
-              Employee Login
-            </a>
-          </button>
-        </div>
+        <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
+          
+            <li><a href="#">Home Page</a></li>
+            <li><a href="#">Admin Login</a></li>
+            <li><a href="#">Employee Login</a></li>
+          
+        </ul>
 
 
         <div className="navbar-btn-div">

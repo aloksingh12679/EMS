@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import "../../assets/styles/LandingPageStyles/LandingPage.css";
-import Navbar from "../../Components/Navbar";
 import Footer from "../../Components/Footer";
 import { Link } from "react-router-dom";
+import Navbar_ from "../../Components/Navbar_";
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <>
-      <div>
-        <Navbar />
+      <div className="home-main">
+        <Navbar_ />
         {/* Hero Section */}
         <section className="hero">
           <div className="hero-container">
@@ -120,7 +120,7 @@ export default function HomePage() {
           </div>
         </section>
         {/* CTA Section */}
-        <section className="cta-section">
+        {/* <section className="cta-section">
           <div className="cta-container">
             <h2>Ready to optimize your workforce?</h2>
             <p>
@@ -135,7 +135,7 @@ export default function HomePage() {
 
             <p className="cta-note">No credit card required for trial.</p>
           </div>
-        </section>
+        </section> */}
         <Footer />
       </div>
     </>
