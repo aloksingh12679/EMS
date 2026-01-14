@@ -31,6 +31,8 @@ export const leaveService = {
         } catch (error) {
             throw error;
         }
-    }
+    },
+
+    
 
 }
