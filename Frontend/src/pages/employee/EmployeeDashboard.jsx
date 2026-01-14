@@ -102,14 +102,28 @@ export default function EmployeeDashboard() {
            
 
             
-           <div className="text-center p-8 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-xl shadow-lg">
-  <h1 className="text-3xl font-bold mb-2">
-    Welcome back, {capitalize(me?.firstName) || "Employee"}
-  </h1>
-  <p className="text-xl opacity-90">
-    It's {getCurrentDate()}
-  </p>
+          <div
+  className="relative overflow-hidden rounded-2xl shadow-lg"
+  style={{
+    backgroundColor: "#0B1220", // deep navy from logo base
+  }}
+>
+  {/* Subtle brand gradient overlay */}
+  <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-sky-500/20 to-indigo-500/20"></div>
+
+  {/* Content */}
+  <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-14 text-white">
+    <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+      Welcome back, {capitalize(me?.firstName) || "Employee"}
+    </h1>
+
+    <p className="text-base sm:text-lg text-white/80">
+      {getCurrentDate()}
+    </p>
+  </div>
 </div>
+
+
           
         </header>
 
@@ -399,7 +413,7 @@ const SalaryRow = ({ month, year, baseSalary, taxApply ,deduction, net, status }
       <div className="text-xs text-gray-400">{year}</div>
     </td>
     <td className="text-center">${parseFloat(baseSalary || 0).toLocaleString()}</td>
-    <td className="text-center text-red-500">{`$-${((parseFloat(baseSalary) || 0) * (parseFloat(taxApply) || 0) / 100 + (parseFloat(deduction) || 0)).toFixed(2)}`}
+    <td className="text-center text-red-500">`$-${((parseFloat(baseSalary) || 0) * (parseFloat(taxApply) || 0) / 100 + (parseFloat(deduction) || 0)).toFixed(2)}`
 </td>
     <td className="text-center font-semibold">${parseFloat(net || 0).toLocaleString()}</td>
     <td className="text-center">

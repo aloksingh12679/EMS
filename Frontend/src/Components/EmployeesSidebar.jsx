@@ -64,21 +64,34 @@ const EmployeesSidebar = () => {
 
             {/* Sidebar */}
             <aside 
-                className={`
-                    fixed w-64 min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 border-r border-blue-200 text-gray-800 flex flex-col
-                    transform transition-transform duration-300 ease-in-out z-40
-                    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-                    ${!isMobile ? 'lg:translate-x-0' : ''}
-                `}
-            >
+    className={`
+        fixed w-64 min-h-screen
+        bg-[#F9FAFB]
+        border-r border-gray-200
+        text-gray-800 flex flex-col
+        transform transition-transform duration-300 ease-in-out z-40
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${!isMobile ? 'lg:translate-x-0' : ''}
+    `}
+>
+
                 {/* LOGO */}
-                <div className="px-6 py-5 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-blue-700">
-                    <h1 className="text-lg font-bold text-white">EMS Portal</h1>
-                    <p className="text-xs text-blue-100">Enterprise Employee</p>
-                </div>
+               <div className="px-6 py-6 border-b border-gray-200 bg-white">
+    <img
+        src="/logo.png"
+        alt="Company Logo"
+        className="h-12 mx-auto object-contain"
+    />
+    <p className="text-xs text-gray-500 text-center mt-2 tracking-wide">
+        Enterprise Employee
+    </p>
+</div>
+
+
+
 
                 {/* MENU */}
-                <nav className="flex-1 px-3 py-4 space-y-1">
+               <nav className="flex-1 px-4 py-6 space-y-2">
                     {menuItems.map((item, index) => (
                         <MenuItem
                             key={index}
@@ -94,8 +107,8 @@ const EmployeesSidebar = () => {
                 </nav>
 
                 {/* USER CARD & LOGOUT */}
-                <div className="p-4 border-t border-blue-200 space-y-3 bg-gradient-to-b from-blue-100 to-blue-200">
-                    <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="p-4 border-t border-gray-200 bg-[#F1F5FF] space-y-4">
+                    <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
                             <span className="text-white font-bold text-sm">{capitalize(user?.firstName.charAt(0) + user?.lastName.charAt(0))}</span>
                         </div>
@@ -107,12 +120,18 @@ const EmployeesSidebar = () => {
 
                     {/* Logout Button */}
                     <button
-                        onClick={handleLogout}
-                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
-                    >
-                        <MdLogout size={18} />
-                        <span>Logout</span>
-                    </button>
+    onClick={handleLogout}
+    className="
+        flex items-center justify-center gap-2 w-full py-3
+        rounded-xl bg-blue-600 text-white
+        hover:bg-blue-700 active:scale-95
+        transition font-semibold shadow-md
+    "
+>
+    <MdLogout size={18} />
+    <span>Logout</span>
+</button>
+
                 </div>
             </aside>
 
@@ -160,5 +179,8 @@ const MenuItem = ({ icon, label, active, onClick }) => (
         <span className="text-sm">{label}</span>
     </button>
 );
+
+
+
 
 export default EmployeesSidebar;
