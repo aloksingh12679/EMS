@@ -30,12 +30,9 @@ export default function HomePage() {
               </p>
 
               <div className="hero-buttons">
-                <Link to={"/admin-login"} className="btn-primary">
-                  <span>🔐</span> Admin Login
-                </Link>
-                <Link to={"/employee-login"} className="btn-secondary">
-                  <span>👤</span> Employee Access
-                </Link>
+                <a href="#features" className="btn-secondary">
+                  <i class="fa-solid fa-arrow-trend-up"></i> Features
+                </a>
               </div>
 
               <div className="trust-badge">
@@ -85,7 +82,7 @@ export default function HomePage() {
                 Everything you need to manage your workforce effectively,
                 securely, and compliantly in a single platform.
               </p>
-              <a href="#" className="view-all">
+              <a href="#features" className="view-all">
                 View all features <i class="fa-solid fa-arrow-right"></i>
               </a>
             </div>

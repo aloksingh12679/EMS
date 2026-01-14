@@ -162,12 +162,12 @@ const EmployeeLeave = () => {
                 <div className='right-main lg:w-[100%]  md:px-[30px] '>
 
                     <div className='main-1 md:mt-[35px]'>
-                        <div className='h-[130px]'>
-                            <span className='text-[32px] font-bold px-[30px]'>
+                        <div className='h-[130px] mt-5'>
+                            <span className='text-[25px] md:text-[32px] font-bold px-[30px]'>
                                 Leave Management
                             </span>
                             <div className=' md:flex justify-between px-[30px]'>
-                                <p className='text-lg text-slate-700 mb-2'>
+                                <p className='text-sm md:text-lg text-slate-700 mb-2'>
                                     Request time off, track your balance and view request history.
                                 </p>
                                 <span className='border s bg-[white] text-sm text-slate-600 rounded-full px-3 py-1.5 shadow-sm'>Current Cycle: 2026-2027</span>
@@ -182,9 +182,9 @@ const EmployeeLeave = () => {
                         <div className="  max-w-screen-sm md:w-[50%] m-[15px] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 
                             {/* HEADER */}
-                            <div className="bg-gradient-to-br from-[#0B1220] to-[#1E293B] px-6 py-5 text-white">
-                                <h3 className="text-lg font-semibold">New Request</h3>
-                                <p className="text-sm text-slate-300">
+                            <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 px-6 py-5 text-white">
+                                <h3 className="text-[15px] md:text-lg font-semibold">New Request</h3>
+                                <p className="text-[13px] md:text-sm text-white">
                                     Submit a new leave application
                                 </p>
                             </div>
@@ -281,7 +281,7 @@ const EmployeeLeave = () => {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 bg-[#0B1220] text-white py-3 rounded-xl font-semibold hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex-1 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                         disabled={loading}
                                     >
                                         {loading ? "Submitting..." : "Submit Request"}

@@ -75,8 +75,8 @@ export default function MyProfile() {
                 <div className="p-6 lg:p-10 max-w-7xl mx-auto">
                     {/* Page Header */}
                     <div className="mb-8">
-                        <h1 className="text-4xl font-bold text-gray-900">My Profile</h1>
-                        <p className="text-gray-600 mt-2">View and manage your personal and professional information</p>
+                        {/* <h1 className="text-4xl font-bold text-gray-900">My Profile</h1>
+                        <p className="text-gray-600 mt-2">View and manage your personal and professional information</p> */}
                     </div>
 
                     {/* Profile Header Card */}

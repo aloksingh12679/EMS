@@ -15,7 +15,7 @@ const AdminSidebar = () => {
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const { logout ,  user} = useAuth();
+    const { logout, user } = useAuth();
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -62,7 +62,7 @@ const AdminSidebar = () => {
             )}
 
             {/* Sidebar */}
-            <aside 
+            <aside
                 className={`
                     fixed w-64 min-h-screen bg-gradient-to-b from-slate-50 to-white border-r border-gray-200 text-gray-800 flex flex-col
                     transform transition-transform duration-300 ease-in-out z-40
@@ -74,20 +74,16 @@ const AdminSidebar = () => {
                 }}
             >
                 {/* LOGO - Hidden on mobile */}
-                <div className="px-6 py-6 border-b border-gray-200 bg-white/80 backdrop-blur-sm hidden lg:block">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-md">
-                            <span className="text-white font-bold text-lg">EM</span>
-                        </div>
-                        <div className="text-left">
-                            <h1 className="text-lg font-bold text-gray-900 tracking-tight">EMS Portal</h1>
-                            <p className="text-xs text-gray-500 font-medium">Enterprise Admin</p>
-                        </div>
-                    </div>
+                <div className="px-6 py-6 border-b border-gray-200 bg-white">
+                    <img
+                        src="/logo.png"
+                        alt="Company Logo"
+                        className="h-16 mx-auto object-contain"
+                    />
                 </div>
-                
+
                 {/* Mobile Header - Shows only on mobile when sidebar is open */}
-                {isMobile && (
+                {/* {isMobile && (
                     <div className="px-6 py-6 border-b border-gray-200 bg-white/80 backdrop-blur-sm lg:hidden">
                         <div className="flex items-center justify-between px-5">
                             <div>
@@ -96,7 +92,7 @@ const AdminSidebar = () => {
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
 
                 {/* MENU */}
                 <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -129,8 +125,12 @@ const AdminSidebar = () => {
                     {/* Logout Button */}
                     <button
                         onClick={handleLogout}
-                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
+                        className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl 
+    bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 
+    text-white hover:from-indigo-700 hover:via-blue-700 hover:to-purple-700 
+    active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
                     >
+
                         <MdLogout size={18} />
                         <span>Logout</span>
                     </button>
@@ -139,8 +139,8 @@ const AdminSidebar = () => {
 
             {/* Overlay for mobile when sidebar is open */}
             {isMobile && isOpen && (
-                <div 
-                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 transition-opacity" 
+                <div
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 transition-opacity"
                     onClick={() => setIsOpen(false)}
                 />
             )}
@@ -194,8 +194,8 @@ const MenuItem = ({ icon, label, active, onClick }) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer group relative overflow-hidden
-            ${active 
-                ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 font-semibold shadow-sm" 
+            ${active
+                ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 font-semibold shadow-sm"
                 : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
             }`}
     >
@@ -203,12 +203,12 @@ const MenuItem = ({ icon, label, active, onClick }) => (
         {active && (
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-600 to-blue-700 rounded-r-full shadow-md"></div>
         )}
-        
+
         <div className={`text-lg transition-colors ${active ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}`}>
             {icon}
         </div>
         <span className="text-sm font-medium">{label}</span>
-        
+
         {/* Hover effect */}
         {!active && (
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>

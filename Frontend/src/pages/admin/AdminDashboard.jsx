@@ -12,36 +12,36 @@ import AdminSidebar from '../../Components/AdminSidebar';
 import { employeeService } from "../../services/employeeServices";
 import NotificationSystem from './NotificationSystem';
 import {
-    HiUser,
-    HiUserAdd,
-    HiExclamation,
-    HiDocumentText,
+  HiUser,
+  HiUserAdd,
+  HiExclamation,
+  HiDocumentText,
 } from "react-icons/hi";
-import { useEffect , useState} from "react";
-import {useNavigate} from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { capitalize } from "../../utils/helper";
 import { leaveService } from "../../services/leaveServive";
 
 const data = [
-    { week: "Week 1", attendance: 60 },
-    { week: "Week 2", attendance: 75 },
-    { week: "Week 3", attendance: 55 },
-    { week: "Week 4", attendance: 69 },
+  { week: "Week 1", attendance: 60 },
+  { week: "Week 2", attendance: 75 },
+  { week: "Week 3", attendance: 55 },
+  { week: "Week 4", attendance: 69 },
 ];
 
 const AdminDashboard = () => {
 
   const navigate = useNavigate();
-const [stats , setStats] = useState()
-   
+  const [stats, setStats] = useState()
 
-useEffect(() => {
+
+  useEffect(() => {
     fetchEmployees();
   }, []);
 
   const fetchEmployees = async () => {
     try {
-      
+
       const result = await employeeService.getAdminDashboardStats();
       const NotificationData = await employeeService.getTickets();
       console.log(NotificationData);
@@ -49,10 +49,10 @@ useEffect(() => {
       if (result && result.data) {
         setStats(result.data.stats);
       }
-      
+
     } catch (error) {
       console.error("Error:", error);
-     
+
     }
   };
 
@@ -72,11 +72,11 @@ useEffect(() => {
 
       {/* MAIN DASHBOARD CONTENT - Changed: Added dashboard-wrapper class for responsive margin */}
       <div className="dashboard-wrapper bg-[#F6F8FB] min-h-screen">
-        
+
         {/* TOP HEADER BAR - Changed: Added header-wrapper class for responsive margin */}
         <div className="header-wrapper w-full bg-white px-4 sm:px-6 lg:px-10 py-4 border-b border-slate-200">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            
+
             {/* SEARCH BAR - Changed: Added flex-wrap and full width on mobile for mobile responsiveness */}
             <div className="flex items-center gap-3 bg-slate-100 rounded-full px-4 py-2.5 w-full sm:max-w-xl">
               <FiSearch className="text-slate-400 text-lg flex-shrink-0" />
@@ -90,11 +90,11 @@ useEffect(() => {
             {/* RIGHT ACTIONS - Changed: Added flex-shrink-0 to prevent squashing */}
             <div className="flex items-center gap-4 flex-shrink-0">
               {/* Notification */}
-             <NotificationSystem />
+              <NotificationSystem />
 
               {/* Button - Changed: Added responsive classes to show/hide on mobile */}
-              <button   onClick={() => navigate('/admin/employees/add')}
-className="hidden sm:flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:opacity-95 transition whitespace-nowrap">
+              <button onClick={() => navigate('/admin/employees/add')}
+                className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:opacity-95 transition whitespace-nowrap">
                 <FiPlus />
                 New Employee
               </button>
@@ -154,80 +154,10 @@ className="hidden sm:flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5
             />
           </div>
 
-          {/* ATTENDANCE CHART + RECENT ACTIVITY - Changed: Made them appear side by side on large screens */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
-            {/* ATTENDANCE CHART - Changed: Takes 2 columns on xl screens */}
-            <div className="xl:col-span-2">
-              <div className="bg-white rounded-[24px] px-6 sm:px-8 py-6 shadow-sm border border-slate-100">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
-                  <div>
-                    <h3 className="text-[16px] font-semibold text-slate-900">
-                      Monthly Attendance Trend
-                    </h3>
-                    <p className="text-[13px] text-slate-500 mt-1">
-                      Average daily presence over the last 30 days
-                    </p>
-                  </div>
-                  {/* Filter pill */}
-                  <span className="text-[13px] font-medium text-slate-600 bg-slate-100 px-4 py-2 rounded-full">
-                    Last 30 Days
-                  </span>
-                </div>
+          {/*  RECENT ACTIVITY - Changed: Made them appear side by side on large screens */}
 
-                {/* Chart - Changed: Made height responsive */}
-                <div className="w-full h-[220px] sm:h-[260px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={data}>
-                      <CartesianGrid
-                        stroke="#E5E7EB"
-                        strokeDasharray="3 3"
-                        vertical={false}
-                      />
-                      <XAxis
-                        dataKey="week"
-                        stroke="#94A3B8"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={12}
-                      />
-                      <YAxis
-                        stroke="#94A3B8"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={12}
-                        unit="%"
-                      />
-                      <Tooltip
-                        cursor={{ stroke: "#E5E7EB", strokeWidth: 1 }}
-                        contentStyle={{
-                          backgroundColor: "#0B1220",
-                          borderRadius: "999px",
-                          border: "none",
-                          color: "#fff",
-                          fontSize: "12px",
-                          padding: "6px 10px",
-                        }}
-                        labelFormatter={(label) => `98% ${label}`}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="attendance"
-                        stroke="#2563EB"
-                        strokeWidth={2.5}
-                        dot={false}
-                        activeDot={{
-                          r: 5,
-                          fill: "#2563EB",
-                          stroke: "#fff",
-                          strokeWidth: 2,
-                        }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-1  gap-6 mt-8">
 
             {/* RECENT ACTIVITY - Changed: Takes 1 column on xl screens, appears beside attendance */}
             <div className="xl:col-span-1">
@@ -284,6 +214,8 @@ className="hidden sm:flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5
             </div>
           </div>
 
+
+
           {/* QUICK ACTIONS - Changed: Made grid responsive for mobile/tablet */}
           <div className="mt-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -292,7 +224,7 @@ className="hidden sm:flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5
                 label="Add Employee"
                 iconBg="bg-blue-50"
                 iconColor="text-blue-600"
-                  link="/admin/employees/add"
+                link="/admin/employees/add"
 
               />
               <QuickActionCard
@@ -300,7 +232,7 @@ className="hidden sm:flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5
                 label="Approve Leave"
                 iconBg="bg-orange-50"
                 iconColor="text-orange-500"
-                  link="/admin/employees/leaves"
+                link="/admin/employees/leaves"
 
               />
               <QuickActionCard
@@ -308,14 +240,14 @@ className="hidden sm:flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5
                 label="Run Payroll"
                 iconBg="bg-green-50"
                 iconColor="text-green-600"
-                  link="/admin/employees/salary"
+                link="/admin/employees/salary"
 
               />
             </div>
           </div>
 
           {/* SALARY DISTRIBUTION + AI ANALYTICS - Changed: Made them appear side by side on large screens */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8 pb-8">
+          <div className="grid grid-cols-1 xl:grid-cols-1 gap-6 mt-8 pb-8">
             {/* SALARY DISTRIBUTION - Changed: Takes 2 columns on xl screens */}
             <div className="xl:col-span-2">
               <div className="bg-white rounded-[24px] px-6 sm:px-8 py-7 shadow-sm border border-slate-100">
@@ -332,30 +264,6 @@ className="hidden sm:flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5
                     <SalaryBar label="80k+" fill="45%" />
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* AI ANALYTICS CARD - Changed: Takes 1 column on xl screens, appears beside salary chart */}
-            <div className="xl:col-span-1">
-              <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#0B1220] to-[#1E3A8A] h-fit">
-                <div>
-                  <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-white text-sm mb-4">
-                    🚀 New Feature
-                  </span>
-
-                  <h3 className="text-xl sm:text-2xl text-white font-bold mb-3">
-                    AI Analytics Beta
-                  </h3>
-
-                  <p className="text-slate-200 text-sm leading-relaxed">
-                    Predict attrition risks and optimize workforce planning
-                    with our new AI engine.
-                  </p>
-                </div>
-
-                <button className="mt-4 w-full rounded-lg bg-white py-2 text-sm font-semibold text-primary transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                  Try it now
-                </button>
               </div>
             </div>
           </div>
@@ -457,7 +365,7 @@ const QuickActionCard = ({ icon, label, iconBg, iconColor, link }) => {
   };
 
   return (
-    <div 
+    <div
       onClick={handleClick}
       className="flex items-center gap-4 sm:gap-5 bg-white px-4 sm:px-6 py-5 rounded-[20px] border border-slate-100 shadow-sm cursor-pointer transition-all hover:shadow-md hover:-translate-y-[1px]"
     >

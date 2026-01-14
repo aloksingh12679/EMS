@@ -4,7 +4,7 @@
   top: 0;
   background: #ffffff;
   border-bottom: 1px solid #f0f0f0;
-  padding: 0px 60px;
+  padding: 0px 20px;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -12,23 +12,52 @@
 .navbar-container {
   width: 100%;
   margin: 0 auto;
-  padding: 10px 0px;
+  /* padding: 10px 0px; */
+  padding-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .navbar-logo {
+  width: 230px;
+  height: auto;
+  font-size: 50px;
+  /* background: #111; */
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a1a2e;
+  /* justify-content: center; */
+  overflow: hidden;
 }
 
-.logo-icon {
-  font-size: 1.5rem;
+.logo-image {
+  width: 230px !important;
+  height: 40px !important;
+  object-fit: cover;
+  object-position: top;
+}
+
+.navbar-logo {
+  width: 230px;
+  overflow: hidden;
+  height: auto;
+  /* background: rgba(10, 10, 10, 0.75); */
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.logo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 200px !important;
+  height: 52px !important;
+  object-fit: cover !important;
+  object-position: top !important;
+  /* filter: brightness(0) saturate(100%); */
 }
 
 .nav-menu {
@@ -36,6 +65,7 @@
   list-style: none;
   gap: 2rem;
   margin: 0;
+  padding-top: 20px;
 }
 
 .nav-menu a {
@@ -51,17 +81,23 @@
 
 .contact-sales-btn {
   background: #1a1a2e;
-  color: white;
   border: none;
   padding: 0.6rem 1rem;
   border-radius: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s;
+  transition:  0.4s;
+}
+.contact-sales-btn a{
+  text-decoration: none;
+  color: white;
+}
+.contact-sales-btn:hover{
+  transform: scale(1.1);
 }
 
-.contact-sales-btn:hover {
-  background: #0f0f1e;
+.contact-sales-btn:hover a{
+  color: whitesmoke;
 }
 
 /* .mobile-menu-btn {
@@ -83,21 +119,24 @@
 
 .navbar-btn-div {
   display: flex;
+  padding-top: 20px;
 }
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 0 20px;
+    padding: 0 10px;
   }
 
   .navbar-container {
-    padding: 10px 0 !important;
+    padding: 0px 0px !important;
+    padding-bottom: 10px !important;
   }
 
   .mobile-menu-btn {
     display: block;
   }
   .navbar-btn-div {
+    padding-top: 10px;
     display: flex ;
     /* flex-direction: column; */
     gap: 20px;

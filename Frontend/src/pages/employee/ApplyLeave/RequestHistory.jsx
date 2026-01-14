@@ -88,11 +88,11 @@ const RequestHistory = ({ requestedLeaves = [] }) => {
                             >
                                 {/* TYPE */}
                                 <div className="flex items-center gap-3">
-                                    <div
+                                    {/* <div
                                         className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconData.bg} flex-shrink-0`}
                                     >
                                         {iconData.icon}
-                                    </div>
+                                    </div> */}
                                     <div className="min-w-0">
                                         <p className="font-semibold text-slate-900">
                                             {capitalizeFirst(item.leaveType)} Leave
