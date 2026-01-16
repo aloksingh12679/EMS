@@ -182,9 +182,10 @@ const EmployeeLeave = () => {
                         <div className="  max-w-screen-sm md:w-[50%] m-[15px] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 
                             {/* HEADER */}
-                            <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 px-6 py-5 text-white">
+                            <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400
+ px-6 py-5 text-white">
                                 <h3 className="text-[15px] md:text-lg font-semibold">New Request</h3>
-                                <p className="text-[13px] md:text-sm text-white">
+                                <p className="text-[13px] md:text-sm text-white">Git
                                     Submit a new leave application
                                 </p>
                             </div>
@@ -281,7 +282,8 @@ const EmployeeLeave = () => {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex-1 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400
+ text-white py-3 rounded-xl font-semibold hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                         disabled={loading}
                                     >
                                         {loading ? "Submitting..." : "Submit Request"}
