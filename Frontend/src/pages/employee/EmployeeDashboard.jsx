@@ -83,92 +83,148 @@ export default function EmployeeDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f8fb] font-sans">
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100/30 font-sans relative overflow-hidden">
+      {/* Animated Background Particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-96 h-96 bg-blue-400/10 rounded-full blur-3xl -top-48 -left-48 animate-pulse"></div>
+        <div className="absolute w-96 h-96 bg-purple-400/10 rounded-full blur-3xl top-1/3 -right-48 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl -bottom-48 left-1/3 animate-pulse" style={{ animationDelay: '4s' }}></div>
+      </div>
       <EmployeesSidebar />
 
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 min-[1112px]:ml-[280px]">
+        {/* PROFILE HEADER CARD */}
+        <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 transform transition-all hover:shadow-blue-500/40 hover:shadow-2xl group">
+          {/* Animated shimmer effect */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+          </div>
+          {/* Decorative Background Elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl transform translate-x-32 -translate-y-32 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-900/20 rounded-full blur-2xl transform -translate-x-20 translate-y-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+          
+          <div className="relative z-10 px-6 py-6 sm:px-8 sm:py-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              {/* Profile Info */}
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-8 bg-white/60 rounded-full"></div>
+                  <h1 className="text-2.5xl sm:text-4xl font-extrabold text-white drop-shadow-lg">
+                    Welcome back, {capitalize(me?.firstName) || "Employee"} {capitalize(me?.lastName) || ""}
+                  </h1>
+                </div>
+                <p className="text-white/90 text-sm sm:text-base font-semibold ml-4">{getCurrentDate()}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      {/* ===== OVERLAY (mobile only) =====
-      {sidebarOpen && (
-        <div
-          onClick={closeSidebar}
-          className="fixed inset-0 bg-black/40 z-40 min-[1112px]:hidden"
-        />
-      )} */}
-
-      <main className="flex-1 p-4 sm:p-6 lg:p-10 space-y-8 min-[1112px]:ml-[280px]">
-        <header className=" gap-4 flex-row items-center">
-
-
-
-
-          <div className="relative overflow-hidden rounded-2xl shadow-lg 
-    bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600">
-
-            {/* Optional soft glow overlay */}
-            <div className="absolute inset-0 bg-white/5"></div>
-
-            {/* Content */}
-            <div className="relative z-10 px-6 py-10 sm:px-10 sm:py-14 text-white">
-              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-                Welcome back, {capitalize(me?.firstName) || "Employee"}
-              </h1>
-
-              <p className="text-base sm:text-lg text-white/80">
-                {getCurrentDate()}
-              </p>
+        {/* QUICK STATS GRID */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+          {/* Attendance Card */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
+            <div className="p-6 relative">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+                <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Attendance Rate</p>
+              <div className="flex items-baseline gap-2 mb-3">
+                <h3 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">92%</h3>
+                <span className="text-green-600 bg-green-50 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 animate-bounce">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  +2.4%
+                </span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 mb-2 overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer"></div>
+                <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 h-2 rounded-full shadow-lg shadow-green-500/50 transition-all duration-1000 group-hover:shadow-green-500/70" style={{ width: "92%" }} />
+              </div>
+              <p className="text-slate-400 text-xs group-hover:text-slate-600 transition-colors">Target: 95% monthly average</p>
             </div>
           </div>
 
-
-
-        </header>
-
-        {/* STATS */}
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {/* Attendance */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[160px] relative overflow-hidden group">
-            <div>
-              <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">Attendance</p>
-              <div className="flex items-baseline gap-2 mt-2">
-                <h3 className="text-slate-900 text-3xl font-bold">92%</h3>
-                <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs font-bold">+2.4%</span>
+          {/* Current Salary Card */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
+            <div className="p-6 relative">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+                <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-            </div>
-            <div className="w-full bg-slate-100 rounded-full h-2 mt-4">
-              <div className="bg-[#0b1220] h-2 rounded-full" style={{ width: "92%" }} />
-            </div>
-            <p className="text-slate-400 text-xs mt-2">Target: 95% monthly average</p>
-          </div>
-
-          {/* Salary */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between h-40 relative overflow-hidden group">
-            <div>
-              <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">Current Salary</p>
-              <div className="flex items-baseline gap-2 mt-2">
-                <h3 className="text-slate-900 text-3xl font-bold">$ {(salarydetails[0]?.baseSalary) || 0}</h3>
-                <span className="text-slate-400 text-sm">/ month</span>
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Current Salary</p>
+              <div className="flex items-baseline gap-2 mb-3">
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
+                  ${(salarydetails[0]?.baseSalary)?.toLocaleString() || "0"}
+                </h3>
+                <span className="text-slate-400 text-sm group-hover:text-slate-600 transition-colors">/ month</span>
               </div>
-            </div>
-            <div className="flex items-center gap-2 mt-auto">
-              <span className="material-symbols-outlined text-green-600 text-sm">trending_up</span>
-              <p className="text-slate-500 text-xs">Next review in 14 days</p>
+              <div className="flex items-center gap-2 mt-4 text-blue-600 bg-blue-50 px-3 py-2 rounded-lg group-hover:bg-blue-100 transition-colors">
+                <svg className="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <p className="text-xs font-semibold">Next review in 14 days</p>
+              </div>
             </div>
           </div>
 
-          {/* Leave */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between h-40 relative overflow-hidden group">
-            <div>
-              <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">Leave Balance</p>
-              <div className="flex items-baseline gap-2 mt-2">
-                <h3 className="text-slate-900 text-3xl font-bold">{me?.leaveBalance?.annual + me?.leaveBalance?.sick + me?.leaveBalance?.personal} Days</h3>
-                <span className="text-slate-400 text-sm">Remaining</span>
+          {/* Total Leave Balance Card */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
+            <div className="p-6 relative">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+                <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Leave Balance</p>
+              <div className="flex items-baseline gap-2 mb-3">
+                <h3 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
+                  {(me?.leaveBalance?.annual || 0) + (me?.leaveBalance?.sick || 0) + (me?.leaveBalance?.personal || 0)}
+                </h3>
+                <span className="text-slate-400 text-sm group-hover:text-slate-600 transition-colors">Days</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                <span className="bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 px-2.5 py-1 rounded-lg text-xs font-semibold border border-blue-200 hover:scale-110 hover:shadow-md transition-all cursor-pointer">
+                  {me?.leaveBalance?.annual || 0} Annual
+                </span>
+                <span className="bg-gradient-to-r from-green-50 to-green-100 text-green-700 px-2.5 py-1 rounded-lg text-xs font-semibold border border-green-200 hover:scale-110 hover:shadow-md transition-all cursor-pointer">
+                  {me?.leaveBalance?.sick || 0} Sick
+                </span>
+                <span className="bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 px-2.5 py-1 rounded-lg text-xs font-semibold border border-orange-200 hover:scale-110 hover:shadow-md transition-all cursor-pointer">
+                  {me?.leaveBalance?.personal || 0} Personal
+                </span>
               </div>
             </div>
-            <div className="flex gap-2 mt-auto">
-              <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-medium">{me?.leaveBalance?.annual || 0} Annual</span>
-              <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs font-medium"> {me?.leaveBalance?.sick || 0} Sick</span>
-              <span className="bg-orange-50 text-orange-700 px-2 py-1 rounded text-xs font-medium">{me?.leaveBalance?.personal || 0} personal</span>
+          </div>
+
+          {/* Tasks Status Card */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
+            <div className="p-6 relative">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+                <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Active Tasks</p>
+              <div className="flex items-baseline gap-2 mb-3">
+                <h3 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
+                  {taskdetails?.filter(t => t.status !== "completed").length || 0}
+                </h3>
+                <span className="text-slate-400 text-sm group-hover:text-slate-600 transition-colors">Pending</span>
+              </div>
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 group-hover:border-amber-100 transition-colors">
+                <span className="text-xs text-slate-500 group-hover:text-slate-700 transition-colors">Completed</span>
+                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg hover:scale-110 transition-transform group-hover:bg-green-100">
+                  {taskdetails?.filter(t => t.status === "completed").length || 0} / {taskdetails?.length || 0}
+                </span>
+              </div>
             </div>
           </div>
         </section>
@@ -189,44 +245,55 @@ const MyTasks = ({ taskdetails }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col min-h-[420px]">
-      <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+    <div className="lg:col-span-1 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col min-h-[420px] overflow-hidden hover:shadow-2xl transition-shadow">
+      <div className="p-6 bg-gradient-to-r from-slate-50 to-blue-50/30 border-b border-slate-100 flex justify-between items-center">
         <div>
-          <h3 className="text-slate-900 font-bold text-lg">My Tasks</h3>
-          <p className="text-slate-500 text-sm">Assigned for this week</p>
+          <h3 className="text-slate-900 font-bold text-lg flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            My Tasks
+          </h3>
+          <p className="text-slate-500 text-sm mt-1">Assigned for this week</p>
         </div>
         <button
           aria-label="Add task"
-          className="h-8 w-8 flex items-center justify-center
-               rounded-full border border-slate-300
-               bg-white hover:bg-slate-100 transition"
+          className="h-10 w-10 flex items-center justify-center
+               rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 
+               hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl 
+               transition-all hover:scale-105"
         >
-          <Plus className="h-4 w-4 text-slate-600" />
+          <Plus className="h-5 w-5 text-white" />
         </button>
       </div>
 
-      <div className="flex-1 p-3 sm:p-4 flex flex-col gap-3 overflow-y-auto">
+      <div className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto bg-gradient-to-b from-slate-50/50 to-white">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
           </div>
         ) : taskdetails && taskdetails.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-12 w-12 text-slate-300 mb-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            <p className="text-slate-500 text-sm">No tasks assigned</p>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-10 w-10 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+            </div>
+            <p className="text-slate-500 text-sm font-medium">No tasks assigned</p>
+            <p className="text-slate-400 text-xs mt-1">Check back later for updates</p>
           </div>
         ) : (
           taskdetails?.map((task) => (
@@ -245,8 +312,8 @@ const MyTasks = ({ taskdetails }) => {
         )}
       </div>
 
-      <div className="p-4 border-t border-slate-100 bg-slate-50/50 rounded-b-xl">
-        <button className="w-full text-center text-sm text-slate-400 hover:text-primary font-medium">
+      <div className="p-4 border-t border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50/30">
+        <button className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-semibold hover:bg-blue-50 py-2 rounded-lg transition-all">
           View All Tasks ({taskdetails?.length || 0})
         </button>
       </div>
@@ -256,10 +323,11 @@ const MyTasks = ({ taskdetails }) => {
 
 const TaskItem = ({ title, priority, color, due }) => {
   const colors = {
-    red: "text-red-600 bg-red-50",
-    amber: "text-amber-600 bg-amber-50",
-    blue: "text-blue-600 bg-blue-50",
+    red: "text-red-600 bg-gradient-to-r from-red-50 to-red-100 border-red-200",
+    amber: "text-amber-600 bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200",
+    blue: "text-blue-600 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200",
   };
+  
   // Format due date
   const formatDueDate = (dueDate) => {
     if (!dueDate) return "No due date";
@@ -286,13 +354,22 @@ const TaskItem = ({ title, priority, color, due }) => {
       return `Due ${date.toLocaleDateString('en-US', options)}`;
     }
   };
+  
   return (
-    <div className="group flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all cursor-pointer">
-      <div className="flex-1">
-        <p className="text-sm font-medium text-slate-900 group-hover:text-primary transition-colors">{title}</p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className={`text-xs font-medium px-2 py-0.5 rounded ${colors[color] || 'text-slate-600 bg-slate-50'}`}>{priority}</span>
-          <span className="text-xs text-slate-400">{formatDueDate(due)}</span>
+    <div className="group flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+      <div className="w-5 h-5 rounded border-2 border-slate-300 group-hover:border-blue-500 transition-colors mt-0.5 flex-shrink-0"></div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">{title}</p>
+        <div className="flex items-center gap-2 mt-2 flex-wrap">
+          <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${colors[color] || 'text-slate-600 bg-slate-50 border-slate-200'}`}>
+            {priority}
+          </span>
+          <span className="text-xs text-slate-500 flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {formatDueDate(due)}
+          </span>
         </div>
       </div>
     </div>
@@ -300,11 +377,18 @@ const TaskItem = ({ title, priority, color, due }) => {
 };
 
 const TaskDone = ({ title }) => (
-  <div className="group flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all cursor-pointer">
-    <div className="flex-1 opacity-60">
-      <p className="text-sm font-medium text-slate-900 line-through">{title}</p>
-      <div className="flex items-center gap-2 mt-1">
-        <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded">Done</span>
+  <div className="group flex items-start gap-3 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 hover:shadow-md transition-all cursor-pointer">
+    <div className="w-5 h-5 rounded bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-semibold text-green-800 line-through leading-snug">{title}</p>
+      <div className="flex items-center gap-2 mt-2">
+        <span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-lg border border-green-300">
+          Completed
+        </span>
       </div>
     </div>
   </div>
@@ -314,16 +398,23 @@ const SalaryHistory = ({ salarydetails }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="lg:col-span-2 bg-white rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col">
+    <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex flex-col hover:shadow-2xl transition-shadow">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
-        <div>
-          <h2 className="font-bold">Salary History</h2>
-          <p className="text-sm text-gray-500">Recent payment activity</p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="font-bold text-lg text-slate-900">Salary History</h2>
+            <p className="text-sm text-slate-500">Recent payment activity</p>
+          </div>
         </div>
 
-        <button className="bg-gray-900 text-white px-5 py-2 rounded-full text-sm flex gap-2 items-center w-full sm:w-auto justify-center">
-          <Download size={16} /> Download Payslip
+        <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold flex gap-2 items-center w-full sm:w-auto justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105">
+          <Download size={18} /> Download Payslip
         </button>
       </div>
 
@@ -331,39 +422,45 @@ const SalaryHistory = ({ salarydetails }) => {
       <div className="hidden sm:block overflow-x-auto lg:overflow-visible">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
           </div>
         ) : salarydetails && salarydetails.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <FileText className="h-12 w-12 text-slate-300 mb-2" />
-            <p className="text-slate-500 text-sm">No salary records found</p>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mb-4">
+              <FileText className="h-10 w-10 text-slate-400" />
+            </div>
+            <p className="text-slate-500 text-sm font-medium">No salary records found</p>
+            <p className="text-slate-400 text-xs mt-1">Check back later for updates</p>
           </div>
         ) : (
-          <table className="min-w-[720px] lg:min-w-full w-full text-sm">
-            <thead className="text-xs font-semibold text-gray-400 border-b">
-              <tr>
-                <th className="text-left py-3">MONTH</th>
-                <th className="text-center">BASE SALARY</th>
-                <th className="text-center">DEDUCTIONS</th>
-                <th className="text-center">NET PAY</th>
-                <th className="text-center">STATUS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {salarydetails?.map((salary) => (
-                <SalaryRow
-                  key={salary._id || salary.id}
-                  month={salary.month}
-                  year={new Date().getFullYear()}
-                  baseSalary={salary.baseSalary}
-                  deduction={salary.deductions}
-                  taxApply={salary?.taxApply}
-                  net={salary.netSalary}
-                  status={salary.Status}
-                />
-              ))}
-            </tbody>
-          </table>
+          <div className="bg-gradient-to-b from-slate-50/50 to-white rounded-xl p-1">
+            <table className="min-w-[720px] lg:min-w-full w-full text-sm">
+              <thead className="text-xs font-bold text-slate-500 border-b-2 border-slate-200">
+                <tr>
+                  <th className="text-left py-4 px-4">MONTH</th>
+                  <th className="text-center px-4">BASE SALARY</th>
+                  <th className="text-center px-4">DEDUCTIONS</th>
+                  <th className="text-center px-4">NET PAY</th>
+                  <th className="text-center px-4">STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salarydetails?.map((salary, index) => (
+                  <SalaryRow
+                    key={salary._id || salary.id}
+                    month={salary.month}
+                    year={new Date().getFullYear()}
+                    baseSalary={salary.baseSalary}
+                    deduction={salary.deductions}
+                    taxApply={salary?.taxApply}
+                    net={salary.netSalary}
+                    status={salary.Status}
+                    isLast={index === salarydetails.length - 1}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
@@ -371,12 +468,15 @@ const SalaryHistory = ({ salarydetails }) => {
       <div className="sm:hidden space-y-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
           </div>
         ) : salarydetails && salarydetails.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <FileText className="h-12 w-12 text-slate-300 mb-2" />
-            <p className="text-slate-500 text-sm">No salary records found</p>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center mb-4">
+              <FileText className="h-10 w-10 text-slate-400" />
+            </div>
+            <p className="text-slate-500 text-sm font-medium">No salary records found</p>
+            <p className="text-slate-400 text-xs mt-1">Check back later for updates</p>
           </div>
         ) : (
           salarydetails?.map((salary) => (
@@ -394,8 +494,8 @@ const SalaryHistory = ({ salarydetails }) => {
       </div>
 
       {/* FOOTER */}
-      <div className="mt-6 p-4 border-t border-slate-100 bg-slate-50/50 rounded-b-xl">
-        <button className="w-full text-center text-sm text-gray-600 hover:text-primary font-medium">
+      <div className="mt-6 p-4 bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-xl">
+        <button className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-semibold hover:bg-blue-50 py-2 rounded-lg transition-all">
           View All Payslips ({salarydetails?.length || 0})
         </button>
       </div>
@@ -403,21 +503,26 @@ const SalaryHistory = ({ salarydetails }) => {
   );
 };
 
-const SalaryRow = ({ month, year, baseSalary, taxApply, deduction, net, status }) => (
-  <tr className="border-b last:border-none">
-    <td className="py-4">
-      <div>{month}</div>
-      <div className="text-xs text-gray-400">{year}</div>
+const SalaryRow = ({ month, year, baseSalary, taxApply, deduction, net, status, isLast }) => (
+  <tr className={`hover:bg-blue-50/50 transition-colors ${!isLast ? 'border-b border-slate-100' : ''}`}>
+    <td className="py-4 px-4">
+      <div className="font-semibold text-slate-900">{month}</div>
+      <div className="text-xs text-slate-400">{year}</div>
     </td>
-    <td className="text-center">${parseFloat(baseSalary || 0).toLocaleString()}</td>
-    <td className="text-center text-red-500">`$-${((parseFloat(baseSalary) || 0) * (parseFloat(taxApply) || 0) / 100 + (parseFloat(deduction) || 0)).toFixed(2)}`
-    </td>
-    <td className="text-center font-semibold">${parseFloat(net || 0).toLocaleString()}</td>
-    <td className="text-center">
-      <span className={`px-3 py-1 rounded-full text-xs ${status === 'paid' ? 'bg-green-100 text-green-700' :
-          status === 'processing' ? 'bg-blue-100 text-blue-700' :
-            'bg-yellow-100 text-yellow-700'
-        }`}>
+    <td className="text-center px-4 font-semibold text-slate-900">${parseFloat(baseSalary || 0).toLocaleString()}</td>
+    <td className="text-center px-4 font-semibold text-red-600">-${((parseFloat(baseSalary) || 0) * (parseFloat(taxApply) || 0) / 100 + (parseFloat(deduction) || 0)).toFixed(2)}</td>
+    <td className="text-center px-4 font-bold text-green-600">${parseFloat(net || 0).toLocaleString()}</td>
+    <td className="text-center px-4">
+      <span className={`px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 ${
+        status === 'paid' ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-300' :
+        status === 'processing' ? 'bg-gradient-to-r from-blue-100 to-sky-100 text-blue-700 border border-blue-300' :
+        'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700 border border-yellow-300'
+      }`}>
+        {status === 'paid' && (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        )}
         {capitalize(status || 'pending')}
       </span>
     </td>
@@ -425,33 +530,36 @@ const SalaryRow = ({ month, year, baseSalary, taxApply, deduction, net, status }
 );
 
 const MobileSalaryCard = ({ month, year, base, deduction, net, status }) => (
-  <div className="border rounded-xl p-4 bg-slate-50 space-y-3">
-    <div className="flex justify-between items-center">
+  <div className="border-2 border-slate-100 rounded-2xl p-5 bg-gradient-to-br from-white to-slate-50/50 hover:shadow-lg transition-all hover:border-blue-200">
+    <div className="flex justify-between items-center mb-4">
       <div>
-        <p className="font-semibold text-slate-900">{month}</p>
-        <p className="text-xs text-gray-400">{year}</p>
+        <p className="font-bold text-slate-900 text-lg">{month}</p>
+        <p className="text-xs text-slate-400 font-medium">{year}</p>
       </div>
-      <span className={`px-3 py-1 rounded-full text-xs ${status === 'paid' ? 'bg-green-100 text-green-700' :
-          status === 'processing' ? 'bg-blue-100 text-blue-700' :
-            'bg-yellow-100 text-yellow-700'
-        }`}>
+      <span className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
+        status === 'paid' ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-300' :
+        status === 'processing' ? 'bg-gradient-to-r from-blue-100 to-sky-100 text-blue-700 border border-blue-300' :
+        'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700 border border-yellow-300'
+      }`}>
         {capitalize(status || 'pending')}
       </span>
     </div>
 
-    <div className="flex justify-between text-sm">
-      <span className="text-gray-500">Base Salary</span>
-      <span>{base}</span>
-    </div>
+    <div className="space-y-3">
+      <div className="flex justify-between text-sm items-center p-2.5 bg-slate-50 rounded-lg">
+        <span className="text-slate-600 font-medium">Base Salary</span>
+        <span className="font-bold text-slate-900">{base}</span>
+      </div>
 
-    <div className="flex justify-between text-sm text-red-500">
-      <span>Deductions</span>
-      <span>{deduction}</span>
-    </div>
+      <div className="flex justify-between text-sm items-center p-2.5 bg-red-50 rounded-lg">
+        <span className="text-red-600 font-medium">Deductions</span>
+        <span className="font-bold text-red-600">{deduction}</span>
+      </div>
 
-    <div className="flex justify-between font-semibold">
-      <span>Net Pay</span>
-      <span>{net}</span>
+      <div className="flex justify-between font-semibold items-center p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+        <span className="text-green-800">Net Pay</span>
+        <span className="text-green-700 text-lg">{net}</span>
+      </div>
     </div>
   </div>
 );
