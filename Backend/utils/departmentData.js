@@ -6,7 +6,7 @@ const departmentData = [
         totalEmployees: 45,
         budget: 5000000,
         isActive: true,
-        manager: "Alex Morgan"  // From adminData[0]
+         // From adminData[0]
     },
     {
         name: "Human Resources",
@@ -15,7 +15,7 @@ const departmentData = [
         totalEmployees: 12,
         budget: 1200000,
         isActive: true,
-        manager: "Sarah Johnson"  // From adminData[1]
+         // From adminData[1]
     },
     {
         name: "Finance",
@@ -24,7 +24,7 @@ const departmentData = [
         totalEmployees: 18,
         budget: 8000000,
         isActive: true,
-        manager: "Michael Chen"  // From adminData[2]
+          // From adminData[2]
     },
     {
         name: "Sales",
@@ -33,7 +33,7 @@ const departmentData = [
         totalEmployees: 32,
         budget: 3500000,
         isActive: true,
-        manager: "Emily Wilson"  // From adminData[3]
+         // From adminData[3]
     },
     {
         name: "Marketing",
@@ -42,7 +42,7 @@ const departmentData = [
         totalEmployees: 22,
         budget: 2800000,
         isActive: true,
-        manager: "David Kumar"  // From adminData[4]
+         // From adminData[4]
     },
     {
         name: "Operations",
@@ -51,7 +51,7 @@ const departmentData = [
         totalEmployees: 28,
         budget: 3200000,
         isActive: true,
-        manager: "Lisa Rodriguez"  // From adminData[5]
+          // From adminData[5]
     },
 ];
 

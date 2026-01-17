@@ -8,5 +8,6 @@ export const ticketService = {
               } catch (error) {
                   throw error;
               }
-    }
+    },
+    
 }

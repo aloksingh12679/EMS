@@ -1,6 +1,9 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const {status} = require('http-status');
+const dotenv = require("dotenv");
+const Department = require("../models/Department")
+dotenv.config();
 
 // api = api/v1/auth/login
 const login = async(req,res,next) => {
@@ -181,9 +184,160 @@ const forgotPassword = async (req,res,next) =>{
 }
 
 
+const register = async (req, res) => {
+    try {
+        const { 
+            fullName, 
+            email, 
+            mobileNumber, 
+            password, //admin123
+            confirmPassword,
+            department, 
+            registerAs, 
+            secretKey 
+        } = req.body;
+        console.log(req.body);
+        console.log(fullName);
+        console.log(email);
+        console.log(password);
+        console.log(registerAs);
+        console.log(department);
+        console.log(secretKey);
+        console.log(confirmPassword);
+
+        // Validation
+        if (!fullName || !email || !password || !confirmPassword || !registerAs || !department) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide all required fields'
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /\S+@\S+\.\S+/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide a valid email address'
+            });
+        }
+
+
+        // Check password match
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Passwords do not match'
+            });
+        }
+
+      
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+
+        // registerAs
+        if (!['HR', 'Admin'].includes(registerAs)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid registration type. Must be HR or Admin'
+            });
+        }
+
+        // Verify secret key for HR registration
+        const HR_SECRET_KEY = process.env.HR_SECRET_KEY;
+        
+        if (registerAs === 'Admin' && secretKey !== HR_SECRET_KEY) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid secret key. Only authorized HRs can register.'
+            });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
+        // Split full name into first and last name
+        const nameParts = fullName.trim().split(' ');
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+
+        // Create user
+       const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    contactNumber: mobileNumber || null,
+    password, // Will be hashed by pre-save middleware
+    role: registerAs,
+    isActive: true,
+    status: 'active'
+});
+
+console.log(user);
+
+// Corrected Department update
+const departmentInfo = await Department.findOneAndUpdate(
+    { name : department }, 
+    { manager: user._id }, 
+    { 
+        new: true, 
+        upsert: false 
+    }
+);
+
+console.log(departmentInfo);
+        
+       
+
+        // // Generate JWT token
+        // const token = jwt.sign(
+        //     { id: user._id, role: user.role },
+        //     process.env.JWT_SECRET,
+        //     { expiresIn: '30d' }
+        // );
+
+        
+        user.password = undefined;
+
+        res.status(201).json({
+            success: true,
+            message: 'Registration successful',
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+                contactNumber: user.contactNumber
+            }
+        });
+
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error registering user',
+            error: error.message
+        });
+    }
+};
+
+
+
 module.exports = {
     login,
     logout,
     forgotPassword,
-    getCurrentUser
+    getCurrentUser,
+    register
 }

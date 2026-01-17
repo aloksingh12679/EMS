@@ -106,7 +106,7 @@ const EmployeesSidebar = () => {
                 {/* USER CARD & LOGOUT */}
                 <div className="p-4 border-t border-gray-200 bg-[#F1F5FF] space-y-4">
                     <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
                             <span className="text-white font-bold text-sm">{capitalize(user?.firstName.charAt(0) + user?.lastName.charAt(0))}</span>
                         </div>
                         <div className="overflow-hidden">
@@ -119,8 +119,8 @@ const EmployeesSidebar = () => {
                     <button
                         onClick={handleLogout}
                         className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl 
-    bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 
-    text-white hover:from-indigo-700 hover:via-blue-700 hover:to-purple-700 
+    bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 
+    text-white hover:from-blue-700 hover:via-blue-600 hover:to-blue-500 
     active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
                     >
                         <MdLogout size={18} />

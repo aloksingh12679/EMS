@@ -15,15 +15,15 @@ const intializingBase = async() => {
          // Clear existing data
         await User.deleteMany({});
         await Department.deleteMany({});
-        const createdAdmins = [];
+        // const createdAdmins = [];
         
-       for (const admin of adminData) {
-  const user = new User(admin);
-  const res = await user.save(); // ✅ Triggers pre-save hook
-  createdAdmins.push(res);
-}
+//        for (const admin of adminData) {
+//   const user = new User(admin);
+//   const res = await user.save(); 
+//   createdAdmins.push(res);
+// }
 
-console.log("admin data inserted succesfully");
+// console.log("admin data inserted succesfully");
         
 
         // for (let i = 0; i < createdAdmins.length; i++) {
@@ -36,23 +36,23 @@ console.log("admin data inserted succesfully");
         //         { 
         //             manager: ,
         //             isActive: true 
-        //         }
-        //     );
-        // }
+        // //         }
+        // //     );
+        // // }
       
 
-        departmentData.forEach((dep) => {
-          for (let i = 0; i < createdAdmins.length; i++) {
-             const manager = `${createdAdmins[i].firstName} ${createdAdmins[i].lastName}`;
+        // departmentData.forEach((dep) => {
+        //   for (let i = 0; i < createdAdmins.length; i++) {
+        //      const manager = `${createdAdmins[i].firstName} ${createdAdmins[i].lastName}`;
 
-            if(dep.manager === manager){
-              dep.manager = createdAdmins[i]._id;
-            }
-          }
-        })
+        //     if(dep.manager === manager){
+        //       dep.manager = createdAdmins[i]._id;
+        //     }
+        //   }
+        // })
         
         await Department.insertMany(departmentData).then(res => {
-          console.log("department inserted");
+          console.log("department inserted" , res);
         });
 
 

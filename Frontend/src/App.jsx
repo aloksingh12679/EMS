@@ -20,6 +20,7 @@ import MyTasks from "./pages/employee/MyTasks";
 import Support from "./pages/employee/SupportSystem";
 import EmployeeLeave from "./pages/employee/ApplyLeave/EmployeeLeave";
 import MyProfile from "./pages/employee/MyProfile";
+import Register from "./pages/auth/Register";
 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -65,35 +66,43 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/employee-login" element={<EmployeeLogin />} />
+          <Route path="/register" element={<Register />} />
 
 
 
-
+{/* admin pages */}
          
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           <Route path="/admin/employees" element={<EmployeesList />} />
 
           <Route path="/admin/employee/:id" element={<EmployeeProfile/>}/>
+           <Route path="/admin/employee/add" element={< AddEmployee/>} />
 
           <Route path="/admin/attendance" element={<EmployeeAttendance />} />
 
-          <Route path="/support" element={<Support />} />
 
-           <Route path="/admin/salary" element={< SalaryManagement/>} />
+           <Route path="/admin/employees/salary" element={< SalaryManagement/>} />
 
-           <Route path="/admin/leaves" element={< LeaveRecord/>} />
-           <Route path="/admin/employee/add" element={< AddEmployee/>} />
+           <Route path="/admin/employees/leaves" element={< LeaveRecord/>} />
+           
 
-<Route path="/admin/employee/:id/edit" element={<EmployeeEdit />} />
-<Route path="/employee/apply-leave" element={<EmployeeLeave />} />
+<Route path="/admin/employees/:id/edit" element={<EmployeeEdit />} />
 
-{/* one page og employee side */}
+{/*employee side pages*/}
 
-          {/* <Route path="/employee/dashboard" element={<EmployeeDashboard />} /> */}
+          <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+          <Route path="/employee/profile" element={<MyProfile />} />
+                    <Route path="/employee/mytasks" element={<MyTasks />} />
+<Route path="/employee/apply-leave" element={<EmployeeLeave />} /> 
+<Route path="/employee/support-system" element={<Support/>} /> 
+
+
+
 
 
           {/* Protected Admin Routes */}
+
           {/* <Route 
             path="/admin/dashboard" 
             element={
