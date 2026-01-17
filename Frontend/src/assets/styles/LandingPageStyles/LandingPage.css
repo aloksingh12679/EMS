@@ -68,6 +68,19 @@ a {
   margin-bottom: 3rem;
 }
 
+.hero-buttons .get-started-btn{
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.get-started-btn:hover{
+  color: white !important;
+}
+
+.btn-secondary:hover{
+  transform: scale(1.05);
+}
+
 .btn-primary,
 .btn-secondary {
   padding: 1rem 2rem;
@@ -81,18 +94,6 @@ a {
   gap: 0.5rem;
   transition: all 0.3s;
 }
-
-.btn-primary {
-  background: #1a1a2e;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #0f0f1e;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(26, 26, 46, 0.2);
-}
-
 .btn-secondary {
   background: white;
   color: #1a1a2e;
@@ -249,11 +250,13 @@ a {
   max-width: 600px;
 }
 
+
 .section-header h2 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: #1a1a2e;
+  /* color: #1a1a2e; */
+  color: #3b5bdb;
 }
 
 .section-header > p {
@@ -298,8 +301,15 @@ a {
 }
 
 .feature-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 1rem;
+  color: #2563EB ;
+}
+
+.feature-icon span {
+  background: rgb(225, 248, 248);
+  padding: 10px;
+  border-radius: 25px;
 }
 
 .feature-card h3 {

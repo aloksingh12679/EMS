@@ -19,7 +19,7 @@ body {
 .header {
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
-  padding: 8px 24px;
+  padding: 10px 24px;
   margin-left: 255.2px;
 }
 
@@ -129,6 +129,11 @@ body {
   gap: 16px;
 }
 
+.title-info-para{
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
 .title-info h1 {
   font-size: 30px;
   font-weight: 700;
@@ -140,6 +145,7 @@ body {
   color: #6b7280;
   font-size: 14px;
 }
+
 
 .action-buttons {
   display: flex;
@@ -157,6 +163,17 @@ body {
   cursor: pointer;
   transition: all 0.2s;
   border: none;
+}
+
+/* pay-roll btn div style */
+
+.run-payroll{
+   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+   transition: 0.5s;
+}
+
+.run-payroll:hover{
+  transform: scale(1.05);
 }
 
 .btn-outline {
@@ -705,6 +722,10 @@ body {
     align-items: flex-start;
     gap: 12px;
   } */
+
+  .content-grid{
+    margin-bottom: 400px !important;
+  }
 
   .search-box {
     width: 100%;

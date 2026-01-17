@@ -30,8 +30,11 @@ export default function HomePage() {
               </p>
 
               <div className="hero-buttons">
-                <a href="#features" className="btn-secondary">
-                  <i class="fa-solid fa-arrow-trend-up"></i> Features
+                <a href="#" className="btn-secondary get-started-btn">
+                   Get Started
+                </a>
+                <a href="#features" className="btn-secondary book-demo-btn">
+                  <i class="fa-solid fa-arrow-trend-up"></i> Book a Demo
                 </a>
               </div>
 
@@ -90,28 +93,30 @@ export default function HomePage() {
             <div className="features-grid">
               {[
                 {
-                  icon: "🔒",
+                  icon: <i className="fa-solid fa-lock"></i>,
                   title: "Secure Login",
                   desc: "Bank-grade security with Multi-factor authentication (MFA) & Single Sign-On (SSO) readiness.",
                 },
                 {
-                  icon: "⏱",
+                  icon: <i className="fa-solid fa-calendar-check"></i>,
                   title: "Attendance Tracking",
                   desc: "Seamless biometric integration with real-time tracking of employee hours and overtime.",
                 },
                 {
-                  icon: "💰",
+                  icon: <i className="fa-solid fa-money-bill-wave"></i>,
                   title: "Salary Management",
                   desc: "Automated global payroll processing, tax compliance, and instant payslip generation.",
                 },
                 {
-                  icon: "📊",
+                  icon: <i className="fa-solid fa-chart-line"></i>,
                   title: "Performance",
                   desc: "Data-driven KPI tracking, 360-degree feedback loops, and quarterly review cycles.",
                 },
               ].map((feature, idx) => (
                 <div key={idx} className="feature-card">
-                  <div className="feature-icon">{feature.icon}</div>
+                  <div className="feature-icon">
+                    <span>{feature.icon}</span>
+                  </div>
                   <h3>{feature.title}</h3>
                   <p>{feature.desc}</p>
                 </div>

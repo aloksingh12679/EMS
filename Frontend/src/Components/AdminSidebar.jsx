@@ -55,7 +55,7 @@ const AdminSidebar = () => {
             {isMobile && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed top-1 left-4 z-50 w-9 h-9 bg-white text-gray-900 rounded-lg hover:bg-gray-100 active:scale-95 transition-all duration-200 shadow-md border border-gray-200 flex items-center justify-center"
+                    className="fixed top-3 left-4 z-50 w-9 h-9 bg-white text-gray-900 rounded-lg hover:bg-gray-100 active:scale-95 transition-all duration-200 shadow-md border border-gray-200 flex items-center justify-center"
                 >
                     {isOpen ? <MdClose size={18} /> : <MdMenu size={18} />}
                 </button>
