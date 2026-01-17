@@ -30,12 +30,14 @@ export default function HomePage() {
               </p>
 
               <div className="hero-buttons">
-                <a href="#" className="btn-secondary get-started-btn">
-                   Get Started
-                </a>
-                <a href="#features" className="btn-secondary book-demo-btn">
-                  <i class="fa-solid fa-arrow-trend-up"></i> Book a Demo
-                </a>
+                <div className="hero-btn">
+                  <a href="#" className="btn-secondary get-started-btn">
+                    Get Started
+                  </a>
+                  <a href="#features" className="btn-secondary book-demo-btn">
+                    <i class="fa-solid fa-arrow-trend-up"></i> Book Demo
+                  </a>
+                </div>
               </div>
 
               <div className="trust-badge">

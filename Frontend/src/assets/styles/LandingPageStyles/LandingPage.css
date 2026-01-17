@@ -68,6 +68,11 @@ a {
   margin-bottom: 3rem;
 }
 
+.hero-btn{
+  display: flex;
+  gap: 2rem;
+}
+
 .hero-buttons .get-started-btn{
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
