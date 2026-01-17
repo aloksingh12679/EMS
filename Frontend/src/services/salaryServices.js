@@ -22,9 +22,11 @@ export const salaryService = {
     }
 
     ,
-    runEmployeePayroll : async() => {
+    runEmployeePayroll : async(updatedEmployees) => {
          try {
-                  const response = await api.post(`/admin/employees/salary/run-payroll`);
+                  const response = await api.post(`/admin/employees/salary/run-payroll` , {
+                    updatedEmployees
+                  });
                   return response.data;
               } catch (error) {
                   throw error;

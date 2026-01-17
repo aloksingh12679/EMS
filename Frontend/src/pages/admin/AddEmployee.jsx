@@ -2,6 +2,7 @@ import { useState } from "react";
 import AdminSidebar from "../../Components/AdminSidebar";
 import { MdPerson, MdBadge, MdAttachMoney, MdCheckCircle, MdEmail, MdPersonAdd, MdClose } from "react-icons/md";
 import {employeeService} from '../../services/employeeServices.js';
+import { emailService } from "../../services/emailServices.js";
 export default function AddEmployee() {
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -12,6 +13,7 @@ export default function AddEmployee() {
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 const [photoUploadError, setPhotoUploadError] = useState("");
 const [isSubmitting, setIsSubmitting] = useState(false);
+ const [isSendingEmail, setIsSendingEmail] = useState(false);
     const [formData, setFormData] = useState({
         // Step 1 - Personal
         firstName: "",
@@ -220,8 +222,24 @@ const [isSubmitting, setIsSubmitting] = useState(false);
     }
 };
 
-    const handleEmailEmployee = () => {
-        showToast(`Email sent to ${formData.email}` , "success");
+    const handleEmailEmployee = async() => {
+        setIsSendingEmail(true); // Start loading
+        
+        try {
+            const response = await emailService.registraionEmail(formData, employeeId);
+            
+            if (response && response.success) {
+                showToast(`Email sent successfully to ${formData.personalEmail}`, "success");
+            }
+        } catch(err) {
+            console.log("email sending error", err);
+            showToast(
+                err.response?.data?.message || "Failed to send email. Please try again.", 
+                "error"
+            );
+        } finally {
+            setIsSendingEmail(false); // Stop loading
+        }
     };
 
     const handleAddAnother = () => {
@@ -308,6 +326,55 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                     animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 }
             `}</style>
+             {/* Email Sending Loading Overlay */}
+            {isSendingEmail && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+                        <div className="flex flex-col items-center gap-5">
+                            {/* Animated Mail Icon */}
+                            <div className="relative">
+                                <MdEmail className="text-blue-500 animate-pulse" size={64} />
+                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                            
+                            {/* Loading Text */}
+                            <div className="text-center">
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                    Sending Email...
+                                </h3>
+                                <p className="text-gray-600 text-sm">
+                                    Please wait, sending registration email to
+                                </p>
+                                <p className="text-blue-600 font-medium text-sm mt-1">
+                                    {formData.personalEmail}
+                                </p>
+                            </div>
+                            
+                            {/* Animated Dots */}
+                            <div className="flex gap-2">
+                                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+                                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Form Submitting Loading Overlay */}
+            {isSubmitting && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
+                        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {isUploadingPhoto ? 'Uploading Photo...' : 'Submitting Employee Data...'}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            Please wait, this may take a moment
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div>
                 <AdminSidebar />
@@ -886,7 +953,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                             </div>
                         )}
                     </div>
-                    {isSubmitting && (
+                    {/* {isSubmitting && (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
         <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
             <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -898,30 +965,52 @@ const [isSubmitting, setIsSubmitting] = useState(false);
             </p>
         </div>
     </div>
-)}
+)} */}
 <style>{`
-    @keyframes slideLeft {
-        from {
-            opacity: 0;
-            transform: translateX(100%);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    .animate-slideLeft {
-        animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-    .animate-spin {
-        animation: spin 1s linear infinite;
-    }
-`}</style>
+                @keyframes slideLeft {
+                    from {
+                        opacity: 0;
+                        transform: translateX(100%);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                }
+                .animate-slideLeft {
+                    animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                @keyframes spin {
+                    to {
+                        transform: rotate(360deg);
+                    }
+                }
+                .animate-spin {
+                    animation: spin 1s linear infinite;
+                }
+                @keyframes bounce {
+                    0%, 100% {
+                        transform: translateY(0);
+                    }
+                    50% {
+                        transform: translateY(-10px);
+                    }
+                }
+                .animate-bounce {
+                    animation: bounce 1s infinite;
+                }
+                @keyframes pulse {
+                    0%, 100% {
+                        opacity: 1;
+                    }
+                    50% {
+                        opacity: 0.5;
+                    }
+                }
+                .animate-pulse {
+                    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                }
+            `}</style>
                 </main>
             </div>
         </>

@@ -20,7 +20,7 @@ export default function EmployeeProfile() {
 
   const [activeTab, setActiveTab] = useState('personal-info');
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [salaryData , setSalaryData] = useState([]);
+  const [salaryData , setSalaryData] = useState();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [profile , setProfile] = useState({});
@@ -79,11 +79,7 @@ export default function EmployeeProfile() {
 
               setTasksData(result.tasks);
 
-
-             setSalaryData((prev) => {
-          const newSalary = [...prev, result.data.salary];
-          return newSalary;
-        });
+setSalaryData(result.Salaries);
 setLeavesData(result.leaves);
 
     console.log(salaryData);
@@ -638,7 +634,7 @@ showToast(response.data.message);
             <tbody className="divide-y divide-gray-100">
               {salaryData.map((record) => (
                 <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-semibold text-gray-900">{record.month || 'N/A'} '26</td>
+                  <td className="px-4 py-3 font-semibold text-gray-900">{record?.month || 'N/A'} '26</td>
                   <td className="px-4 py-3 text-right text-gray-700">₹{(record.baseSalary || 0).toLocaleString()}</td>
                   <td className="px-4 py-3 text-right text-green-600 font-medium">+₹{(record.allowances || 0).toLocaleString()}</td>
                   <td className="px-4 py-3 text-right text-red-600 font-medium">−₹{(record.deductions || 0).toLocaleString()}</td>
