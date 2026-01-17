@@ -17,12 +17,13 @@ const {
     addTask,
     updateSalary,
     runPayroll,
-    leaveAction
+    leaveAction,
+    sentEmail
 } = require("../controllers/adminController.js");
 
 const { protect} = require('../middleware/auth');
 const { getAdminTickets, updateTicket } = require('../controllers/supportTicketController.js');
-
+const {ActivatePaymentMode ,  UpdateBankDetails} = require("../controllers/paymentController.js");
 
 router.use(protect);
 
@@ -39,6 +40,9 @@ router.patch("/support-tickets/:id/mark-read",updateTicket);
 router.route("/employees")
 .get(getAllEmployees)
 .post(upload.single('profilePhoto') , createEmployee);
+
+// after registraion
+router.post("/employees/sent-email" , sentEmail );
 
 
 router.route("/employee/:id")
@@ -63,9 +67,12 @@ router.post("/employees/salary/run-payroll" , runPayroll);
 // leaves detail
 router.route("/employees/leaves")
 .get(getleavesDetail)
-.post(leaveAction)
+.post(leaveAction);
 
-
+// bank secure activity
+router.route("/employees/salary/paymentmode")
+.post(ActivatePaymentMode)
+.put(UpdateBankDetails);
 
 // Department management routes
 

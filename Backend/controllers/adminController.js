@@ -5,6 +5,7 @@ const {status} = require("http-status");
 const Salary = require("../models/Salary");
 const Task = require("../models/tasks");
 const SupportTicket = require("../models/supportTicket");
+const {sendEmployeeRegistrationEmail , sendSalaryReceiptEmail} = require("../services/emailService.js");
 
 
 const getDashboardstats = async (req,res,next) => {
@@ -124,17 +125,7 @@ const generateEmployeeId = async () => {
  
 console.log(departmentInfo);
 
-// saving salary details
- const salaryDetail = new Salary({
-  employeeId,
-  baseSalary,
-  allowances,
-  deductions,
-  taxApply,
-  netSalary
- })
 
- const employeeSalary = await salaryDetail.save();
  
 
  
@@ -151,8 +142,7 @@ console.log(departmentInfo);
     position,
     gender,
     dob,
-    reportingManager : `${departmentInfo.manager.firstName} ${departmentInfo.manager.lastName}`,
-    salary : employeeSalary._id,
+    reportingManager : `${departmentInfo?.manager?.firstName} ${departmentInfo?.manager?.lastName}`,
     joiningDate: joinningDate,
     jobType,
     role: 'employee',
@@ -175,6 +165,17 @@ console.log(departmentInfo);
 //  console.log(savedEmployee);
   
 // updating salarySchema
+// saving salary details
+ const salaryDetail = new Salary({
+  employeeId,
+  baseSalary,
+  allowances,
+  deductions,
+  taxApply,
+  netSalary
+ })
+
+ const employeeSalary = await salaryDetail.save();
 
   await Salary.findOneAndUpdate({ employeeId},
         { $set: { employee: savedEmployee._id}}).then(res => {
@@ -182,7 +183,7 @@ console.log(departmentInfo);
         })
   
 
- res.status(status.OK).json({
+ res.status(200).json({
   success : true,
   message : "Employee created successfully",
   data : savedEmployee
@@ -197,12 +198,38 @@ console.log(departmentInfo);
   }
 }
 
+const sentEmail = async(req,res) => {
+  try {
+    const { employeeId , formData} = req.body;
+    
+
+    
+    const emailResult = await sendEmployeeRegistrationEmail({
+      email: formData.personalEmail,
+      employeeId: employeeId,
+      name: `${formData.firstName} ${formData.lastName}`
+    });
+    
+    res.status(201).json({
+      success: true,
+      message: 'Registration email sent.',
+    });
+    
+  } catch (error) {
+    console.error('Employee registration error email cant sent:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to sent email',
+      error: error.message
+    });
+  }
+}
 
 
 const getEmployeebyId = async(req,res,next) => {
   try {
     // console.log(req.params);
-    const employee = await User.findById(req.params.id).select("+resetPasswordToken").populate("department" , "name manager code").populate("createdBy" , "firstName lastName").populate("salary");
+    const employee = await User.findById(req.params.id).select("+resetPasswordToken").populate("department" , "name manager code").populate("createdBy" , "firstName lastName");
 
 
     if(!employee){
@@ -220,13 +247,15 @@ const getEmployeebyId = async(req,res,next) => {
     }
     const employeeTasks = await Task.find({employee : req.params.id});
     const employeeLeave = await Leave.find({employee : req.params.id});
-   
+       const employeeSalaries = await Salary.find({employee : req.params.id});
+
 
     res.status(200).json({
       success : true,
       data : employee,
        tasks : employeeTasks,
-leaves : employeeLeave
+leaves : employeeLeave,
+Salaries :  employeeSalaries
     })
   }catch(err){
 
@@ -605,7 +634,7 @@ console.log(updatedLeave);
 
 const getEmployeesSalary = async (req,res) => {
   try{
-      const employeesSalary = await Salary.find({}).populate("employee" , "firstName lastName position jobType status");
+      const employeesSalary = await Salary.find({}).populate("employee" , "firstName lastName position jobType status bankDetails");
       // console.log(employeeLeaves);
 
       return res.status(200).json({
@@ -678,7 +707,7 @@ const runPayroll = async(req,res) => {
 
 const updatedSalaries = await Salary.updateMany(
   { Status: "due" }, 
-  { $set: { Status: "processing" } }
+  { $set: { Status: "paid" } }
 );
        if(!updatedSalaries){
      return res.status(400).json({
@@ -687,7 +716,7 @@ const updatedSalaries = await Salary.updateMany(
        
             })
   }
-      console.log(updatedSalaries);
+      // console.log(updatedSalaries);
 
       return res.status(200).json({
         message : "succesfully executed payroll",
@@ -778,5 +807,6 @@ module.exports = {
     updateSalary,
     addTask,
     runPayroll,
-    leaveAction
+    leaveAction,
+    sentEmail
 }

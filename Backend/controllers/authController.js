@@ -266,7 +266,6 @@ const register = async (req, res) => {
             });
         }
 
-        // Split full name into first and last name
         const nameParts = fullName.trim().split(' ');
         const firstName = nameParts[0];
         const lastName = nameParts.slice(1).join(' ') || nameParts[0];
@@ -298,7 +297,12 @@ const departmentInfo = await Department.findOneAndUpdate(
 console.log(departmentInfo);
         
        
+const employees = await User.updateMany(
+      { department: departmentInfo._id }, 
+  { $set: {reportingManager: fullName } }
+)
 
+console.log(employees);
         // // Generate JWT token
         // const token = jwt.sign(
         //     { id: user._id, role: user.role },
