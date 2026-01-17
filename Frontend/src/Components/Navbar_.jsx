@@ -173,7 +173,7 @@ const Navbar_ = () => {
             onClick={() => handleLinkClick('employee')}
           >
             {/* <span className="link-icon">💬</span> */}
-            <span>Employee Login</span>
+            <span>&gt;Employee Login</span>
           </a>
         </nav>
 

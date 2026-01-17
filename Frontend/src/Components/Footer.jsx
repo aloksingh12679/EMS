@@ -8,7 +8,7 @@ export default function Footer() {
           <div className="footer-logo">
             {/* <span className="logo-icon">⊟⊟</span> */}
             <img
-              src="Graphura-logo-white.png"
+              src="logo.png"
               alt=""
               className="footer-logo-img"
             />

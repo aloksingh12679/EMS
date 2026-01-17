@@ -60,6 +60,7 @@ export default function SecureSalaryManagement() {
     allowances: "",
     taxApply: "",
     deductions: "",
+    deductions: "",
   });
 
   useEffect(() => {
@@ -81,7 +82,9 @@ fetchEmployeesSalary();
   };
 
   const showToast = (message, type = "success") => {
+  const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
   };
 
@@ -267,6 +270,9 @@ const updatedEmployees = employees.map((emp) =>
       doc.text("Employee Details", 20, 55);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
+      const employeeName = `${capitalize(
+        selectedEmployee?.employee?.firstName || ""
+      )} ${capitalize(selectedEmployee?.employee?.lastName || "")}`;
       const employeeName = `${capitalize(
         selectedEmployee?.employee?.firstName || ""
       )} ${capitalize(selectedEmployee?.employee?.lastName || "")}`;

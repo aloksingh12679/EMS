@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { capitalize } from "../../utils/helper";
 import { leaveService } from "../../services/leaveServive";
+import { IoMdPersonAdd } from "react-icons/io";
 
 const data = [
   { week: "Week 1", attendance: 60 },
@@ -75,28 +76,31 @@ const AdminDashboard = () => {
 
         {/* TOP HEADER BAR - Changed: Added header-wrapper class for responsive margin */}
         <div className="header-wrapper w-full bg-white px-4 sm:px-6 lg:px-10 py-4 border-b border-slate-200">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex  sm:flex-row items-start sm:items-center justify-between gap-4">
 
             {/* SEARCH BAR - Changed: Added flex-wrap and full width on mobile for mobile responsiveness */}
-            <div className="flex items-center gap-3 bg-slate-100 rounded-full px-4 py-2.5 w-full sm:max-w-xl">
-              <FiSearch className="text-slate-400 text-lg flex-shrink-0" />
-              <input
-                type="text"
-                placeholder="Search employees, departments..."
-                className="bg-transparent outline-none w-full text-sm text-slate-600 placeholder-slate-400"
-              />
+            <div className="flex items-center gap-3  rounded-full px-4 py-2.5 w-full sm:max-w-xl">
+              <h1 className="text-[20px] sm:text-[28px] lg:text-[32px] font-bold text-slate-900 mx-2">
+                Welcome back, {capitalize(stats?.Admin?.firstName)} 👋
+              </h1>
+
             </div>
 
             {/* RIGHT ACTIONS - Changed: Added flex-shrink-0 to prevent squashing */}
-            <div className="flex items-center gap-4 flex-shrink-0">
+            <div className="flex items-center  gap-4 flex-shrink-0">
               {/* Notification */}
               <NotificationSystem />
 
               {/* Button - Changed: Added responsive classes to show/hide on mobile */}
               <button onClick={() => navigate('/admin/employees/add')}
-                className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:opacity-95 transition whitespace-nowrap">
+                className=" hidden sm:flex items-center gap-2 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:opacity-95 transition whitespace-nowrap">
                 <FiPlus />
                 New Employee
+              </button >
+              <button onClick={() => navigate('/admin/employees/add')}
+                className="sm:hidden sm:flex items-center gap-2 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 text-white px-4 py-2.5 rounded-full text-sm font-semibold hover:opacity-95 transition whitespace-nowrap">
+                <IoMdPersonAdd />
+
               </button>
             </div>
           </div>
@@ -108,18 +112,18 @@ const AdminDashboard = () => {
             {/* LEFT */}
             <div>
               {/* Changed: Made heading text responsive */}
-              <h1 className="text-2xl sm:text-[28px] lg:text-[32px] font-bold text-slate-900 mb-2">
+              {/* <h1 className="text-2xl sm:text-[28px] lg:text-[32px] font-bold text-slate-900 mb-2">
                 Welcome back, {capitalize(stats?.Admin?.firstName)} 👋
-              </h1>
+              </h1> */}
               {/* Changed: Made subtitle text responsive */}
-              <p className="text-slate-500 text-[13px] sm:text-[14px] lg:text-[15px]">
+              {/* <p className="text-slate-500 text-[13px] sm:text-[14px] lg:text-[15px]">
                 Here's what's happening in your organization today.
-              </p>
+              </p> */}
             </div>
           </div>
 
           {/* STATS GRID - No changes needed, already responsive */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatsCard
               icon={<FaUsers className="text-blue-600" />}
               title="Total Employees"
@@ -129,7 +133,7 @@ const AdminDashboard = () => {
               badgeColor="bg-green-100 text-green-700"
             />
             <StatsCard
-              icon={<MdOutlineVerified className="text-green-600" />}
+              icon={<MdOutlineVerified className="text-blue-600" />}
               title="Present Today"
               value={stats?.totalEmployees}
               subText="60 absent (excused)"
@@ -137,7 +141,7 @@ const AdminDashboard = () => {
               badgeColor="bg-green-100 text-green-700"
             />
             <StatsCard
-              icon={<HiOutlineClock className="text-orange-500" />}
+              icon={<HiOutlineClock className="text-blue-500" />}
               title="Pending leaves"
               value={stats?.pendingLeaves}
               subText="3 urgent requests"
@@ -145,7 +149,7 @@ const AdminDashboard = () => {
               badgeColor="bg-orange-100 text-orange-700"
             />
             <StatsCard
-              icon={<BsBuilding className="text-purple-600" />}
+              icon={<BsBuilding className="text-blue-600" />}
               title="Departments"
               value={stats?.totalDepartments}
               subText="Across 3 locations"
@@ -222,7 +226,7 @@ const AdminDashboard = () => {
               <QuickActionCard
                 icon={<FaUserPlus />}
                 label="Add Employee"
-                iconBg="bg-blue-50"
+                iconBg="bg-blue-100"
                 iconColor="text-blue-600"
                 link="/admin/employees/add"
 
@@ -230,7 +234,7 @@ const AdminDashboard = () => {
               <QuickActionCard
                 icon={<MdOutlineApproval />}
                 label="Approve Leave"
-                iconBg="bg-orange-50"
+                iconBg="bg-orange-100"
                 iconColor="text-orange-500"
                 link="/admin/employees/leaves"
 
@@ -238,7 +242,7 @@ const AdminDashboard = () => {
               <QuickActionCard
                 icon={<HiCurrencyDollar />}
                 label="Run Payroll"
-                iconBg="bg-green-50"
+                iconBg="bg-green-100"
                 iconColor="text-green-600"
                 link="/admin/employees/salary"
 
@@ -383,7 +387,7 @@ const SalaryBar = ({ label, fill, active }) => {
     <div className="flex flex-col items-center justify-end h-full">
       <div className="w-full h-full bg-slate-100 rounded-[20px] flex items-end overflow-hidden">
         <div
-          className={`w-full rounded-[20px] ${active ? "bg-[#0B1220]" : "bg-[#111827]"}`}
+          className={`w-full rounded-[20px] ${active ? "bg-blue-500" : "bg-blue-500"}`}
           style={{ height: fill }}
         />
       </div>

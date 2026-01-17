@@ -26,7 +26,7 @@ body {
 }
 
 /* ===== SIDEBAR ===== */
-.sidebar {
+/* .sidebar {
   width: 260px;
   background: #1a1f3a;
   color: white;
@@ -107,7 +107,7 @@ body {
 .sidebar-footer {
   border-top: 1px solid #2d3748;
   padding-top: 16px;
-}
+} */
 
 .nav-item.settings-item {
   margin-bottom: 12px;
@@ -168,7 +168,7 @@ body {
 
 .top-header {
   background: white;
-  padding: 8px 32px;
+  padding: 18px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -263,7 +263,7 @@ body {
 
 /* ===== PROFILE HEADER CARD ===== */
 .profile-card {
-  background: #2d3748;
+  /* background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);; */
   border-radius: 10px;
   /* border-top-left-radius: 10px;
   border-top-right-radius: 10px; */
@@ -797,6 +797,10 @@ body {
   .main-content{
     margin-left: 0;
   }
+
+  .top-header h1{
+  margin-left: 40px;
+}
 }
 
 @media (max-width: 768px) {
