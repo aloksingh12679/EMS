@@ -18,7 +18,8 @@ const {
     updateSalary,
     runPayroll,
     leaveAction,
-    sentEmail
+    sentEmail,
+    getDepartmentTasks
 } = require("../controllers/adminController.js");
 
 const { protect} = require('../middleware/auth');
@@ -51,12 +52,23 @@ router.route("/employee/:id")
 .delete(deleteEmployee);
 
 
+
+router.get("/employees/tasks" , getDepartmentTasks);
+
 router.post("/employee/:id/addtask", addTask);
+
+
+
+
 
 
 router.route("/employees/salary")
 .get(getEmployeesSalary)
 .post(updateSalary);
+
+
+
+
 
 
 router.post("/employees/salary/run-payroll" , runPayroll);

@@ -6,7 +6,7 @@ const Salary = require("../models/Salary");
 const Task = require("../models/tasks");
 const SupportTicket = require("../models/supportTicket");
 const {sendEmployeeRegistrationEmail , sendSalaryReceiptEmail} = require("../services/emailService.js");
-
+const mongoose = require("mongoose");
 
 const getDashboardstats = async (req,res,next) => {
   try {
@@ -755,7 +755,7 @@ const addTask = async(req,res) => {
       });
 
      const task = await newTask.save();
- 
+    
 
 
 
@@ -777,7 +777,58 @@ const addTask = async(req,res) => {
 }
 
 
+const getDepartmentTasks = async(req,res) => {
+  try{
+     const {id} = req.user._id;
+     let departmentDetails;
+     let departmentEmployees;
+     let departmentTasks;
+     if(req.user.role === "Admin"){
+       departmentDetails = await Department.find({}).populate("manager" , "firstName lastName");
+      departmentEmployees = await User.find({role : "employee"});
+     }else{
+ departmentDetails = await Department.findOne({
+  manager: new mongoose.Types.ObjectId(id)
+}).populate("manager", "firstName lastName");
+      departmentEmployees = await User.find({department : departmentDetails._id});
 
+     }
+ 
+     if(!departmentDetails){
+      return res.status(201).json({
+        success : false,
+        message : "No department Details"
+     })
+     }
+     
+      departmentTasks = await Task.find({});
+
+     if(!departmentEmployees){
+       return res.status(201).json({
+        success : false,
+        message : "No Employees in the department"
+     })
+     }
+    return res.status(200).json({
+      success : true,
+      data : {
+        role : req.user.role,
+        departmentDetails,
+        departmentEmployees,
+        departmentTasks,
+
+      }
+     })
+ 
+  }catch(err){
+   console.error('Error getting department Task:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: err.message
+    });
+  }
+}
 
 
 
@@ -808,5 +859,6 @@ module.exports = {
     addTask,
     runPayroll,
     leaveAction,
-    sentEmail
+    sentEmail,
+    getDepartmentTasks
 }

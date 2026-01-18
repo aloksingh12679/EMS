@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     email : {
         type : String,
         required : function(){
-            return this.role === 'Admin';
+            return this.role === 'Admin' || this.role === 'Department Head';
         },
         unique : true,
         sparse : true,
@@ -19,9 +19,6 @@ const userSchema = new mongoose.Schema({
 
     password : {
         type :  String,
-        required : function(){
-            return this.role === 'Admin';
-        },
         unique : true,
         sparse : true,
         trim : true,
@@ -60,9 +57,7 @@ const userSchema = new mongoose.Schema({
 
     contactNumber : {
         type : Number,
-        required : function(){
-            return this.role === 'employee'
-        },
+        required : true
     },
     
     personalEmail : {
@@ -104,6 +99,8 @@ const userSchema = new mongoose.Schema({
         default : function(){
             if(this.role == "Admin"){
                 return "manager"
+            }else{
+                return "Department Head"
             }
         }
     },
@@ -127,7 +124,7 @@ const userSchema = new mongoose.Schema({
     //    others credentials - system needs
     role : {
         type : String,
-        enum : ['Admin' , 'employee'],
+        enum : ['Admin' , 'employee' , 'Department Head' ],
         required : true
     },
     

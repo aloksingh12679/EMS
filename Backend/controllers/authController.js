@@ -9,17 +9,16 @@ dotenv.config();
 const login = async(req,res,next) => {
 try {
     console.log("here");
- const {email , password , employeeId} = req.body;
+ const {email , password , employeeId , role} = req.body;
     if(!email && !employeeId){
         return res.status(400).json({"message" : "please fill all given fields"});
     }
-// console.log(email);
-// console.log(password);
 console.log(employeeId);
  let currUser;
  let loginType;
 
-    if(email){
+    if(role === "Admin" && email){
+        console.log(role);
         if(!password){
             return res.status(400).json({"message" : "Password is required"})
         }
@@ -31,7 +30,7 @@ console.log(employeeId);
         return res.status(404).json({"message" : "Wrong email or Password"});
         }
          
-        if(currUser.role !== 'Admin'){
+        if(currUser.role === 'employee' ){
         return res.status(403).json({"message" : "Access Denied ! only admin can login"});
 
         }
@@ -39,11 +38,11 @@ console.log(employeeId);
         const isPasswordValid = await currUser.comparePassword(password);
         // console.log(isPasswordValid);
         if(!isPasswordValid){
-            return res.status(status.NOT_FOUND).json({"message" : "wrong Password"});
+            return res.status(400).json({"message" : "wrong Password"});
         }
 
 
-    }else if(employeeId){
+    }else if(role === "employee" && employeeId){
         currUser = await User.findOne({employeeId : employeeId});
       console.log(currUser);
         loginType = 'employeeId' ; 
@@ -51,11 +50,26 @@ console.log(employeeId);
         if(!currUser) {
         return res.status(400).json({"message" : "Invalid Employee ID"});
         }
+        if(currUser.personalEmail !== email){
+            return res.status(400).json({"message" : "Invalid email Id"});
+        }
 
         if(currUser.role !== "employee") {
             return res.status(403).json({"message" : "Access Denied ! only Employee can login"});
 
         }
+        if(password){
+        const isPasswordValid = await currUser.comparePassword(password);
+        if(!isPasswordValid){
+            return res.status(400).json({"message" : "wrong Password"});
+        }
+
+        }else{
+                        return res.status(403).json({"message" : "Enter password"});
+
+        }
+      
+        
     }
 
     if(currUser.isActive === false){
@@ -95,7 +109,7 @@ console.log(employeeId);
         lastLogin : currUser.lastLogin
     }
 
-    res.status(status.OK).json({
+    res.status(200).json({
         success : true,
         message : 'login succesfully',
         token,
@@ -186,6 +200,7 @@ const forgotPassword = async (req,res,next) =>{
 
 const register = async (req, res) => {
     try {
+        const {form} = req.body;
         const { 
             fullName, 
             email, 
@@ -195,18 +210,10 @@ const register = async (req, res) => {
             department, 
             registerAs, 
             secretKey 
-        } = req.body;
-        console.log(req.body);
-        console.log(fullName);
-        console.log(email);
-        console.log(password);
-        console.log(registerAs);
-        console.log(department);
-        console.log(secretKey);
-        console.log(confirmPassword);
-
+        } = form;
+// console.log(req.body);
         // Validation
-        if (!fullName || !email || !password || !confirmPassword || !registerAs || !department) {
+        if (!fullName || !email || !password || !confirmPassword || !registerAs) {
             return res.status(400).json({
                 success: false,
                 message: 'Please provide all required fields'
@@ -240,25 +247,14 @@ const register = async (req, res) => {
         }
 
         // registerAs
-        if (!['HR', 'Admin'].includes(registerAs)) {
+        if (!['Department Head', 'Admin'].includes(registerAs)) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid registration type. Must be HR or Admin'
             });
         }
 
-        // Verify secret key for HR registration
-        const HR_SECRET_KEY = process.env.HR_SECRET_KEY;
-        
-        if (registerAs === 'Admin' && secretKey !== HR_SECRET_KEY) {
-            return res.status(403).json({
-                success: false,
-                message: 'Invalid secret key. Only authorized HRs can register.'
-            });
-        }
-
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
+         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
                 success: false,
@@ -266,12 +262,15 @@ const register = async (req, res) => {
             });
         }
 
-        const nameParts = fullName.trim().split(' ');
+         const nameParts = fullName.trim().split(' ');
         const firstName = nameParts[0];
         const lastName = nameParts.slice(1).join(' ') || nameParts[0];
 
-        // Create user
-       const user = await User.create({
+        const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
+        const DEPARTMENT_HEAD_SECRET_KEY= process.env.DEPARTMENT_HEAD_SECRET_KEY;
+        
+        if (registerAs === 'Admin' && secretKey === ADMIN_SECRET_KEY) {
+             const user = await User.create({
     firstName,
     lastName,
     email,
@@ -281,10 +280,18 @@ const register = async (req, res) => {
     isActive: true,
     status: 'active'
 });
-
-console.log(user);
-
-// Corrected Department update
+           
+        }else if(registerAs === 'Department Head' && secretKey === DEPARTMENT_HEAD_SECRET_KEY){
+const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    contactNumber: mobileNumber || null,
+    password, // Will be hashed by pre-save middleware
+    role: registerAs,
+    isActive: true,
+    status: 'active'
+});
 const departmentInfo = await Department.findOneAndUpdate(
     { name : department }, 
     { manager: user._id }, 
@@ -301,29 +308,18 @@ const employees = await User.updateMany(
       { department: departmentInfo._id }, 
   { $set: {reportingManager: fullName } }
 )
+        }else{
+             return res.status(403).json({
+                success: false,
+                message: 'Invalid secret key. Only authorized HRs can register.'
+            });
+        }
 
-console.log(employees);
-        // // Generate JWT token
-        // const token = jwt.sign(
-        //     { id: user._id, role: user.role },
-        //     process.env.JWT_SECRET,
-        //     { expiresIn: '30d' }
-        // );
-
-        
-        user.password = undefined;
+     
 
         res.status(201).json({
             success: true,
             message: 'Registration successful',
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role,
-                contactNumber: user.contactNumber
-            }
         });
 
     } catch (error) {
@@ -338,10 +334,68 @@ console.log(employees);
 
 
 
+const createPassword = async (req, res) => {
+  try {
+    const { employeeId, password, confirmPassword } = req.body;
+
+    if (!employeeId || !password || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Passwords do not match"
+      });
+    }
+
+   
+    const employee = await User.findOne({ employeeId });
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found"
+      });
+    }
+
+    // 4️⃣ Prevent resetting if password already exists
+    if (employee.password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password already created"
+      });
+    }
+
+    
+    employee.password = password;
+    await employee.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password created successfully"
+    });
+
+  } catch (err) {
+    console.error("Password creation error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
+
+
+
+
 module.exports = {
     login,
     logout,
     forgotPassword,
     getCurrentUser,
+    createPassword,
     register
 }
