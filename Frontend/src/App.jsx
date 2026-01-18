@@ -73,7 +73,7 @@ function App() {
           <Route path="/employee-login" element={<EmployeeLogin />} />
           <Route path="/create-password" element={<CreatePasswordForm />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Navigate to="/" replace />} /> {/* ✅ Add this */}
+          <Route path="/login" element={<Navigate to="/" replace />} /> 
 
 
 
@@ -91,7 +91,7 @@ function App() {
           <Route path="/admin/employee/add" element={<AddEmployee />} />
 
           {/* <Route path="/admin/attendance" element={<EmployeeAttendance />} /> */}
-
+{/* 
           <Route
             path="/admin/employees/salary"
             element={<SalaryManagement />}
@@ -99,7 +99,7 @@ function App() {
 
           <Route path="/admin/employees/leaves" element={<LeaveRecord />} />
 
-<Route path="/admin/employees/:id/edit" element={<EmployeeEdit />} /> */}
+<Route path="/admin/employees/:id/edit" element={<EmployeeEdit />} />  */}
 
           {/*employee side pages*/}
 
