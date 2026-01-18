@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import "./App.css";
 import "./index.css";
@@ -23,32 +28,31 @@ import Register from "./pages/auth/Register";
 import Tasks from "./pages/admin/Tasks/Tasks";
 import CreatePasswordForm from "./pages/auth/CreatePasswordForm";
 
-
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading} = useAuth();
-  
+  const { user, loading } = useAuth();
+
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontSize: '18px'
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontSize: "18px",
+        }}
+      >
         Loading...
       </div>
     );
   }
 
-  if(!localStorage.getItem('token')) {
-    
+  if (!localStorage.getItem("token")) {
     return <Navigate to="/" replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-  
-    if (user.role === 'Admin' || user.role === 'Department Head') {
+    if (user.role === "Admin" || user.role === "Department Head") {
       return <Navigate to="/admin/dashboard" replace />;
     } else {
       return <Navigate to="/employee/dashboard" replace />;
@@ -67,7 +71,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/employee-login" element={<EmployeeLogin />} />
-<Route path="/create-password" element={<CreatePasswordForm />} />
+          <Route path="/create-password" element={<CreatePasswordForm />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Navigate to="/" replace />} /> {/* ✅ Add this */}
 
@@ -83,20 +87,21 @@ function App() {
 
           <Route path="/admin/employees" element={<EmployeesList />} />
 
-          <Route path="/admin/employee/:id" element={<EmployeeProfile/>}/>
-           <Route path="/admin/employee/add" element={< AddEmployee/>} />
+          <Route path="/admin/employee/:id" element={<EmployeeProfile />} />
+          <Route path="/admin/employee/add" element={<AddEmployee />} />
 
-          <Route path="/admin/attendance" element={<EmployeeAttendance />} />
+          {/* <Route path="/admin/attendance" element={<EmployeeAttendance />} /> */}
 
+          <Route
+            path="/admin/employees/salary"
+            element={<SalaryManagement />}
+          />
 
-           <Route path="/admin/employees/salary" element={< SalaryManagement/>} />
-
-           <Route path="/admin/employees/leaves" element={< LeaveRecord/>} />
-           
+          <Route path="/admin/employees/leaves" element={<LeaveRecord />} />
 
 <Route path="/admin/employees/:id/edit" element={<EmployeeEdit />} /> */}
 
-{/*employee side pages*/}
+          {/*employee side pages*/}
 
           {/* <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
           <Route path="/employee/profile" element={<MyProfile />} />
