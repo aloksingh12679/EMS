@@ -36,7 +36,7 @@ const AdminSidebar = () => {
     const menuItems = [
         { icon: <MdDashboard />, label: "Dashboard", path: "/admin/dashboard" },
         { icon: <MdPeople />, label: "Employees", path: "/admin/employees" },
-        { icon: <MdEventAvailable />, label: "Attendance", path: "/admin/employees/attendance" },
+        { icon: <MdEventAvailable />, label: "Tasks", path: "/admin/employees/tasks" },
         { icon: <MdPeople />, label: "Leaves", path: "/admin/employees/leaves" },
         { icon: <MdPeople />, label: "Payroll", path: "/admin/employees/salary" }
     ];

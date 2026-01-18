@@ -11,6 +11,14 @@ export const emailService = {
         } catch (error) {
             throw error;
         }
+    },
+    createPassword : async(form) => {
+ try {
+            const response = await api.post('/auth/create-password' ,form);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
    
 }

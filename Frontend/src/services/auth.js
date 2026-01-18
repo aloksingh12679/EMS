@@ -3,14 +3,15 @@ import api from './api';
 
 
 export const authService = {
-    login : async(email,password,employeeId) => {
+    login : async(email,password,employeeId , role) => {
         
       
             
             const response = await api.post('/auth/login', {
                 email,
                 password,
-                employeeId
+                employeeId,
+                role
             });
 
             if (response.data.success) {
@@ -23,10 +24,26 @@ export const authService = {
       
       
    },
+   register: async (form) => {
+  const response = await api.post('/auth/register', {form});
+
+//   if (response.data.success) {
+//     if (response.data.token) {
+//       localStorage.setItem('token', response.data.token);
+//     }
+//     if (response.data.user) {
+//       localStorage.setItem('user', JSON.stringify(response.data.user));
+//     }
+//   }
+
+  return response.data;
+},
+
 
     logout : () => {
         localStorage.removeItem('token');
     localStorage.removeItem('user');
+    window.location.href= "/";
     },
 
     getCurrentUser: () => {

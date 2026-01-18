@@ -51,9 +51,9 @@ return response.data;
         }
     },
 
-    addTask : async(id , tasksData) => {
+    addTask : async(employeeId , tasksData) => {
 try{
-const response = await api.post(`/admin/employee/${id}/addtask` , tasksData);
+const response = await api.post(`/admin/employee/${employeeId}/addtask` , tasksData);
 return response.data;
 
         }catch(error){
@@ -106,6 +106,15 @@ return response.data;
         
    try{
 const response = await api.get(`/employee/dashboard`);
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    },
+    getDepartmentTasks : async() => {
+        try{
+const response = await api.get(`/admin/employees/tasks`);
 return response.data;
 
         }catch(error){

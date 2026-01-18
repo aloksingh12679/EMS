@@ -27,13 +27,19 @@ export const AuthProvider = ({children}) => {
       checkAuth();
     },[]);
 
-    const login = async (email,password,employeeId) => {
+    const login = async (email,password,employeeId , role) => {
        
-        const result = await authService.login(email,password,employeeId);
+        const result = await authService.login(email, password ,employeeId , role);
  
        return result;
         
 
+    }
+
+    const register = async(form) => {
+        const result = await authService.register(form);
+ 
+       return result;
     }
 
     const logout = () => {
@@ -46,6 +52,7 @@ export const AuthProvider = ({children}) => {
         loading,
         login,
         logout,
+        register
         
     }
 

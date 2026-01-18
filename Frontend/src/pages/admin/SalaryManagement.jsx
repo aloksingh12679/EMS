@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 
-import { salaryService }from "../../services/salaryServices";
+import { salaryService } from "../../services/salaryServices";
 import AdminSidebar from "../../Components/AdminSidebar";
 import { paymentService } from "../../services/paymentService";
 
@@ -60,12 +60,10 @@ export default function SecureSalaryManagement() {
     allowances: "",
     taxApply: "",
     deductions: "",
-    deductions: "",
   });
 
   useEffect(() => {
-   
-fetchEmployeesSalary();
+    fetchEmployeesSalary();
   }, []);
 
   const fetchEmployeesSalary = async () => {
@@ -74,17 +72,18 @@ fetchEmployeesSalary();
       console.log(result);
       if (result && result.data && result.success) {
         setEmployees(result.data);
-        setSelectedEmployee(result.data[0]);
+        if (result.data.length > 0) {
+          setSelectedEmployee(result.data[0]);
+        }
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error fetching employees:", error);
+      showToast("Failed to fetch employee data", "error");
     }
   };
 
   const showToast = (message, type = "success") => {
-  const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
   };
 
@@ -93,40 +92,34 @@ fetchEmployeesSalary();
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
-
-
-
-
   const handleActivatePaymentMode = () => {
     setShowSecretKeyModal(true);
   };
 
-  const handleSecretKeySubmit = async(e) => {
-e.preventDefault();
-    try{
+  const handleSecretKeySubmit = async (e) => {
+    e.preventDefault();
     setIsAuthenticating(true);
-     const response = await paymentService.ActivatePaymentMode(secretKey);
-     if(response && response.success){
- setIsPaymentMode(true);
+
+    try {
+      const response = await paymentService.ActivatePaymentMode(secretKey);
+      
+      if (response && response.success) {
+        setIsPaymentMode(true);
         setShowSecretKeyModal(false);
         setSecretKey("");
         showToast("Payment mode activated successfully!", "success");
-     }else {
+      } else {
         showToast("Invalid secret key! Access denied.", "error");
       }
-
-    }catch(err){
-console.log("Payment mode authentication error"  , err);
+    } catch (err) {
+      console.log("Payment mode authentication error", err);
+      showToast(
+        err.response?.data?.message || "Authentication failed. Please try again.",
+        "error"
+      );
+    } finally {
+      setIsAuthenticating(false);
     }
-
-    // setTimeout(() => {
-    //   const PAYMENT_SECRET_KEY = "SECURE_PAYMENT_2026";
-
-    //   if (secretKey === PAYMENT_SECRET_KEY) {
-       
-    //   } 
-    //   setIsAuthenticating(false);
-    // }, 1500);
   };
 
   const handleAddBankDetails = (employeeId) => {
@@ -135,12 +128,12 @@ console.log("Payment mode authentication error"  , err);
 
     if (employee?.employee?.bankDetails?.accountNumber) {
       setBankDetailsForm({
-        accountHolderName: employee.employee.bankDetails.accountHolderName,
-        accountNumber: employee.employee.bankDetails.accountNumber,
-        confirmAccountNumber: employee.employee.bankDetails.accountNumber,
-        ifscCode: employee.employee.bankDetails.ifscCode,
-        bankName: employee.employee.bankDetails.bankName,
-        branchName: employee.employee.bankDetails.branchName,
+        accountHolderName: employee.employee.bankDetails.accountHolderName || "",
+        accountNumber: employee.employee.bankDetails.accountNumber || "",
+        confirmAccountNumber: employee.employee.bankDetails.accountNumber || "",
+        ifscCode: employee.employee.bankDetails.ifscCode || "",
+        bankName: employee.employee.bankDetails.bankName || "",
+        branchName: employee.employee.bankDetails.branchName || "",
       });
     } else {
       setBankDetailsForm({
@@ -155,96 +148,92 @@ console.log("Payment mode authentication error"  , err);
     setShowBankDetailsModal(true);
   };
 
-  const handleBankDetailsSubmit = async(e) => {
-
+  const handleBankDetailsSubmit = async (e) => {
     e.preventDefault();
-    try{
-if (bankDetailsForm.accountNumber !== bankDetailsForm.confirmAccountNumber) {
-      showToast("Account numbers don't match!", "error");
-      return;
-    }
-    const bankDetails = {
-accountHolderName: bankDetailsForm.accountHolderName,
-              accountNumber: bankDetailsForm.accountNumber,
-              ifscCode: bankDetailsForm.ifscCode,
-              bankName: bankDetailsForm.bankName,
-              branchName: bankDetailsForm.branchName,
-    }
 
-     const updatedEmployees = employees.map((emp) =>
-      emp?.employee?._id === editingEmployeeId
-        ? {
-            ...emp,
-           ...bankDetails
-          }
-        : emp
-    );
-      const response = await paymentService.UpdateBankDetails(editingEmployeeId , bankDetails);
-      if(response && response.success){
-        
-    setEmployees(updatedEmployees);
-    fetchEmployeesSalary();
-    setShowBankDetailsModal(false);
-    showToast("Bank details saved successfully!", "success");
+    try {
+      if (bankDetailsForm.accountNumber !== bankDetailsForm.confirmAccountNumber) {
+        showToast("Account numbers don't match!", "error");
+        return;
       }
 
-    }catch(err){
-console.log("updating bank details"  , err);
+      const bankDetails = {
+        accountHolderName: bankDetailsForm.accountHolderName,
+        accountNumber: bankDetailsForm.accountNumber,
+        ifscCode: bankDetailsForm.ifscCode,
+        bankName: bankDetailsForm.bankName,
+        branchName: bankDetailsForm.branchName,
+      };
 
-    }
-  };
-
-  const handleProcessPayment = async() => {
-    try{
-          setIsProcessingPayment(true);
-  const dueEmployees = employees.filter(
-      (emp) => emp.Status.toLowerCase() === "due" && emp.employee.bankDetails
-    );
- const totalAmount = dueEmployees.reduce(
-      (sum, emp) => sum + parseFloat(emp.netSalary),
-      0
-    );
-    if (totalAmount > organizationBalance) {
-      showToast("Insufficient organization balance!", "error");
-      setIsProcessingPayment(false);
-      return;
-    }
-const updatedEmployees = employees.map((emp) =>
-        emp.Status.toLowerCase() === "due" && emp.employee.bankDetails
-          ? { ...emp, Status: "Paid" }
-          : emp
-      );
-    const response = await salaryService.runEmployeePayroll(updatedEmployees);
-    if(response && response.success){
- setTimeout(() => {
+      const response = await paymentService.UpdateBankDetails(editingEmployeeId, bankDetails);
       
-
-      setEmployees(updatedEmployees);
-      setOrganizationBalance(organizationBalance - totalAmount);
-
+      if (response && response.success) {
+        await fetchEmployeesSalary(); // Refresh employee data
+        setShowBankDetailsModal(false);
+        showToast("Bank details saved successfully!", "success");
+      }
+    } catch (err) {
+      console.log("Error updating bank details", err);
       showToast(
-        `Payment processed for ${dueEmployees.length} employees! Confirmation emails sent.`,
-        "success"
+        err.response?.data?.message || "Failed to update bank details",
+        "error"
       );
-      setIsProcessingPayment(false);
-    }, 3000);
     }
-
-   
-    }catch(err){
-      console.log("Error updating status(paid) of employees" , err);
-
-    }
-
-  
-
-   
-
-    
-
-    
   };
 
+  const handleProcessPayment = async () => {
+    try {
+      setIsProcessingPayment(true);
+
+      const dueEmployees = employees.filter(
+        (emp) => emp.Status.toLowerCase() === "due" && emp.employee.bankDetails
+      );
+
+      const totalAmount = dueEmployees.reduce(
+        (sum, emp) => sum + parseFloat(emp.netSalary),
+        0
+      );
+
+      if (totalAmount > organizationBalance) {
+        showToast("Insufficient organization balance!", "error");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      if (dueEmployees.length === 0) {
+        showToast("No employees to process payment for", "error");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      const response = await salaryService.runEmployeePayroll(dueEmployees);
+
+      if (response && response.success) {
+        // Update local state
+        const updatedEmployees = employees.map((emp) =>
+          emp.Status.toLowerCase() === "due" && emp.employee.bankDetails
+            ? { ...emp, Status: "Paid" }
+            : emp
+        );
+
+        setEmployees(updatedEmployees);
+        setOrganizationBalance(organizationBalance - totalAmount);
+
+        showToast(
+          `Payment processed for ${dueEmployees.length} employees! Confirmation emails sent.`,
+          "success"
+        );
+      }
+    } catch (err) {
+      console.log("Error processing payment", err);
+      showToast(
+        err.response?.data?.message || "Failed to process payment",
+        "error"
+      );
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   const handleDownloadPayslip = () => {
     if (!selectedEmployee || !selectedEmployee.employee) {
@@ -254,28 +243,31 @@ const updatedEmployees = employees.map((emp) =>
 
     try {
       const doc = new jsPDF();
+      
+      // Header
       doc.setFont("helvetica");
       doc.setFillColor(15, 23, 41);
       doc.rect(0, 0, 210, 40, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(24);
       doc.setFont("helvetica", "bold");
-      doc.text("EMS Portal", 105, 20, { align: "center" });
+      doc.text("GRAPHURA HR", 105, 20, { align: "center" });
       doc.setFontSize(12);
       doc.setFont("helvetica", "normal");
-      doc.text("GRAPHURA PAYSLIP RECEIPT", 105, 30, { align: "center" });
+      doc.text("PAYSLIP RECEIPT", 105, 30, { align: "center" });
+      
+      // Employee Details
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       doc.text("Employee Details", 20, 55);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
+      
       const employeeName = `${capitalize(
         selectedEmployee?.employee?.firstName || ""
       )} ${capitalize(selectedEmployee?.employee?.lastName || "")}`;
-      const employeeName = `${capitalize(
-        selectedEmployee?.employee?.firstName || ""
-      )} ${capitalize(selectedEmployee?.employee?.lastName || "")}`;
+      
       doc.text(`Name: ${employeeName}`, 20, 65);
       doc.text(`Employee ID: ${selectedEmployee?.employeeId || "N/A"}`, 20, 72);
       doc.text(
@@ -288,15 +280,20 @@ const updatedEmployees = employees.map((emp) =>
         120,
         65
       );
+      
       doc.setDrawColor(200, 200, 200);
       doc.line(20, 95, 190, 95);
+      
+      // Earnings
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
       doc.text("Earnings", 20, 105);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
+      
       const baseSalary = parseFloat(selectedEmployee?.baseSalary) || 0;
       const allowances = parseFloat(selectedEmployee?.allowances) || 0;
+      
       doc.text("Base Salary", 20, 115);
       doc.text(
         `$${baseSalary.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
@@ -311,13 +308,18 @@ const updatedEmployees = employees.map((emp) =>
         122,
         { align: "right" }
       );
+      
       doc.line(20, 130, 190, 130);
+      
+      // Deductions
       doc.setFont("helvetica", "bold");
       doc.text("Deductions", 20, 140);
       doc.setFont("helvetica", "normal");
+      
       const taxApply = parseFloat(selectedEmployee?.taxApply) || 0;
       const taxAmount = (baseSalary * taxApply) / 100;
       const deductions = parseFloat(selectedEmployee?.deductions) || 0;
+      
       doc.text(`Tax (${taxApply}%)`, 20, 150);
       doc.text(
         `$${taxAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
@@ -332,7 +334,10 @@ const updatedEmployees = employees.map((emp) =>
         157,
         { align: "right" }
       );
+      
       doc.line(20, 165, 190, 165);
+      
+      // Net Pay
       const netSalary = parseFloat(selectedEmployee?.netSalary) || 0;
       doc.setFillColor(240, 240, 240);
       doc.rect(20, 172, 170, 15, "F");
@@ -346,17 +351,18 @@ const updatedEmployees = employees.map((emp) =>
         182,
         { align: "right" }
       );
+      
       const fileName = `Payslip_${employeeName.replace(/\s+/g, "_")}_${
         selectedEmployee?.month || "Unknown"
       }_2026.pdf`;
       doc.save(fileName);
+      
       showToast("Payslip downloaded successfully!", "success");
     } catch (error) {
       console.error("Error generating PDF:", error);
       showToast("Failed to download payslip", "error");
     }
   };
-
 
   const filteredEmployees = employees.filter((emp) => {
     const matchesSearch =
@@ -374,7 +380,9 @@ const updatedEmployees = employees.map((emp) =>
   });
 
   const dueCount = employees.filter((emp) => emp.Status.toLowerCase() === "due").length;
-  const employeesWithoutBank = employees.filter((emp) => !emp?.employee?.bankDetails?.accountNumber).length;
+  const employeesWithoutBank = employees.filter(
+    (emp) => !emp?.employee?.bankDetails?.accountNumber
+  ).length;
   const totalPayableSalary = employees
     .filter((emp) => emp.Status.toLowerCase() === "due" && emp.employee.bankDetails)
     .reduce((sum, emp) => sum + parseFloat(emp.netSalary), 0);
@@ -407,7 +415,8 @@ const updatedEmployees = employees.map((emp) =>
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                   <CreditCard className="text-blue-600" size={20} />
-                  {employees.find((e) => e.employee._id === editingEmployeeId)?.bankDetails?.accountNumber
+                  {employees.find((e) => e.employee._id === editingEmployeeId)?.employee?.bankDetails
+                    ?.accountNumber
                     ? "Edit"
                     : "Add"}{" "}
                   Bank Details
@@ -555,7 +564,8 @@ const updatedEmployees = employees.map((emp) =>
           </div>
         )}
 
-        {/* Payment Dashboard Content */}
+        {/* Payment Dashboard Content - Keep existing Payment Mode UI */}
+        {/* (Rest of your Payment Mode UI code stays the same) */}
         <div className="p-4 sm:p-6">
           {/* Header */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
@@ -796,7 +806,6 @@ const updatedEmployees = employees.map((emp) =>
   // Regular Salary Management View (With AdminSidebar)
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      
       <AdminSidebar />
 
       {/* Main Content - Responsive with sidebar offset */}
@@ -818,7 +827,7 @@ const updatedEmployees = employees.map((emp) =>
           </div>
         )}
 
-        {/* Secret Key Modal -> using to open payment gateway */}
+        {/* Secret Key Modal */}
         {showSecretKeyModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-4 sm:p-6">
@@ -848,51 +857,52 @@ const updatedEmployees = employees.map((emp) =>
                 </p>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Secret Payment Key
-                </label>
-                <input
-                  type="password"
-                  value={secretKey}
-                  onChange={(e) => setSecretKey(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="Enter secret key..."
-                  disabled={isAuthenticating}
-                />
-              </div>
+              <form onSubmit={handleSecretKeySubmit}>
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Secret Payment Key
+                  </label>
+                  <input
+                    type="password"
+                    value={secretKey}
+                    onChange={(e) => setSecretKey(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter secret key..."
+                    disabled={isAuthenticating}
+                  />
+                </div>
 
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowSecretKeyModal(false);
-                    setSecretKey("");
-                  }}
-                  disabled={isAuthenticating}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSecretKeySubmit}
-                  disabled={isAuthenticating || !secretKey}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:bg-gray-400 flex items-center justify-center gap-2"
-                >
-                  {isAuthenticating ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Verifying...
-                    </>
-                  ) : (
-                    <>
-                      <Unlock size={18} />
-                      Authenticate
-                    </>
-                  )}
-                </button>
-              </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowSecretKeyModal(false);
+                      setSecretKey("");
+                    }}
+                    disabled={isAuthenticating}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isAuthenticating || !secretKey}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:bg-gray-400 flex items-center justify-center gap-2"
+                  >
+                    {isAuthenticating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <Unlock size={18} />
+                        Authenticate
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
@@ -915,52 +925,58 @@ const updatedEmployees = employees.map((emp) =>
 
               <form
                 onSubmit={async (e) => {
-                  try{
                   e.preventDefault();
-                  const baseSalary = parseFloat(updateFormData.baseSalary) || 0;
-                  const allowances = parseFloat(updateFormData.allowances) || 0;
-                  const deductions = parseFloat(updateFormData.deductions) || 0;
-                  const taxApply = parseFloat(updateFormData.taxApply) || 0;
-                  const taxAmount = (baseSalary * taxApply) / 100;
-                  const netSalary = baseSalary + allowances - deductions - taxAmount;
+                  
+                  try {
+                    const baseSalary = parseFloat(updateFormData.baseSalary) || 0;
+                    const allowances = parseFloat(updateFormData.allowances) || 0;
+                    const deductions = parseFloat(updateFormData.deductions) || 0;
+                    const taxApply = parseFloat(updateFormData.taxApply) || 0;
+                    const taxAmount = (baseSalary * taxApply) / 100;
+                    const netSalary = baseSalary + allowances - deductions - taxAmount;
 
                     const updateData = {
-        ...updateFormData,
-        netSalary: netSalary.toFixed(2)
-      };
-                  const updatedEmployees = employees.map((emp) =>
-                    emp._id === selectedEmployee._id
-                      ? {
-                          ...emp,
-                          ...updateFormData,
-                          baseSalary: parseFloat(updateFormData.baseSalary),
-                          allowances: parseFloat(updateFormData.allowances),
-                          taxApply: parseFloat(updateFormData.taxApply),
-                          deductions: parseFloat(updateFormData.deductions),
-                          netSalary: netSalary.toFixed(2),
-                        }
-                      : emp
-                  );
-                      const response =  await salaryService.updateEmployeeSalary(updateData);
- 
+                      ...updateFormData,
+                      netSalary: netSalary.toFixed(2)
+                    };
 
-                 if(response.success){
-                  setEmployees(updatedEmployees);
-                  setSelectedEmployee({
-                    ...selectedEmployee,
-                    baseSalary: parseFloat(updateFormData.baseSalary),
-                    allowances: parseFloat(updateFormData.allowances),
-                    taxApply: parseFloat(updateFormData.taxApply),
-                    deductions: parseFloat(updateFormData.deductions),
-                    netSalary: netSalary.toFixed(2),
-                  });
-                  showToast("Salary updated successfully!", "success");
-                  setShowUpdateModal(false);
-                 }
-                }catch(err){
- console.error("Error updating salary:", err);
-      showToast("Failed to update salary", "error");
-                }}}
+                    const response = await salaryService.updateEmployeeSalary(updateData);
+
+                    if (response.success) {
+                      const updatedEmployees = employees.map((emp) =>
+                        emp._id === selectedEmployee._id
+                          ? {
+                              ...emp,
+                              baseSalary: parseFloat(updateFormData.baseSalary),
+                              allowances: parseFloat(updateFormData.allowances),
+                              taxApply: parseFloat(updateFormData.taxApply),
+                              deductions: parseFloat(updateFormData.deductions),
+                              netSalary: netSalary.toFixed(2),
+                            }
+                          : emp
+                      );
+
+                      setEmployees(updatedEmployees);
+                      setSelectedEmployee({
+                        ...selectedEmployee,
+                        baseSalary: parseFloat(updateFormData.baseSalary),
+                        allowances: parseFloat(updateFormData.allowances),
+                        taxApply: parseFloat(updateFormData.taxApply),
+                        deductions: parseFloat(updateFormData.deductions),
+                        netSalary: netSalary.toFixed(2),
+                      });
+                      
+                      showToast("Salary updated successfully!", "success");
+                      setShowUpdateModal(false);
+                    }
+                  } catch (err) {
+                    console.error("Error updating salary:", err);
+                    showToast(
+                      err.response?.data?.message || "Failed to update salary",
+                      "error"
+                    );
+                  }
+                }}
                 className="space-y-4"
               >
                 <div>
@@ -1367,23 +1383,20 @@ const updatedEmployees = employees.map((emp) =>
         </div>
       </div>
 
-      {/* CSS for responsive behavior matching AdminSidebar */}
+      {/* CSS for responsive behavior */}
       <style>{`
-        /* On screens 1120px and above, content has sidebar offset */
         @media (min-width: 1120px) {
           .lg\\:ml-64 {
             margin-left: 16rem;
           }
         }
         
-        /* On screens below 1120px, full width */
         @media (max-width: 1119px) {
           .lg\\:ml-64 {
             margin-left: 0;
           }
         }
 
-        /* Scrollbar styling */
         div::-webkit-scrollbar {
           width: 6px;
         }

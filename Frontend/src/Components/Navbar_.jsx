@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import "../assets/styles/LandingPageStyles/Navbar_.css"
+import React, { useState, useEffect} from 'react';
+import "../assets/styles/LandingPageStyles/Navbar_.css";
+import { useNavigate } from "react-router-dom";
 
 const Navbar_ = () => {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeLink, setActiveLink] = useState('home');
   const [scrolled, setScrolled] = useState(false);
@@ -42,6 +44,12 @@ const Navbar_ = () => {
     };
   }, [isMobileMenuOpen]);
 
+  const handleRegister = () => {
+   
+      navigate("/register");
+    
+  }
+
   // Close mobile menu on window resize
   useEffect(() => {
     const handleResize = () => {
@@ -77,7 +85,7 @@ const Navbar_ = () => {
             </li>
             <li role="none">
               <a
-                href="/admin"
+                href="/admin-login"
                 role="menuitem"
                 className={`animated-nav-link ${activeLink === 'admin' ? 'active' : ''}`}
                 onClick={() => handleLinkClick('admin')}
@@ -88,7 +96,7 @@ const Navbar_ = () => {
             </li>
             <li role="none">
               <a
-                href="#"
+                href="/employee-login"
                 role="menuitem"
                 className={`animated-nav-link ${activeLink === 'employee' ? 'active' : ''}`}
                 onClick={() => handleLinkClick('employee')}
@@ -101,7 +109,7 @@ const Navbar_ = () => {
 
           {/* Desktop Register Button */}
           <div className="animated-navbar-cta">
-            <button className="animated-register-btn" aria-label="Register for an account">
+            <button onClick={handleRegister} className="animated-register-btn" aria-label="Register for an account">
               <span className="btn-text">Admin Register</span>
               <span className="btn-shine"></span>
             </button>

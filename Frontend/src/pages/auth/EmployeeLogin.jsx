@@ -1,34 +1,36 @@
 import React, { useState } from "react";
-import { User, ArrowRight, Lock, Grid3x3 } from "lucide-react";
-import { useAuth } from '../../context/AuthContext';
+import { User, ArrowRight, Lock, Mail } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import Navbar from "../../Components/formNavbar";
+
+/* LOCAL IMAGE */
+import sideImage from "../../assets/images/emp.jpg";
 
 export default function EmployeeLogin() {
   const [employeeId, setEmployeeId] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '', type: '' });
-const {login}  = useAuth();
+  const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
-  const showToast = (message, type = 'success') => {
+  const { login } = useAuth();
+
+  const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: '' }), 4000);
+    setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
   };
 
-  // Form validation
   const validateForm = () => {
     const newErrors = {};
-
-    if (!employeeId.trim()) {
-      newErrors.employeeId = "Employee ID is required";
-    } else if (employeeId.trim().length < 3) {
-      newErrors.employeeId = "Employee ID must be at least 3 characters";
-    }
-
+    if (!employeeId.trim()) newErrors.employeeId = "Employee ID is required";
+    if (!email.trim()) newErrors.email = "Email is required";
+    if (!password.trim()) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -42,7 +44,7 @@ const {login}  = useAuth();
 
     try {
       
-      const result = await login(false , false , employeeId);
+      const result = await login(email , password , employeeId , "employee");
       console.log(result);
      if(result.success){
              
@@ -65,158 +67,134 @@ const {login}  = useAuth();
       setIsLoading(false);
     }
   };
-
   return (
-    <div className="min-h-screen flex bg-[#f6f7f8] font-[Inter]">
-      {/* Toast Notification */}
+    <div className="min-h-screen bg-[#EEF2F7] font-[Inter]">
+      <Navbar />
+
+      {/* TOAST */}
       {toast.show && (
-        <div className={`fixed top-6 right-6 z-50 animate-slideIn ${toast.type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[280px] max-w-md`}>
-          <div className={`w-2 h-2 rounded-full ${toast.type === 'error' ? 'bg-red-300' : 'bg-green-300'}`}></div>
-          <span className="font-medium">{toast.message}</span>
-          <button 
-            onClick={() => setToast({ show: false, message: '', type: '' })} 
-            className="ml-auto text-white/80 hover:text-white"
-          >
-            ✕
-          </button>
+        <div
+          className={`fixed top-20 right-6 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${
+            toast.type === "error" ? "bg-red-500" : "bg-green-600"
+          }`}
+        >
+          {toast.message}
         </div>
       )}
 
-      {/* LEFT SIDE */}
-      <div className="hidden lg:flex w-1/2 relative text-white">
-        <img
-          src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600"
-          className="absolute inset-0 w-full h-full object-cover"
-          alt="office"
-        />
-        <div className="absolute inset-0 bg-[#0f1729]/80"></div>
+      <div className="pt-12 min-h-[calc(100vh-64px)] flex items-center justify-center px-4">
+        <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 min-h-[720px]">
 
-        <div className="relative z-10 p-12 flex flex-col justify-between w-full">
-          <div className="flex items-center gap-2">
-            <Grid3x3 size={24} />
-            <span className="font-bold">Enterprise EMS</span>
-          </div>
+          {/* LEFT FORM */}
+          <div className="p-12 flex flex-col justify-center">
 
-          <div>
-            <h1 className="text-4xl font-bold leading-tight mb-6">
-              Streamlined workforce management for the modern enterprise.
-            </h1>
+            <h2 className="text-3xl font-bold text-blue-900 mb-3">
+              Employee Portal
+            </h2>
+            <p className="text-sm text-slate-500 mb-10">
+              Securely access your dashboard using your credentials.
+            </p>
 
-            {/* PROFILE IMAGES */}
-            <div className="flex items-center gap-3 text-blue-200 text-sm">
-              <div className="flex -space-x-3">
-                <img
-                  src="https://i.pravatar.cc/40?img=1"
-                  className="w-8 h-8 rounded-full border-2 border-white"
-                  alt="user1"
-                />
-                <img
-                  src="https://i.pravatar.cc/40?img=2"
-                  className="w-8 h-8 rounded-full border-2 border-white"
-                  alt="user2"
-                />
-                <img
-                  src="https://i.pravatar.cc/40?img=3"
-                  className="w-8 h-8 rounded-full border-2 border-white"
-                  alt="user3"
-                />
-                <div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-white flex items-center justify-center text-xs">
-                  +2k
+            <form onSubmit={handleSubmit}>
+              {/* Employee ID */}
+              <label className="block mb-6">
+                <span className="text-sm font-semibold text-blue-900">
+                  Employee ID
+                </span>
+                <div className="relative mt-3">
+                  <User className="absolute left-4 top-4 text-blue-400" />
+                  <input
+                    type="text"
+                    value={employeeId}
+                    onChange={(e) => setEmployeeId(e.target.value)}
+                    placeholder="Ex: EMP-001"
+                    className="w-full h-14 pl-12 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-600"
+                  />
                 </div>
+                {errors.employeeId && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.employeeId}
+                  </p>
+                )}
+              </label>
+
+              {/* Email */}
+              <label className="block mb-6">
+                <span className="text-sm font-semibold text-blue-900">
+                  Email
+                </span>
+                <div className="relative mt-3">
+                  <Mail className="absolute left-4 top-4 text-blue-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="employee@email.com"
+                    className="w-full h-14 pl-12 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-600"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                )}
+              </label>
+
+              {/* Password */}
+              <label className="block">
+                <span className="text-sm font-semibold text-blue-900">
+                  Password
+                </span>
+                <div className="relative mt-3">
+                  <Lock className="absolute left-4 top-4 text-blue-400" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    className="w-full h-14 pl-12 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-600"
+                  />
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.password}
+                  </p>
+                )}
+              </label>
+
+              {/* 🔹 FORGOT PASSWORD */}
+              <div className="flex justify-end mt-3 mb-8">
+                <a
+                  href="/employee/forgot-password"
+                  className="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline transition"
+                >
+                  Forgot password?
+                </a>
               </div>
-              Join 2,000+ employees
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-14 bg-blue-800 hover:bg-blue-900 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition"
+              >
+                {isLoading ? "Authenticating..." : "Secure Login"}
+                <ArrowRight size={18} />
+              </button>
+            </form>
+
+            <div className="text-xs text-slate-400 flex justify-center items-center gap-1 mt-10">
+              <Lock size={14} />
+              Protected by Enterprise Grade Security
             </div>
           </div>
 
-          <div className="text-sm text-white/50">
-            © 2024 Enterprise Corp · Privacy · Terms
-          </div>
-        </div>
-      </div>
-
-      {/* RIGHT SIDE */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center relative">
-        <div className="absolute inset-0 bg-[radial-gradient(#dcdfe4_1px,transparent_1px)] [background-size:24px_24px]"></div>
-
-        <div className="relative bg-white w-[420px] rounded-2xl p-8 shadow-xl">
-          <h2 className="text-2xl font-bold text-[#0f1729] mb-2">
-            Employee Portal
-          </h2>
-
-          <p className="text-sm text-slate-500 mb-6">
-            Securely access your dashboard using your unique ID.
-          </p>
-
-          <form onSubmit={handleSubmit}>
-            <label className="block mb-4">
-              <span className="text-sm font-semibold">Employee ID</span>
-              <div className="relative mt-2">
-                <User 
-                  className="absolute left-3 top-3 text-slate-400" 
-                  size={20}
-                />
-                <input
-                  type="text"
-                  placeholder="Ex: #EMP-001"
-                  value={employeeId}
-                  onChange={(e) => {
-                    setEmployeeId(e.target.value);
-                    
-                    if (errors.employeeId) {
-                      setErrors({ ...errors, employeeId: '' });
-                    }
-                  }}
-                  className={`w-full h-12 pl-10 pr-4 border rounded-xl outline-none focus:ring-2 focus:ring-[#0f1729]/20 ${
-                    errors.employeeId ? 'border-red-500 focus:ring-red-500/20' : ''
-                  }`}
-                />
-              </div>
-              {errors.employeeId && (
-                <p className="text-red-500 text-xs mt-1">{errors.employeeId}</p>
-              )}
-            </label>
-
-            <button 
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-12 bg-[#0f1729] hover:bg-slate-800 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Authenticating...</span>
-                </>
-              ) : (
-                <>
-                  Secure Login
-                  <ArrowRight size={20} />
-                </>
-              )}
-            </button>
-          </form>
-
-          <p className="text-center text-sm text-slate-500 mt-4 cursor-pointer hover:text-slate-700">
-            Forgot ID?
-          </p>
-
-          <div className="mt-6 border rounded-xl p-4 bg-slate-50">
-            <div className="flex justify-between text-xs font-semibold">
-              <span className="text-emerald-600 flex items-center gap-1">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                SYSTEM OPERATIONAL
-              </span>
-              <span className="text-slate-400">v2.4.0</span>
-            </div>
-
-            <div className="mt-2 h-1.5 bg-slate-200 rounded-full">
-              <div className="h-full w-full bg-[#0f1729] rounded-full"></div>
-            </div>
+          {/* RIGHT IMAGE */}
+          <div className="hidden md:flex items-center justify-center bg-blue-50 p-10">
+            <img
+              src={sideImage}
+              alt="Employee Login"
+              className="w-full h-full max-w-lg object-contain scale-110"
+            />
           </div>
 
-          <div className="mt-6 text-xs text-slate-400 flex justify-center items-center gap-1">
-            <Lock size={14} />
-            Protected by Enterprise Grade Security
-          </div>
         </div>
       </div>
     </div>
