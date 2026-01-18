@@ -5,23 +5,138 @@ const path = require('path');
 
 // Email configuration
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // ya aap koi bhi service use kar sakte hain
+  service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // aapka email
-    pass: process.env.EMAIL_PASSWORD // app password (Gmail ke liye)
+    user: process.env.EMAIL_USER, 
+    pass: process.env.EMAIL_PASSWORD 
   }
 });
 
-// Helper function to generate random transaction ID
 const generateTransactionId = () => {
   return 'TXN' + Date.now() + Math.random().toString(36).substr(2, 9).toUpperCase();
 };
 
-// Case 1: Employee Registration Email
+
+
+
+const sendOtp = async(userDetails) => {
+const {user , otp} = userDetails; 
+console.log(user);
+
+  const mailOptions = {
+          from: process.env.EMAIL_USER,
+          to: user.personalEmail || user.email,
+          subject: 'Password Reset OTP - Graphura HR',
+          html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <style>
+                body { 
+                  font-family: 'Segoe UI', sans-serif; 
+                  background-color: #f0f4f8;
+                  margin: 0;
+                  padding: 20px;
+                }
+                .container { 
+                  max-width: 600px; 
+                  margin: 0 auto; 
+                  background-color: white;
+                  border-radius: 16px;
+                  overflow: hidden;
+                  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
+                }
+                .header { 
+                  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+                  color: white; 
+                  padding: 40px 30px;
+                  text-align: center;
+                }
+                .logo {
+                  font-size: 32px;
+                  font-weight: bold;
+                  margin-bottom: 10px;
+                }
+                .content { 
+                  padding: 40px 30px;
+                }
+                .otp-box {
+                  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+                  border: 3px solid #2563eb;
+                  border-radius: 12px;
+                  padding: 30px;
+                  text-align: center;
+                  margin: 30px 0;
+                }
+                .otp {
+                  font-size: 48px;
+                  font-weight: bold;
+                  color: #2563eb;
+                  letter-spacing: 8px;
+                  font-family: 'Courier New', monospace;
+                }
+                .warning {
+                  background-color: #fef3c7;
+                  border-left: 4px solid #f59e0b;
+                  padding: 15px 20px;
+                  border-radius: 6px;
+                  margin: 25px 0;
+                }
+                .footer { 
+                  background-color: #f8fafc;
+                  text-align: center; 
+                  padding: 30px;
+                  border-top: 1px solid #e2e8f0;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <div class="logo">GRAPHURA HR</div>
+                  <p>Password Reset Request</p>
+                </div>
+                
+                <div class="content">
+                  <h2 style="color: #1e293b;">Hello ${user.firstName || user.name},</h2>
+                  <p style="color: #475569;">We received a request to reset your password. Use the OTP below to proceed:</p>
+                  
+                  <div class="otp-box">
+                    <p style="color: #1e40af; font-size: 14px; margin: 0 0 10px 0;">Your OTP Code</p>
+                    <div class="otp">${otp}</div>
+                  </div>
+                  
+                  <div class="warning">
+                    <p style="color: #92400e; margin: 0;">⚠️ <strong>Important:</strong> This OTP will expire in 10 minutes. If you didn't request this, please ignore this email.</p>
+                  </div>
+                  
+                  <p style="color: #64748b; font-size: 14px;">For security reasons, never share this OTP with anyone.</p>
+                </div>
+                
+                <div class="footer">
+                  <p style="color: #64748b; font-size: 13px; margin: 5px 0;">© 2025 Graphura HR. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+            </html>
+          `
+        };
+         try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('otp  sent:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('Error sending Otp', error);
+    throw error;
+  }
+  }
+
+
+
 const sendEmployeeRegistrationEmail = async (employeeData) => {
   const { email, employeeId, name } = employeeData;
   
-  // Password creation link
+
   const passwordCreationLink = `${process.env.FRONTEND_URL}/create-password?employeeId=${employeeId}`;
   
   const mailOptions = {
@@ -351,5 +466,6 @@ module.exports = {
   sendEmployeeRegistrationEmail,
   sendSalaryReceiptEmail,
   verifyEmailConfig,
-  generateTransactionId
+  generateTransactionId,
+  sendOtp
 };
