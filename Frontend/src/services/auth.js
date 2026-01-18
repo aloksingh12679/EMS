@@ -56,6 +56,40 @@ export const authService = {
         return localStorage.getItem('token');
     },
 
+    requestForgotpassword  : async(employeeId , email , userType) => {
+        const response = await api.post("/auth/forgot-password/request",{
+          employeeId,
+          email,
+          userType
+        })
+        return response.data;
+
+      }
+       ,
+       verifyOtp : async (identifier,otp,userType) => {
+         const response = await api.post("/auth/forgot-password/verify-otp",{
+          identifier,
+          otp,
+          userType
+        })
+        return response.data;
+       }
+       ,
+       resetPassword : async (identifier,otp,newPassword,confirmPassword,userType,adminSecretkey , departmentSecretkey , name) => {
+         const response = await api.post("/auth/forgot-password/reset",{
+          identifier,
+
+          otp,
+          password : newPassword,
+          confirmPassword,
+          userType,
+          adminSecretkey,
+          departmentSecretkey,
+          name
+        })
+        return response.data;
+       }
+    
     
 };
 

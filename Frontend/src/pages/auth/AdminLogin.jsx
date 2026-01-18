@@ -9,30 +9,25 @@ import { CiLock } from "react-icons/ci";
 import { BsShieldLock } from "react-icons/bs";
 import { TbShieldSearch } from "react-icons/tb";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-
-/* LEFT SIDE IMAGE */
-import sideImg from "../../assets/images/Admin.jpg";
+import authService from "../../services/auth";
 
 export default function AdminLogin() {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
+  const [view, setView] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const [formValues, setFormValues] = useState({ email: "", password: "" });
+  const {login} = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [userType, setUserType] = useState("Admin");
+  const [secretKey, setSecretKey] = useState("");
+  const [name, setName] = useState("");
+
   const [formErrors, setFormErrors] = useState({});
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
-    // Clear error when user starts typing
-    if (formErrors[name]) {
-      setFormErrors({ ...formErrors, [name]: "" });
-    }
-  };
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
@@ -60,33 +55,28 @@ export default function AdminLogin() {
     return errors;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const errors = validate(formValues);
+  const handleLoginSubmit = async () => {
+    const errors = validate({ email, password });
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
       setIsLoading(true);
       
       try {
-        const result = await login(formValues.email, formValues.password , false , "Admin");
-
-        if (result.success) {
-          showToast("Login successful! Redirecting...", "success");
+        const result = await login(email, password, false, "Admin");
+        console.log(result);
+        if(result.success){
+          showToast('Login successfully! Redirecting...', 'success');
           setTimeout(() => {
-            navigate("/admin/dashboard");
-          }, 1500);
+            window.location.href = "/admin/dashboard";
+          }, 1500); 
         }
-      } catch (err) {
-        const { response } = err;
-        
-        if (!response) {
-          showToast("Network error. Please check your connection.", "error");
-          return;
+      } catch (error) {
+        console.error("Login error:", error);
+        if(error.response?.status === 403){
+          return showToast(error.response.data.message, "error");
         }
-        
-        showToast(response.data.message || "Login failed. Please try again.", "error");
+        showToast(error.response?.data?.message || "Login failed. Please try again.", "error");
       } finally {
         setIsLoading(false);
       }
@@ -95,9 +85,136 @@ export default function AdminLogin() {
     }
   };
 
+  const handleForgotPasswordSubmit = async () => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    
+    if (!email.trim()) {
+      showToast("Email is required", "error");
+      return;
+    }
+    
+    if (!regex.test(email)) {
+      showToast("Please enter a valid email", "error");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await authService.requestForgotpassword(null, email, userType);
+      
+      if (response.success) {
+        showToast("If you are a registered user, you will receive an email with OTP.", "success");
+        setView("verifyOTP");
+      } else {
+        showToast(response.message || "Failed to send OTP", "error");
+      }
+    } catch (error) {
+      showToast("Network error. Please try again.", "error");
+      console.log("admin forgot password error", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!otp.trim() || otp.length !== 6) {
+      showToast("Please enter a valid 6-digit OTP", "error");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await authService.verifyOtp(email, otp, userType);
+      
+      console.log(response);
+      
+      if (response.success) {
+        showToast("OTP verified successfully!", "success");
+        setView("resetPassword");
+      } else {
+        showToast(response.message || "Invalid OTP", "error");
+      }
+    } catch (error) {
+      showToast("Verification failed. Please try again.", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword || !confirmPassword) {
+      showToast("Please fill in all password fields", "error");
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      showToast("Passwords do not match", "error");
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      showToast("Password must be at least 6 characters", "error");
+      return;
+    }
+    
+    if (!name.trim()) {
+      showToast("Name is required for verification", "error");
+      return;
+    }
+    
+    if (!secretKey.trim()) {
+      showToast("Secret key is required for verification", "error");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const adminSecretKey = userType === "Admin" ? secretKey : undefined;
+      const departmentSecretKey = userType === "Department Head" ? secretKey : undefined;
+
+      const response = await authService.resetPassword(
+        email,
+        otp,
+        newPassword,
+        confirmPassword,
+        userType,
+        adminSecretKey,
+        departmentSecretKey,
+        name,
+      );
+
+      console.log(response);
+      
+      if (response.success) {
+        showToast("Password reset successful! Redirecting to login...", "success");
+          console.log("✅ Password reset successful, about to change view");
+
+        setTimeout(() => {
+          setView("login");
+          setEmail("");
+          setPassword("");
+          setOtp("");
+          setNewPassword("");
+          setConfirmPassword("");
+          setSecretKey("");
+          setName("");
+        }, 2000);
+      } else {
+        showToast(response.message || "Failed to reset password", "error");
+      }
+    } catch (error) {
+      console.error("Reset password error:", error);
+      showToast(error.response?.data?.message || "Failed to reset password. Please try again.", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
-      {/* Toast Notification */}
       {toast.show && (
         <div
           className={`fixed top-6 right-6 z-50 animate-slideIn ${
@@ -120,196 +237,415 @@ export default function AdminLogin() {
       )}
 
       <div className="min-h-screen flex items-center justify-center bg-[#E3E8EC] px-4 py-8">
-        {/* CONTAINER */}
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 shadow-2xl rounded-2xl overflow-hidden bg-white">
           
           {/* LEFT IMAGE SIDE */}
           <div className="hidden md:flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-blue-100">
             <div className="relative w-full h-full">
-              <img
-                src={sideImg}
-                alt="Admin Login"
-                className="w-full h-full object-cover rounded-xl shadow-lg"
-              />
+              <div className="w-full h-full bg-gradient-to-br from-blue-200 to-blue-300 rounded-xl shadow-lg flex items-center justify-center">
+                <MdOutlineAdminPanelSettings className="text-blue-800 text-9xl opacity-20" />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent rounded-xl"></div>
             </div>
           </div>
 
           {/* RIGHT FORM SIDE */}
           <div className="p-6 sm:p-8 md:p-10">
-            {/* ICON */}
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center ring-4 ring-blue-100 shadow-md">
-                <MdOutlineAdminPanelSettings className="text-blue-800 text-3xl" />
-              </div>
-            </div>
+            {view === "login" && (
+              <>
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center ring-4 ring-blue-100 shadow-md">
+                    <MdOutlineAdminPanelSettings className="text-blue-800 text-3xl" />
+                  </div>
+                </div>
 
-            {/* TITLE */}
-            <div className="text-center mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">
-                Welcome Back
-              </h2>
-              <p className="text-sm sm:text-base text-blue-600">
-                Please enter your details to sign in.
-              </p>
-            </div>
-
-            {/* FORM */}
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* EMAIL */}
-              <div>
-                <label className="block text-sm font-semibold text-blue-900 mb-2">
-                  Work Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="name@company.com"
-                  value={formValues.email}
-                  onChange={handleChange}
-                  disabled={isLoading}
-                  className={`
-                    w-full px-4 py-3
-                    bg-blue-50
-                    border-2 
-                    ${formErrors.email ? 'border-red-500' : 'border-blue-200'}
-                    rounded-lg
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    transition-all
-                    text-sm font-medium
-                  `}
-                  autoComplete="off"
-                />
-                {formErrors.email && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                    <span>⚠</span> {formErrors.email}
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">
+                    Welcome Back
+                  </h2>
+                  <p className="text-sm sm:text-base text-blue-600">
+                    Please enter your details to sign in.
                   </p>
-                )}
-              </div>
+                </div>
 
-              {/* PASSWORD */}
-              <div>
-                <label className="block text-sm font-semibold text-blue-900 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="••••••••"
-                    value={formValues.password}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    className={`
-                      w-full px-4 py-3 pr-12
-                      bg-blue-50
-                      border-2 
-                      ${formErrors.password ? 'border-red-500' : 'border-blue-200'}
-                      rounded-lg
-                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      transition-all
-                      text-sm font-medium
-                    `}
-                    autoComplete="off"
-                  />
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      Work Email
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="name@company.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (formErrors.email) setFormErrors({ ...formErrors, email: "" });
+                      }}
+                      disabled={isLoading}
+                      className={`
+                        w-full px-4 py-3
+                        bg-blue-50
+                        border-2 
+                        ${formErrors.email ? 'border-red-500' : 'border-blue-200'}
+                        rounded-lg
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                        transition-all
+                        text-sm font-medium
+                      `}
+                      autoComplete="off"
+                    />
+                    {formErrors.email && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <span>⚠</span> {formErrors.email}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (formErrors.password) setFormErrors({ ...formErrors, password: "" });
+                        }}
+                        disabled={isLoading}
+                        className={`
+                          w-full px-4 py-3 pr-12
+                          bg-blue-50
+                          border-2 
+                          ${formErrors.password ? 'border-red-500' : 'border-blue-200'}
+                          rounded-lg
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          transition-all
+                          text-sm font-medium
+                        `}
+                        autoComplete="off"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-700 hover:text-blue-900 disabled:opacity-50"
+                      >
+                        {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                      </button>
+                    </div>
+                    {formErrors.password && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <span>⚠</span> {formErrors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm">
+                    <label className="flex items-center gap-2 text-blue-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => setIsChecked(!isChecked)}
+                        disabled={isLoading}
+                        className="h-4 w-4 rounded border-blue-300 text-blue-900 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
+                      />
+                      Remember me
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setView("forgotPassword")}
+                      disabled={isLoading}
+                      className="font-semibold text-blue-900 underline hover:no-underline disabled:opacity-50"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={handleLoginSubmit}
                     disabled={isLoading}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-700 hover:text-blue-900 disabled:opacity-50"
+                    className="
+                      w-full h-12
+                      bg-gradient-to-r from-blue-900 to-blue-800
+                      text-white font-semibold
+                      rounded-lg
+                      flex items-center justify-center gap-2
+                      shadow-lg shadow-blue-900/30
+                      hover:shadow-xl hover:shadow-blue-900/40
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      transition-all duration-200
+                      active:scale-[0.98]
+                    "
                   >
-                    {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                    {isLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Signing In...
+                      </>
+                    ) : (
+                      <>
+                        <LuLogIn size={20} />
+                        Secure Login
+                      </>
+                    )}
                   </button>
                 </div>
-                {formErrors.password && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                    <span>⚠</span> {formErrors.password}
+
+                <div className="mt-8 text-center border-t border-blue-100 pt-6">
+                  <p className="text-xs text-blue-600 flex items-center justify-center gap-1.5 mb-3">
+                    <CiLock className="text-base text-green-600" />
+                    Protected by Enterprise Grade Security
                   </p>
-                )}
-              </div>
 
-              {/* REMEMBER + FORGOT */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm">
-                <label className="flex items-center gap-2 text-blue-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => setIsChecked(!isChecked)}
+                  <div className="flex flex-wrap justify-center gap-4 text-xs text-blue-500">
+                    <span className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
+                      <MdOutlineVerifiedUser size={14} />
+                      SOC2
+                    </span>
+                    <span className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
+                      <BsShieldLock size={14} />
+                      256-bit AES
+                    </span>
+                    <span className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
+                      <TbShieldSearch size={14} />
+                      ISO 27001
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {view === "forgotPassword" && (
+              <>
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center ring-4 ring-blue-100 shadow-md">
+                    <CiLock className="text-blue-800 text-3xl" />
+                  </div>
+                </div>
+
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">
+                    Forgot Password?
+                  </h2>
+                  <p className="text-sm sm:text-base text-blue-600">
+                    Enter your email to receive an OTP
+                  </p>
+                </div>
+
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      User Type
+                    </label>
+                    <select
+                      value={userType}
+                      onChange={(e) => setUserType(e.target.value)}
+                      className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium"
+                    >
+                      <option value="Admin">Admin</option>
+                      <option value="Department Head">Department Head</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      Work Email
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="name@company.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleForgotPasswordSubmit}
                     disabled={isLoading}
-                    className="h-4 w-4 rounded border-blue-300 text-blue-900 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
-                  />
-                  Remember me
-                </label>
-                <button
-                  type="button"
-                  disabled={isLoading}
-                  className="font-semibold text-blue-900 underline hover:no-underline disabled:opacity-50"
-                >
-                  Forgot Password?
-                </button>
-              </div>
+                    className="w-full h-12 bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold rounded-lg shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]"
+                  >
+                    {isLoading ? "Sending OTP..." : "Send OTP"}
+                  </button>
 
-              {/* SUBMIT BUTTON */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="
-                  w-full h-12
-                  bg-gradient-to-r from-blue-900 to-blue-800
-                  text-white font-semibold
-                  rounded-lg
-                  flex items-center justify-center gap-2
-                  shadow-lg shadow-blue-900/30
-                  hover:shadow-xl hover:shadow-blue-900/40
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-all duration-200
-                  active:scale-[0.98]
-                "
-              >
-                {isLoading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Signing In...
-                  </>
-                ) : (
-                  <>
-                    <LuLogIn size={20} />
-                    Secure Login
-                  </>
-                )}
-              </button>
-            </form>
+                  <button
+                    onClick={() => setView("login")}
+                    className="w-full h-12 border-2 border-blue-300 text-blue-800 rounded-lg font-semibold hover:bg-blue-50 transition-all"
+                  >
+                    Back to Login
+                  </button>
+                </div>
 
-            {/* SECURITY BADGES */}
-            <div className="mt-8 text-center border-t border-blue-100 pt-6">
-              <p className="text-xs text-blue-600 flex items-center justify-center gap-1.5 mb-3">
-                <CiLock className="text-base text-green-600" />
-                Protected by Enterprise Grade Security
-              </p>
+                <div className="mt-8 text-center border-t border-blue-100 pt-6">
+                  <p className="text-xs text-blue-600 flex items-center justify-center gap-1.5 mb-3">
+                    <CiLock className="text-base text-green-600" />
+                    Protected by Enterprise Grade Security
+                  </p>
+                </div>
+              </>
+            )}
 
-              <div className="flex flex-wrap justify-center gap-4 text-xs text-blue-500">
-                <span className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
-                  <MdOutlineVerifiedUser size={14} />
-                  SOC2
-                </span>
-                <span className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
-                  <BsShieldLock size={14} />
-                  256-bit AES
-                </span>
-                <span className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
-                  <TbShieldSearch size={14} />
-                  ISO 27001
-                </span>
-              </div>
-            </div>
+            {view === "verifyOTP" && (
+              <>
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center ring-4 ring-blue-100 shadow-md">
+                    <BsShieldLock className="text-blue-800 text-3xl" />
+                  </div>
+                </div>
+
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">
+                    Verify OTP
+                  </h2>
+                  <p className="text-sm sm:text-base text-blue-600">
+                    Enter the 6-digit code sent to your email
+                  </p>
+                </div>
+
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      OTP Code
+                    </label>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000"
+                      maxLength="6"
+                      className="w-full h-14 text-center text-2xl font-mono tracking-widest bg-blue-50 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleVerifyOTP}
+                    disabled={isLoading}
+                    className="w-full h-12 bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold rounded-lg shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]"
+                  >
+                    {isLoading ? "Verifying..." : "Verify OTP"}
+                  </button>
+
+                  <button
+                    onClick={() => setView("forgotPassword")}
+                    className="w-full text-sm text-blue-700 font-medium hover:underline"
+                  >
+                    Resend OTP
+                  </button>
+                </div>
+
+                <div className="mt-8 text-center border-t border-blue-100 pt-6">
+                  <p className="text-xs text-blue-600 flex items-center justify-center gap-1.5">
+                    <CiLock className="text-base text-green-600" />
+                    Protected by Enterprise Grade Security
+                  </p>
+                </div>
+              </>
+            )}
+
+            {view === "resetPassword" && (
+              <>
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center ring-4 ring-blue-100 shadow-md">
+                    <CiLock className="text-blue-800 text-3xl" />
+                  </div>
+                </div>
+
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">
+                    Reset Password
+                  </h2>
+                  <p className="text-sm sm:text-base text-blue-600">
+                    Create a new secure password
+                  </p>
+                </div>
+
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your full name"
+                      className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      Secret Key ({userType === "Admin" ? "Admin" : "Department"})
+                    </label>
+                    <input
+                      type="password"
+                      value={secretKey}
+                      onChange={(e) => setSecretKey(e.target.value)}
+                      placeholder="Enter secret key"
+                      className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      Confirm Password
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium"
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleResetPassword}
+                    disabled={isLoading}
+                    className="w-full h-12 bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold rounded-lg shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]"
+                  >
+                    {isLoading ? "Resetting Password..." : "Reset Password"}
+                  </button>
+                </div>
+
+                <div className="mt-8 text-center border-t border-blue-100 pt-6">
+                  <p className="text-xs text-blue-600 flex items-center justify-center gap-1.5">
+                    <CiLock className="text-base text-green-600" />
+                    Protected by Enterprise Grade Security
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Animation Styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes slideIn {
           from {
             transform: translateX(100%);

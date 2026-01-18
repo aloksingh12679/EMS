@@ -116,6 +116,7 @@ export default function CreateAccount() {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="register-page">
