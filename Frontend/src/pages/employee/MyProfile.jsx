@@ -80,8 +80,16 @@ export default function MyProfile() {
                     </div>
 
                     {/* Profile Header Card */}
-                    <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-xl shadow-xl mb-8 overflow-hidden">
-                        <div className="p-8">
+                    <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 transform transition-all hover:shadow-blue-500/40 hover:shadow-2xl group mb-8">
+                        {/* Animated shimmer effect */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                        </div>
+                        {/* Decorative Background Elements */}
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl transform translate-x-32 -translate-y-32 animate-pulse"></div>
+                        <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-900/20 rounded-full blur-2xl transform -translate-x-20 translate-y-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+                        
+                        <div className="relative z-10 p-8">
                             <div className="flex flex-col lg:flex-row items-start gap-8">
                                 {/* Profile Avatar */}
                                 <div className="relative group">
@@ -132,9 +140,9 @@ export default function MyProfile() {
                                     
                                     {/* Stats Bar */}
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <div className="relative overflow-hidden group">
+                                        <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/20 rounded-xl"></div>
-                                            <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
+                                            <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <p className="text-4xl font-extrabold text-white drop-shadow-lg">{profileData.leaveBalance?.annual || 0}</p>
                                                     <span className="text-white/60 text-sm font-semibold">/ 24</span>
@@ -142,12 +150,12 @@ export default function MyProfile() {
                                                 <div className="w-full bg-white/20 rounded-full h-2 mb-3 overflow-hidden">
                                                     <div className="bg-white h-full rounded-full shadow-lg transition-all duration-500" style={{width: `${((profileData.leaveBalance?.annual || 0) / 24) * 100}%`}}></div>
                                                 </div>
-                                                <p className="text-white font-semibold text-sm">Annual Leave</p>
+                                                <p className="text-white font-semibold text-sm mt-auto">Annual Leave</p>
                                             </div>
                                         </div>
-                                        <div className="relative overflow-hidden group">
+                                        <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/20 rounded-xl"></div>
-                                            <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
+                                            <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <p className="text-4xl font-extrabold text-white drop-shadow-lg">{profileData.leaveBalance?.sick || 0}</p>
                                                     <span className="text-white/60 text-sm font-semibold">/ 15</span>
@@ -155,12 +163,12 @@ export default function MyProfile() {
                                                 <div className="w-full bg-white/20 rounded-full h-2 mb-3 overflow-hidden">
                                                     <div className="bg-white h-full rounded-full shadow-lg transition-all duration-500" style={{width: `${((profileData.leaveBalance?.sick || 0) / 15) * 100}%`}}></div>
                                                 </div>
-                                                <p className="text-white font-semibold text-sm">Sick Leave</p>
+                                                <p className="text-white font-semibold text-sm mt-auto">Sick Leave</p>
                                             </div>
                                         </div>
-                                        <div className="relative overflow-hidden group">
+                                        <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/20 rounded-xl"></div>
-                                            <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
+                                            <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <p className="text-4xl font-extrabold text-white drop-shadow-lg">{profileData.leaveBalance?.personal || 0}</p>
                                                     <span className="text-white/60 text-sm font-semibold">/ 16</span>
@@ -168,12 +176,12 @@ export default function MyProfile() {
                                                 <div className="w-full bg-white/20 rounded-full h-2 mb-3 overflow-hidden">
                                                     <div className="bg-white h-full rounded-full shadow-lg transition-all duration-500" style={{width: `${((profileData.leaveBalance?.personal || 0) / 16) * 100}%`}}></div>
                                                 </div>
-                                                <p className="text-white font-semibold text-sm">Personal Leave</p>
+                                                <p className="text-white font-semibold text-sm mt-auto">Personal Leave</p>
                                             </div>
                                         </div>
-                                        <div className="relative overflow-hidden group">
+                                        <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/30 rounded-xl"></div>
-                                            <div className="relative p-6 bg-white/15 backdrop-blur-md rounded-xl border-2 border-white/40 hover:bg-white/25 hover:scale-105 transition-all duration-300 shadow-2xl">
+                                            <div className="relative p-6 bg-white/15 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col justify-center">
                                                 <p className="text-5xl font-extrabold text-white drop-shadow-2xl mb-3">
                                                     {(profileData.leaveBalance?.annual || 0) + 
                                                      (profileData.leaveBalance?.sick || 0) + 
