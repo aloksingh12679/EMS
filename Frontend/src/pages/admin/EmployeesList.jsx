@@ -11,7 +11,7 @@ export default function EmployeesList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  
+
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -30,19 +30,32 @@ export default function EmployeesList() {
     }
   };
 
-  const filteredEmployees = employees.filter(employee => {
-    const matchesSearch = searchTerm === "" || 
-      (employee.firstName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (employee.personalEmail?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (employee.employeeId?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (employee.position?.toLowerCase() || "").includes(searchTerm.toLowerCase());
-    
-    const matchesDept = departmentFilter === "all" || 
-      (employee.department?.name?.toLowerCase() || "") === departmentFilter.toLowerCase();
-    
-    const matchesStatus = statusFilter === "all" || 
-      (employee.status?.toLowerCase() || "") === statusFilter.toLowerCase().replace(" ", "_");
-    
+  const filteredEmployees = employees.filter((employee) => {
+    const matchesSearch =
+      searchTerm === "" ||
+      (employee.firstName?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
+      (employee.personalEmail?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
+      (employee.employeeId?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
+      (employee.position?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      );
+
+    const matchesDept =
+      departmentFilter === "all" ||
+      (employee.department?.name?.toLowerCase() || "") ===
+        departmentFilter.toLowerCase();
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      (employee.status?.toLowerCase() || "") ===
+        statusFilter.toLowerCase().replace(" ", "_");
+
     return matchesSearch && matchesDept && matchesStatus;
   });
 
@@ -56,15 +69,14 @@ export default function EmployeesList() {
 
   const handleEmployeeClick = (employeeId) => {
     setTimeout(() => {
-    navigate(`/admin/employees/${employeeId}`);
-
-    },500);
+      navigate(`/admin/employees/${employeeId}`);
+    }, 500);
   };
 
   return (
     <div className="min-h-screen bg-[#f6f7f8]">
-      <AdminSidebar/>
-      
+      <AdminSidebar />
+
       {/* Main Content Area */}
       <div className="main-content w-full">
         {/* Top Navigation */}
@@ -73,23 +85,26 @@ export default function EmployeesList() {
         <main className="p-4 md:p-6">
           {/* Page Header */}
           <div className="mb-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start md:items-start  gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Employee List</h1>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Employee List
+                </h1>
                 <p className="text-gray-600 mt-1">
-                  {loading ? "Loading..." : `${filteredEmployees.length} employees found`}
+                  {loading
+                    ? "Loading..."
+                    : `${filteredEmployees.length} employees found`}
                 </p>
               </div>
-              <div className="flex items-center gap-3 ml-auto">
-             <button 
-                onClick={handleAddEmployee}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors w-full sm:w-auto justify-center"
-              >
-                <span className="material-symbols-outlined"></span>
-                Add Employee
-              </button>
-            </div>
-              
+              <div className="flex items-center gap-3 ml-auto !md:ml-0">
+                <button
+                  onClick={handleAddEmployee}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors w-full sm:w-auto justify-center"
+                >
+                  <span className="material-symbols-outlined"></span>
+                  Add Employee
+                </button>
+              </div>
             </div>
           </div>
 
@@ -106,10 +121,10 @@ export default function EmployeesList() {
                   placeholder="Search by name, ID, email, or role..."
                 />
               </div>
-              
+
               {/* Filters */}
               <div className="flex flex-col sm:flex-row gap-3">
-                <select 
+                <select
                   value={departmentFilter}
                   onChange={(e) => setDepartmentFilter(e.target.value)}
                   className="px-4 py-3 border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-1"
@@ -122,7 +137,7 @@ export default function EmployeesList() {
                   <option value="hr">Human Resources</option>
                 </select>
 
-                <select 
+                <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="px-4 py-3 border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-1"
@@ -144,9 +159,13 @@ export default function EmployeesList() {
             </div>
           ) : filteredEmployees.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-              <span className="material-symbols-outlined text-gray-400 text-4xl mb-3">search_off</span>
+              <span className="material-symbols-outlined text-gray-400 text-4xl mb-3">
+                search_off
+              </span>
               <p className="text-gray-600">No employees found</p>
-              <p className="text-gray-500 text-sm mt-1">Try adjusting your search or filters</p>
+              <p className="text-gray-500 text-sm mt-1">
+                Try adjusting your search or filters
+              </p>
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -163,61 +182,78 @@ export default function EmployeesList() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {filteredEmployees.map((employee) => (
-                      <tr 
+                      <tr
                         key={employee.id}
                         className="hover:bg-gray-50 cursor-pointer"
                         onClick={() => handleEmployeeClick(employee._id)}
                       >
                         <td className="p-4 pl-6">
                           <div className="flex items-center gap-3">
-                            {employee?.profilePhoto?.url && employee.profilePhoto?.url !== '' ? (
-  <div className="w-10 h-10 rounded-full overflow-hidden">
-    <img 
-      src={employee?.profilePhoto?.url} 
-      alt={`${employee.firstName} ${employee.lastName}`}
-      className="w-full h-full object-cover"
-    />
-  </div>
-) : (
-  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-    {capitalize(employee.firstName?.charAt(0)) || 'E'}
-  </div>
-)}
+                            {employee?.profilePhoto?.url &&
+                            employee.profilePhoto?.url !== "" ? (
+                              <div className="w-10 h-10 rounded-full overflow-hidden">
+                                <img
+                                  src={employee?.profilePhoto?.url}
+                                  alt={`${employee.firstName} ${employee.lastName}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                                {capitalize(employee.firstName?.charAt(0)) ||
+                                  "E"}
+                              </div>
+                            )}
                             <div>
-                              <p className="font-medium text-gray-900">{capitalize(employee?.firstName)}</p>
-                              <p className="text-xs text-gray-500 mt-1">{employee.personalEmail}</p>
+                              <p className="font-medium text-gray-900">
+                                {capitalize(employee?.firstName)}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {employee.personalEmail}
+                              </p>
                             </div>
                           </div>
                         </td>
                         <td className="p-4">
-                          <span className="font-mono text-gray-700 font-medium">{employee.employeeId}</span>
+                          <span className="font-mono text-gray-700 font-medium">
+                            {employee.employeeId}
+                          </span>
                         </td>
                         <td className="p-4">
                           <div>
-                            <p className="font-medium text-gray-900">{employee.position}</p>
-                            <p className="text-xs text-gray-500 mt-1">{employee.department?.name}</p>
+                            <p className="font-medium text-gray-900">
+                              {employee.position}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {employee.department?.name}
+                            </p>
                           </div>
                         </td>
                         <td className="p-4">
-                        <span 
-  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-    employee.status === 'active' 
-      ? 'bg-green-100 text-green-800' 
-      : employee.status === 'inactive'
-      ? 'bg-red-100 text-red-800'
-      : 'bg-yellow-100 text-yellow-800'
-  }`}
->
-  {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
-</span>
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                              employee.status === "active"
+                                ? "bg-green-100 text-green-800"
+                                : employee.status === "inactive"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {employee.status.charAt(0).toUpperCase() +
+                              employee.status.slice(1)}
+                          </span>
                         </td>
                         <td className="p-4 pr-6">
                           <span className="text-gray-700">
-                            {employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            }) : 'N/A'}
+                            {employee.joiningDate
+                              ? new Date(
+                                  employee.joiningDate,
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })
+                              : "N/A"}
                           </span>
                         </td>
                       </tr>
