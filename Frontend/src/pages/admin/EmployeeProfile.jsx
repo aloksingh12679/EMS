@@ -31,13 +31,13 @@ export default function EmployeeProfile() {
 
   const [activeTab, setActiveTab] = useState("personal-info");
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [salaryData , setSalaryData] = useState();
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
-  const [profile , setProfile] = useState({});
-  const [owner , setOwner] = useState();
-    const [tasksData, setTasksData] = useState([]);
-    const [leavesData, setLeavesData] = useState();
+  const [salaryData, setSalaryData] = useState();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [profile, setProfile] = useState({});
+  const [owner, setOwner] = useState();
+  const [tasksData, setTasksData] = useState([]);
+  const [leavesData, setLeavesData] = useState();
 
   const showToast = (message, type = "error") => {
     setToast({ show: true, message, type });
@@ -85,8 +85,8 @@ export default function EmployeeProfile() {
 
         setTasksData(result.tasks);
 
-setSalaryData(result.Salaries);
-setLeavesData(result.leaves);
+        setSalaryData(result.Salaries);
+        setLeavesData(result.leaves);
 
         console.log(salaryData);
       } catch (err) {
@@ -103,7 +103,7 @@ setLeavesData(result.leaves);
         id,
         deletePassword,
         showDeleteModal,
-        profile?.status
+        profile?.status,
       );
       if (result.success) {
         console.log(result);
@@ -301,17 +301,15 @@ setLeavesData(result.leaves);
           {/* SCROLLABLE CONTENT */}
           <div className="scrollable-content">
             {/* PROFILE CARD */}
-            <div
-              className="profile-card bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 
-    text-white hover:from-indigo-700 hover:via-blue-700 hover:to-purple-700"
-            >
+            <div className="profile-card">
               <div className="profile-avatar-section">
                 <img
-                  src={profile?.profilePhoto?.url || "profilePhoto"}
+                  // src={profile?.profilePhoto?.url || "profilePhoto"}
+                  src="../../../public/OIP.jpeg"
                   alt={profile?.name}
                   className="profile-img"
                 />
-                <div className="status-indicator"></div>
+                <div className="status-indicator"><i class="fa-regular fa-camera"></i></div>
               </div>
 
               <div className="profile-info">
@@ -469,7 +467,7 @@ setLeavesData(result.leaves);
                             day: "numeric",
                             month: "long",
                             year: "numeric",
-                          }
+                          },
                         )}
                       </p>
                     </div>
@@ -714,52 +712,84 @@ setLeavesData(result.leaves);
                   </div>
                 </div>
 
-    {salaryData.length === 0 ? (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-        <DollarSign size={32} className="text-gray-400 mx-auto mb-2" />
-        <p className="text-gray-900 font-semibold">No Salary Records</p>
-      </div>
-    ) : (
-      <>
-        {/* Desktop Table View */}
-        <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Month</th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Basic</th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Allow.</th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Deduct.</th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Tax %</th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Net</th>
-                <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {salaryData.map((record) => (
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-semibold text-gray-900">{record?.month || 'N/A'} '26</td>
-                  <td className="px-4 py-3 text-right text-gray-700">₹{(record.baseSalary || 0).toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-green-600 font-medium">+₹{(record.allowances || 0).toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-red-600 font-medium">−₹{(record.deductions || 0).toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-amber-600 font-medium">{record.taxApply || 0}%</td>
-                  <td className="px-4 py-3 text-right font-bold text-blue-600">₹{(record.netSalary || 0).toLocaleString()}</td>
-                  <td className="px-4 py-3 text-center">
-                    <span
-                      className="px-2 py-1 text-xs font-semibold rounded-md inline-block"
-                      style={{
-                        backgroundColor: getStatusColor(record.Status) + '15',
-                        color: getStatusColor(record.Status)
-                      }}
-                    >
-                      {record.Status || '?'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                {salaryData.length === 0 ? (
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+                    <DollarSign
+                      size={32}
+                      className="text-gray-400 mx-auto mb-2"
+                    />
+                    <p className="text-gray-900 font-semibold">
+                      No Salary Records
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">
+                              Month
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">
+                              Basic
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">
+                              Allow.
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">
+                              Deduct.
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">
+                              Tax %
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">
+                              Net
+                            </th>
+                            <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {salaryData.map((record) => (
+                            <tr className="hover:bg-gray-50">
+                              <td className="px-4 py-3 font-semibold text-gray-900">
+                                {record?.month || "N/A"} '26
+                              </td>
+                              <td className="px-4 py-3 text-right text-gray-700">
+                                ₹{(record.baseSalary || 0).toLocaleString()}
+                              </td>
+                              <td className="px-4 py-3 text-right text-green-600 font-medium">
+                                +₹{(record.allowances || 0).toLocaleString()}
+                              </td>
+                              <td className="px-4 py-3 text-right text-red-600 font-medium">
+                                −₹{(record.deductions || 0).toLocaleString()}
+                              </td>
+                              <td className="px-4 py-3 text-right text-amber-600 font-medium">
+                                {record.taxApply || 0}%
+                              </td>
+                              <td className="px-4 py-3 text-right font-bold text-blue-600">
+                                ₹{(record.netSalary || 0).toLocaleString()}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span
+                                  className="px-2 py-1 text-xs font-semibold rounded-md inline-block"
+                                  style={{
+                                    backgroundColor:
+                                      getStatusColor(record.Status) + "15",
+                                    color: getStatusColor(record.Status),
+                                  }}
+                                >
+                                  {record.Status || "?"}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
 
                     {/* Mobile List View */}
                     <div className="md:hidden space-y-3">
@@ -877,7 +907,7 @@ setLeavesData(result.leaves);
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
-                              }
+                              },
                             )}{" "}
                             -{" "}
                             {new Date(leave?.endDate).toLocaleDateString(
@@ -886,7 +916,7 @@ setLeavesData(result.leaves);
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
-                              }
+                              },
                             )}
                           </span>
                         </div>
@@ -974,7 +1004,7 @@ setLeavesData(result.leaves);
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
-                              }
+                              },
                             )}
                           </span>
                         </div>
