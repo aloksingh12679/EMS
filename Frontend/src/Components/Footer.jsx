@@ -7,11 +7,7 @@ export default function Footer() {
         <div className="footer-section">
           <div className="footer-logo">
             {/* <span className="logo-icon">⊟⊟</span> */}
-            <img
-              src="logo.png"
-              alt=""
-              className="footer-logo-img"
-            />
+            <img src="logo.png" alt="" className="footer-logo-img" />
           </div>
           <div className="footer-para">
             <p>
@@ -52,7 +48,11 @@ export default function Footer() {
         <div className="footer-section"></div> */}
 
         <div className="footer-section">
-          <h4>Platform</h4>
+          <div className="quick-links-heading">
+            <h4>Platform </h4>
+            <span></span>
+          </div>
+          
           <ul>
             <li>
               <a href="/">Ems Enterprises</a>
@@ -73,12 +73,17 @@ export default function Footer() {
         </div>
 
         <div className="footer-section">
-          <h4>Contact Us</h4>
+          <div className="quick-links-heading">
+            <h4>Contact Us</h4>
+            <span></span>
+          </div>
+          
           <ul>
             <li>
               <a href="#">
-                <i class="fa-solid fa-location-dot"></i> Located At Gurugram,
-                Haryana
+                <i class="fa-solid fa-location-dot"></i>{" "}
+                <span style={{fontWeight: "600"}}>Graphura India Private Limited,</span> near RSF, Pataudi,
+                Gurgaon, Haryana 122503
               </a>
             </li>
             <li>
