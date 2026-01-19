@@ -4,7 +4,7 @@ const {status} = require('http-status');
 const dotenv = require("dotenv");
 const Department = require("../models/Department");
 const OTP = require("../models/Otp");
-const nodemailer = require('nodemailer');
+
 const {sendOtp} = require("../services/emailService");
 dotenv.config();
 
@@ -51,10 +51,10 @@ const requestPasswordReset = async (req, res) => {
     
     // Generate 6-digit OTP
     const otp = crypto.randomInt(100000, 999999).toString();
-    // const emailResult = await sendOtp({
-    //   user : user,
-    //   otp : otp
-    // });
+    const emailResult = await sendOtp({
+      user : user,
+      otp : otp
+    });
     
   await OTP.create({
   identifier: userType === 'employee' ? employeeId : email,

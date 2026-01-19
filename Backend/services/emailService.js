@@ -4,6 +4,12 @@ const fs = require('fs');
 const path = require('path');
 
 // Email configuration
+require('dotenv').config();
+
+// Test karo values load ho rahi hain ya nahi
+console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '***loaded***' : 'NOT LOADED');
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {

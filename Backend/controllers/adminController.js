@@ -294,7 +294,7 @@ let profilePhoto;
 
 
   const employee = await User.findByIdAndUpdate(id , { ...updatedData , department : departmentInfo._id , 
-        reportingManager : `${departmentInfo.manager.firstName} ${departmentInfo.manager.lastName}`,
+        reportingManager : `${departmentInfo?.manager?.firstName || "NOT AllOTED"}`,
         profilePhoto
 
   } , {new :true , runValidators : true})
