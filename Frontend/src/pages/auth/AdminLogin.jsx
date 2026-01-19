@@ -10,6 +10,7 @@ import { BsShieldLock } from "react-icons/bs";
 import { TbShieldSearch } from "react-icons/tb";
 import { useAuth } from "../../context/AuthContext";
 import authService from "../../services/auth";
+import AdminSidePic from "../../assets/images/Admin.jpg";
 
 export default function AdminLogin() {
   const [view, setView] = useState("login");
@@ -190,7 +191,7 @@ export default function AdminLogin() {
       
       if (response.success) {
         showToast("Password reset successful! Redirecting to login...", "success");
-          console.log("✅ Password reset successful, about to change view");
+        console.log("✅ Password reset successful, about to change view");
 
         setTimeout(() => {
           setView("login");
@@ -240,12 +241,17 @@ export default function AdminLogin() {
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 shadow-2xl rounded-2xl overflow-hidden bg-white">
           
           {/* LEFT IMAGE SIDE */}
-          <div className="hidden md:flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-blue-100">
-            <div className="relative w-full h-full">
-              <div className="w-full h-full bg-gradient-to-br from-blue-200 to-blue-300 rounded-xl shadow-lg flex items-center justify-center">
-                <MdOutlineAdminPanelSettings className="text-blue-800 text-9xl opacity-20" />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent rounded-xl"></div>
+          <div className="hidden md:flex items-center justify-center p-0 bg-gradient-to-br from-blue-900 to-blue-800 relative overflow-hidden">
+            <img 
+              src={AdminSidePic} 
+              alt="Admin Login" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-blue-900/30"></div>
+            
+            <div className="absolute bottom-8 left-8 right-8 text-white">
+              <h3 className="text-3xl font-bold mb-2">Admin Portal</h3>
+              <p className="text-blue-100">Secure access to your dashboard</p>
             </div>
           </div>
 

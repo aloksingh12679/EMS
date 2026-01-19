@@ -302,8 +302,8 @@ setLeavesData(result.leaves);
           <div className="scrollable-content">
             {/* PROFILE CARD */}
             <div
-              className="profile-card bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 
-    text-white hover:from-indigo-700 hover:via-blue-700 hover:to-purple-700"
+              className="profile-card bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 
+    text-white hover:from-blue-700 hover:via-blue-600 hover:to-blue-500"
             >
               <div className="profile-avatar-section">
                 <img
@@ -914,15 +914,6 @@ setLeavesData(result.leaves);
                   <h3 className="text-lg font-bold text-gray-900">
                     Assigned Tasks
                   </h3>
-                  {owner === profile?.reportingManager && (
-                    <button
-                      onClick={() => setShowTaskModal(true)}
-                      className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                    >
-                      <Plus size={18} />
-                      Add Task
-                    </button>
-                  )}
                 </div>
 
                 {tasksData && tasksData.length > 0 ? (

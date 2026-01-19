@@ -54,9 +54,9 @@ export default function EmployeeEdit() {
           currentProfilePhoto: employee.profilePhoto || null
         });
 
-        // Set initial profile photo preview
+       
         if (employee.profilePhoto) {
-          setProfilePhotoPreview(employee.profilePhoto);
+          setProfilePhotoPreview(employee.profilePhoto.url);
         }
 
         setLoading(false);
@@ -112,7 +112,6 @@ export default function EmployeeEdit() {
 
       setProfilePhotoFile(file);
       
-      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePhotoPreview(reader.result);
@@ -134,16 +133,16 @@ export default function EmployeeEdit() {
   try {
     let result;
 
-    // If there's a profile photo, use FormData
+    
     if (profilePhotoFile) {
       const formDataWithFile = new FormData();
       
-      // Append the profile photo file
+     
       formDataWithFile.append('profilePhoto', profilePhotoFile);
       
-      // Append all other form fields
+     
       Object.keys(formData).forEach(key => {
-        // Handle nested objects (like leaveBalance)
+        
         if (typeof formData[key] === 'object' && formData[key] !== null) {
           formDataWithFile.append(key, JSON.stringify(formData[key]));
         } else {
@@ -151,10 +150,10 @@ export default function EmployeeEdit() {
         }
       });
       
-      // Send with FormData
+      
       result = await employeeService.updateEmployee(id, formDataWithFile);
     } else {
-      // No profile photo, send regular JSON data
+     
       result = await employeeService.updateEmployee(id, formData);
     }
     
