@@ -166,7 +166,7 @@ setTasks(response.data.taskDetails);
   <main className="min-h-screen p-4 sm:p-6 lg:p-10 min-[1112px]:ml-64 bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
     {/* Header Section with Gradient */}
     <div className="mb-8">
-      <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-3xl p-8 mb-6 shadow-2xl relative overflow-hidden transform transition-all hover:shadow-blue-500/40 hover:shadow-2xl group">
+      <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-3xl p-8 mb-6 shadow-2xl relative overflow-hidden transform transition-all hover:shadow-blue-500/20 group">
         {/* Animated shimmer effect */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -177,7 +177,7 @@ setTasks(response.data.taskDetails);
         
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-3">
-            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl hover:rotate-6 transition-transform duration-300">
+            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl hover:rotate-2 transition-transform duration-300">
               <FolderKanban size={32} className="text-white animate-pulse" />
             </div>
             <div>
@@ -193,9 +193,9 @@ setTasks(response.data.taskDetails);
     </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-3xl shadow-xl border border-blue-100 p-6 mb-8 hover:shadow-2xl transition-shadow duration-300">
+        <div className="bg-white rounded-3xl shadow-xl border border-blue-100 p-6 mb-8 transition-shadow duration-300">
           <div className="flex items-center gap-3 mb-5">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-400 p-2.5 rounded-xl hover:rotate-180 transition-transform duration-500">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-400 p-2.5 rounded-xl transition-transform duration-500">
               <Filter size={20} className="text-white" />
             </div>
             <h3 className="text-xl font-bold text-gray-800">Filter Tasks</h3>
@@ -203,7 +203,7 @@ setTasks(response.data.taskDetails);
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Search */}
             <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 bg-gradient-to-br from-blue-600 to-blue-400 p-1.5 rounded-lg group-focus-within:scale-110 group-focus-within:rotate-12 transition-all duration-300">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 bg-gradient-to-br from-blue-600 to-blue-400 p-1.5 rounded-lg transition-all duration-300">
                 <Search className="text-white" size={16} />
               </div>
               <input
@@ -211,19 +211,19 @@ setTasks(response.data.taskDetails);
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white hover:border-blue-400 hover:shadow-lg transition-all duration-200 font-medium"
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white transition-all duration-200 font-medium"
               />
             </div>
 
             {/* Status Filter */}
             <div className="relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none animate-pulse">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                 <ClipboardList size={18} className="text-blue-600" />
               </div>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white hover:border-blue-400 hover:shadow-lg hover:bg-blue-50 transition-all duration-200 font-medium text-gray-700 appearance-none cursor-pointer"
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white transition-all duration-200 font-medium text-gray-700 appearance-none cursor-pointer"
               >
                 <option value="All">📋 All Status</option>
                 <option value="Pending">⏳ Pending</option>
@@ -235,13 +235,13 @@ setTasks(response.data.taskDetails);
 
             {/* Priority Filter */}
             <div className="relative">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none animate-pulse">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
                 <Award size={18} className="text-blue-600" />
               </div>
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white hover:border-blue-400 hover:shadow-lg hover:bg-blue-50 transition-all duration-200 font-medium text-gray-700 appearance-none cursor-pointer"
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white transition-all duration-200 font-medium text-gray-700 appearance-none cursor-pointer"
               >
                 <option value="All">🎯 All Priority</option>
                 <option value="High">🔴 High Priority</option>
@@ -300,36 +300,36 @@ setTasks(response.data.taskDetails);
               <h3 className="text-2xl font-bold text-gray-900">Task Statistics</h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="group text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 hover:border-blue-400 hover:shadow-2xl hover:scale-110 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
-                <div className="bg-gradient-to-br from-blue-600 to-blue-400 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+              <div className="group text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 hover:border-blue-300 hover:shadow-lg hover:scale-105 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                <div className="bg-gradient-to-br from-blue-600 to-blue-400 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 group-hover:rotate-6 transition-all duration-300">
                   <FolderKanban size={28} className="text-white" />
                 </div>
-                <p className="text-4xl font-bold bg-gradient-to-br from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300">{tasks.length}</p>
+                <p className="text-4xl font-bold bg-gradient-to-br from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2 group-hover:scale-105 transition-transform duration-300">{tasks.length}</p>
                 <p className="text-sm text-gray-700 font-semibold group-hover:text-blue-700 transition-colors duration-300">Total Tasks</p>
               </div>
-              <div className="group text-center p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-2xl hover:scale-110 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
-                <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+              <div className="group text-center p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl border-2 border-yellow-200 hover:border-yellow-300 hover:shadow-lg hover:scale-105 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 group-hover:rotate-6 transition-all duration-300">
                   <TrendingDown size={28} className="text-white animate-pulse" />
                 </div>
-                <p className="text-4xl font-bold text-yellow-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+                <p className="text-4xl font-bold text-yellow-600 mb-2 group-hover:scale-105 transition-transform duration-300">
                   {tasks.filter(t => t.status === 'pending' || t.status === 'Pending').length}
                 </p>
                 <p className="text-sm text-gray-700 font-semibold group-hover:text-yellow-700 transition-colors duration-300">Pending</p>
               </div>
-              <div className="group text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-2xl hover:scale-110 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
-                <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+              <div className="group text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl border-2 border-indigo-200 hover:border-indigo-300 hover:shadow-lg hover:scale-105 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 group-hover:rotate-6 transition-all duration-300">
                   <PlayCircle size={28} className="text-white animate-spin" style={{animationDuration: '3s'}} />
                 </div>
-                <p className="text-4xl font-bold text-indigo-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+                <p className="text-4xl font-bold text-indigo-600 mb-2 group-hover:scale-105 transition-transform duration-300">
                   {tasks.filter(t => t.status === 'In Progress').length}
                 </p>
                 <p className="text-sm text-gray-700 font-semibold group-hover:text-indigo-700 transition-colors duration-300">In Progress</p>
               </div>
-              <div className="group text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-2 border-green-200 hover:border-green-400 hover:shadow-2xl hover:scale-110 hover:-translate-y-2 transition-all duration-300 cursor-pointer">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+              <div className="group text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-2 border-green-200 hover:border-green-300 hover:shadow-lg hover:scale-105 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                <div className="bg-gradient-to-br from-green-500 to-green-600 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 group-hover:rotate-6 transition-all duration-300">
                   <CheckCircle2 size={28} className="text-white" />
                 </div>
-                <p className="text-4xl font-bold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+                <p className="text-4xl font-bold text-green-600 mb-2 group-hover:scale-105 transition-transform duration-300">
                   {tasks.filter(t => t.status === 'completed' || t.status === 'Completed').length}
                 </p>
                 <p className="text-sm text-gray-700 font-semibold group-hover:text-green-700 transition-colors duration-300">Completed</p>
@@ -345,7 +345,7 @@ setTasks(response.data.taskDetails);
 // Task Card Component
 const TaskCard = ({ task, onComplete, formatDate, getPriorityColor, getStatusColor, getStatusIcon }) => {
   return (
-    <div className="group bg-gradient-to-br from-white via-white to-blue-50/30 rounded-3xl shadow-xl border-2 border-blue-100/50 p-7 hover:shadow-2xl hover:-translate-y-3 hover:border-blue-400 hover:scale-[1.03] transition-all duration-500 overflow-hidden relative cursor-pointer backdrop-blur-sm">
+    <div className="group bg-gradient-to-br from-white via-white to-blue-50/30 rounded-3xl shadow-xl border-2 border-blue-100/50 p-7 hover:shadow-lg hover:-translate-y-1 hover:border-blue-300 hover:scale-[1.01] transition-all duration-500 overflow-hidden relative cursor-pointer backdrop-blur-sm">
       {/* Animated shimmer effect */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -362,11 +362,11 @@ const TaskCard = ({ task, onComplete, formatDate, getPriorityColor, getStatusCol
         <div className="flex items-start justify-between mb-5">
           <div className="flex-1">
             <div className="flex items-start gap-3 mb-3">
-              <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 p-3 rounded-xl shadow-lg group-hover:scale-110 group-hover:rotate-12 group-hover:shadow-blue-500/50 transition-all duration-300">
+              <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 p-3 rounded-xl shadow-lg group-hover:scale-105 group-hover:rotate-6 group-hover:shadow-blue-500/30 transition-all duration-300">
                 <Target size={20} className="text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:scale-105 transition-all duration-300 leading-tight">{task?.taskName}</h3>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:scale-102 transition-all duration-300 leading-tight">{task?.taskName}</h3>
               </div>
             </div>
             <p className="text-sm text-gray-600 line-clamp-2 ml-14 group-hover:text-gray-800 transition-colors duration-300 leading-relaxed">{task?.description}</p>
@@ -375,20 +375,20 @@ const TaskCard = ({ task, onComplete, formatDate, getPriorityColor, getStatusCol
 
         {/* Priority & Status */}
         <div className="flex items-center gap-3 mb-6 flex-wrap ml-14">
-          <span className={`px-5 py-2.5 rounded-xl text-xs font-bold border-2 ${getPriorityColor(task.priority)} shadow-md flex items-center gap-2 hover:scale-110 hover:shadow-lg transition-all duration-300 cursor-pointer backdrop-blur-sm`}>
+          <span className={`px-5 py-2.5 rounded-xl text-xs font-bold border-2 ${getPriorityColor(task.priority)} shadow-md flex items-center gap-2 hover:scale-105 hover:shadow-md transition-all duration-300 cursor-pointer backdrop-blur-sm`}>
             <div className="w-2.5 h-2.5 rounded-full bg-current animate-pulse shadow-lg"></div>
             <span className="tracking-wide">{task.priority} Priority</span>
           </span>
-          <span className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 ${getStatusColor(task.status)} shadow-md hover:scale-110 hover:shadow-lg transition-all duration-300 cursor-pointer backdrop-blur-sm`}>
+          <span className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 ${getStatusColor(task.status)} shadow-md hover:scale-105 hover:shadow-md transition-all duration-300 cursor-pointer backdrop-blur-sm`}>
             {getStatusIcon(task.status)}
             <span className="tracking-wide">{task.status}</span>
           </span>
         </div>
 
         {/* Dates */}
-        <div className="space-y-4 mb-7 bg-gradient-to-br from-slate-50/80 via-blue-50/80 to-indigo-50/80 rounded-2xl p-5 border-2 border-blue-200/50 group-hover:border-blue-400/70 group-hover:bg-gradient-to-br group-hover:from-blue-100/80 group-hover:to-indigo-100/80 group-hover:shadow-inner transition-all duration-500 backdrop-blur-sm">
+        <div className="space-y-4 mb-7 bg-gradient-to-br from-slate-50/80 via-blue-50/80 to-indigo-50/80 rounded-2xl p-5 border-2 border-blue-200/50 group-hover:border-blue-300/70 group-hover:bg-gradient-to-br group-hover:from-blue-50/80 group-hover:to-indigo-50/80 group-hover:shadow-sm transition-all duration-500 backdrop-blur-sm">
           <div className="flex items-center gap-4 text-sm">
-            <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl p-3.5 shadow-lg group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-blue-500/60 transition-all duration-300">
+            <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl p-3.5 shadow-lg group-hover:scale-105 group-hover:rotate-3 group-hover:shadow-blue-500/30 transition-all duration-300">
               <Calendar size={20} className="text-white" />
             </div>
             <div className="flex-1">
@@ -398,7 +398,7 @@ const TaskCard = ({ task, onComplete, formatDate, getPriorityColor, getStatusCol
           </div>
           <div className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
           <div className="flex items-center gap-4 text-sm">
-            <div className="bg-gradient-to-br from-red-600 via-red-500 to-red-400 rounded-2xl p-3.5 shadow-lg group-hover:scale-110 group-hover:-rotate-6 group-hover:shadow-red-500/60 transition-all duration-300">
+            <div className="bg-gradient-to-br from-red-600 via-red-500 to-red-400 rounded-2xl p-3.5 shadow-lg group-hover:scale-105 group-hover:-rotate-3 group-hover:shadow-red-500/30 transition-all duration-300">
               <Clock size={20} className="text-white animate-pulse" />
             </div>
             <div className="flex-1">
@@ -412,7 +412,7 @@ const TaskCard = ({ task, onComplete, formatDate, getPriorityColor, getStatusCol
         {task.status !== 'completed' && task.status !== 'Completed' ? (
           <button
             onClick={() => onComplete(task._id)}
-            className="w-full bg-gradient-to-r from-green-600 via-green-500 to-emerald-600 hover:from-green-700 hover:via-green-600 hover:to-emerald-700 text-white py-4 px-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all duration-300 shadow-xl shadow-green-500/30 hover:shadow-2xl hover:shadow-green-500/50 active:scale-95 hover:scale-105 group/btn border border-green-400/30"
+            className="w-full bg-gradient-to-r from-green-600 via-green-500 to-emerald-600 hover:from-green-700 hover:via-green-600 hover:to-emerald-700 text-white py-4 px-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all duration-300 shadow-xl shadow-green-500/30 hover:shadow-lg hover:shadow-green-500/30 active:scale-98 hover:scale-102 group/btn border border-green-400/30"
           >
             <CheckCircle2 size={22} className="group-hover/btn:rotate-[360deg] transition-transform duration-700" />
             <span className="text-base tracking-wide">Mark as Completed</span>
