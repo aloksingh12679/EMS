@@ -353,22 +353,13 @@ export default function AdminLogin() {
                     )}
                   </div>
 
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-sm">
-                    <label className="flex items-center gap-2 text-blue-700 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => setIsChecked(!isChecked)}
-                        disabled={isLoading}
-                        className="h-4 w-4 rounded border-blue-300 text-blue-900 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
-                      />
-                      Remember me
-                    </label>
+                  <div className="flex justify-end">
+                   
                     <button
                       type="button"
                       onClick={() => setView("forgotPassword")}
                       disabled={isLoading}
-                      className="font-semibold text-blue-900 underline hover:no-underline disabled:opacity-50"
+                      className="font-semibold text-blue-900 text-left underline hover:no-underline disabled:opacity-50"
                     >
                       Forgot Password?
                     </button>

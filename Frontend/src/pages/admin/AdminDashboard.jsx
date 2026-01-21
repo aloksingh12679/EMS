@@ -193,75 +193,76 @@ const AdminDashboard = () => {
             />
           </div>
 
-          {/* RECENT ACTIVITY AND DEPARTMENTS GRID */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
-            {/* RECENT ACTIVITY - Takes 2 columns */}
-            <div className="xl:col-span-2">
-              <div className="bg-white rounded-[24px] px-6 py-6 shadow-sm border border-slate-100 h-full">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-[16px] font-semibold text-slate-900">
-                    Recent Activity
-                  </h3>
-                  <span className="text-[13px] font-medium text-blue-600 cursor-pointer">
-                    View All
-                  </span>
-                </div>
+         
+{/* RECENT ACTIVITY AND DEPARTMENTS GRID - UPDATED */}
+<div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-8">
+  {/* RECENT ACTIVITY - Takes 2 columns */}
+  <div className="xl:col-span-2">
+    <div className="bg-white rounded-[24px] px-6 py-6 shadow-sm border border-slate-100 h-full min-h-[600px] flex flex-col">
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+        <h3 className="text-[16px] font-semibold text-slate-900">
+          Recent Activity
+        </h3>
+        <span className="text-[13px] font-medium text-blue-600 cursor-pointer">
+          View All
+        </span>
+      </div>
 
-                <div className="space-y-5">
-                  {loadingActivities ? (
-                    <div className="text-center py-8">
-                      <p className="text-slate-400 text-sm">Loading activities...</p>
-                    </div>
-                  ) : activities.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-slate-400 text-sm">No recent activities</p>
-                    </div>
-                  ) : (
-                    activities.map((activity) => (
-                      <ActivityItem
-                        key={activity._id}
-                        icon={getActivityIcon(activity.icon)}
-                        iconBg={getIconBgColor(activity.iconColor)}
-                        title={activity.title}
-                        desc={activity.description}
-                        time={getTimeAgo(activity.createdAt)}
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* DEPARTMENTS - Takes 1 column */}
-            <div className="xl:col-span-1">
-              <div className="bg-white rounded-[24px] px-6 py-6 shadow-sm border border-slate-100 h-full">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-[16px] font-semibold text-slate-900">
-                    Departments
-                  </h3>
-                  <span className="text-[13px] font-medium text-blue-600 cursor-pointer">
-                    View All
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  {departments.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-slate-400 text-sm">No departments found</p>
-                    </div>
-                  ) : (
-                    departments.map((dept) => (
-                      <DepartmentCard
-                        key={dept._id}
-                        departmentName={dept.name}
-                        managerName={dept.manager ? dept.manager.firstName : 'Not Allotted'}
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
+      <div className="space-y-5 flex-1 overflow-y-auto pr-2">
+        {loadingActivities ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-slate-400 text-sm">Loading activities...</p>
           </div>
+        ) : activities.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-slate-400 text-sm">No recent activities</p>
+          </div>
+        ) : (
+          activities.slice(0, 5).map((activity) => (
+            <ActivityItem
+              key={activity._id}
+              icon={getActivityIcon(activity.icon)}
+              iconBg={getIconBgColor(activity.iconColor)}
+              title={activity.title}
+              desc={activity.description}
+              time={getTimeAgo(activity.createdAt)}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* DEPARTMENTS - Takes 1 column */}
+  <div className="xl:col-span-1">
+    <div className="bg-white rounded-[24px] px-6 py-6 shadow-sm border border-slate-100 h-full min-h-[600px] flex flex-col">
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+        <h3 className="text-[16px] font-semibold text-slate-900">
+          Departments
+        </h3>
+        <span className="text-[13px] font-medium text-blue-600 cursor-pointer">
+          View All
+        </span>
+      </div>
+
+      <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+        {departments.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-slate-400 text-sm">No departments found</p>
+          </div>
+        ) : (
+          departments.map((dept) => (
+            <DepartmentCard
+              key={dept._id}
+              departmentName={dept.name}
+              managerName={dept.manager ? dept.manager.firstName : 'Not Allotted'}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</div>
 
           {/* QUICK ACTIONS */}
           <div className="mt-8">
