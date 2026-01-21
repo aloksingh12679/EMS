@@ -12,7 +12,7 @@ exports.getRecentActivities = async (req, res) => {
             .populate('user', 'firstName lastName profilePhoto')
             .populate('targetUser', 'firstName lastName')
             .sort({ createdAt: -1 })
-            .limit(parseInt(limit));
+            .limit(parseInt(5));
 
         res.status(200).json({
             success: true,
@@ -30,11 +30,15 @@ exports.getRecentActivities = async (req, res) => {
     }
 };
 
+
+
 // @desc    Create activity log
 // @route   POST /api/activities
 // @access  Private
 exports.createActivity = async (req, res) => {
+
     try {
+        console.log(req.body);
         const activity = await Activity.create(req.body);
 
         res.status(200).json({
@@ -52,10 +56,10 @@ exports.createActivity = async (req, res) => {
     }
 };
 
-exports.logActivity = async (data) => {
-    try {
-        await Activity.create(data);
-    } catch (error) {
-        console.error('Log activity error:', error);
-    }
-};
+// exports.logActivity = async (data) => {
+//     try {
+//         await Activity.create(data);
+//     } catch (error) {
+//         console.error('Log activity error:', error);
+//     }
+// };

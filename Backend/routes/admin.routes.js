@@ -25,6 +25,7 @@ const {
 const { protect} = require('../middleware/auth');
 const { getAdminTickets, updateTicket } = require('../controllers/supportTicketController.js');
 const {ActivatePaymentMode ,  UpdateBankDetails} = require("../controllers/paymentController.js");
+const { getRecentActivities } = require('../controllers/activityController.js');
 
 router.use(protect);
 
@@ -33,6 +34,7 @@ router.use(protect);
 // Dashboard routes
 
 router.get("/dashboard/stats" , getDashboardstats);
+router.get("/recent-activities" , getRecentActivities);
 router.get("/tickets" ,getAdminTickets);
 router.patch("/support-tickets/:id/mark-read",updateTicket);
 

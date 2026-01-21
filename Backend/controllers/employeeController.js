@@ -2,7 +2,9 @@ const User = require("../models/user");
 const Department =  require("../models/Department");
 const Task =  require("../models/tasks.js");
 const Leave = require("../models/Leave.js");
+const SupportTicket = require('../models/supportTicket.js');
 
+const logActivity = require("../utils/activityLogger.js");
 
 const {status} = require("http-status");
 const Attendance = require("../models/Attendance");
@@ -205,11 +207,18 @@ const applyLeave = async(req,res) => {
       })
      
       
-              await appliedLeave.save().then((res) => {
-                console.log(res);
-              });
+         const result =  await appliedLeave.save();
 
-
+ await logActivity('leave_request', req.user.id, {
+            relatedModel: 'Leave',
+            relatedId: result._id,
+            metadata: {
+                leaveType: result.leaveType,
+                startDate: result.fromDate,
+                endDate: result.toDate,
+                numberOfDays: calculateDays(result.fromDate, result.toDate)
+            }
+        });
      
 
    
@@ -233,7 +242,13 @@ console.log("apply leave  error" , err);
 
     }
 } 
-
+const calculateDays = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
+    return diffDays;
+};
 
 
 
@@ -355,7 +370,33 @@ const checkOut = async(req,res) => {
   }
   }
 
-  
+  const getMyTickets = async (req, res) => {
+    try {
+        const employeeId = req.user._id; 
+        
+       
+        const tickets = await SupportTicket.find({ employee: employeeId })
+            .populate('employee', 'name email')
+            .populate('assignedTo', 'name email role') 
+            .sort({ createdAt: -1 }); 
+        
+       
+        return res.status(200).json({
+            success: true,
+            count: tickets.length,
+            data: tickets
+        });
+        
+    } catch (err) {
+        console.error('Error fetching tickets:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch tickets',
+            error: err.message
+        });
+    }
+}
+
 
 module.exports = {
     getEmployeedashboard, 
@@ -363,6 +404,7 @@ module.exports = {
     updateTask,
     applyLeave,
     getAppliedLeave,
-    getProfile
+    getProfile,
+    getMyTickets
     
 }

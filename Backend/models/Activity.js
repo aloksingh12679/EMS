@@ -15,7 +15,10 @@ const activitySchema = new mongoose.Schema({
             'leave_approved',
             'leave_rejected',
             'support_ticket',
-            'attendance_marked'
+            'attendance_marked',
+            'system_alert',
+            'policy_update',
+            'task_assigned'
         ]
     },
     title: {
@@ -57,8 +60,11 @@ const activitySchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Index for faster queries
+
 activitySchema.index({ createdAt: -1 });
 activitySchema.index({ type: 1 });
+
+// delete documents after 2 days (172800 seconds)
+activitySchema.index({ createdAt: 1 }, { expireAfterSeconds: 172800 });
 
 module.exports = mongoose.model('Activity', activitySchema);
