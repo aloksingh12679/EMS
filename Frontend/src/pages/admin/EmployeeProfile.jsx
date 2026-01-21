@@ -307,8 +307,8 @@ export default function EmployeeProfile() {
             >
               <div className="profile-avatar-section">
                 <img
-                  // src={profile?.profilePhoto?.url || "profilePhoto"}
-                  src="../../../public/OIP.jpeg"
+                  src={profile?.profilePhoto?.url || "profilePhoto"}
+                  // src="../../../public/OIP.jpeg"
                   alt={profile?.name}
                   className="profile-img"
                 />

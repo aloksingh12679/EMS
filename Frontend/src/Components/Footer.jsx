@@ -107,7 +107,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2023 EMS Enterprise Inc. All rights reserved.</p>
+        <p>© 2026 EMS Enterprise Inc. All rights reserved.</p>
         {/* <div className="footer-links">
           <a href="#">Terms of Service</a>
           <a href="#">Privacy Policy</a>

@@ -94,7 +94,7 @@ export default function EmployeeDashboard() {
 
       <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 min-[1112px]:ml-[280px]">
         {/* PROFILE HEADER CARD */}
-        <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 transform transition-all hover:shadow-blue-500/40 hover:shadow-2xl group">
+        <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 transform transition-all hover:shadow-blue-500/20 group">
           {/* Animated shimmer effect */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -122,10 +122,10 @@ export default function EmployeeDashboard() {
         {/* QUICK STATS GRID */}
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
           {/* Attendance Card */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-lg transition-all hover:-translate-y-1 hover:border-blue-200 cursor-pointer relative">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
             <div className="p-6 relative">
-              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-105 group-hover:rotate-6 transition-all duration-300 group-hover:shadow-lg">
                 <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -149,10 +149,10 @@ export default function EmployeeDashboard() {
           </div>
 
           {/* Current Salary Card */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-lg transition-all hover:-translate-y-1 hover:border-blue-200 cursor-pointer relative">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
             <div className="p-6 relative">
-              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-105 group-hover:rotate-6 transition-all duration-300 group-hover:shadow-lg">
                 <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -174,10 +174,10 @@ export default function EmployeeDashboard() {
           </div>
 
           {/* Total Leave Balance Card */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-lg transition-all hover:-translate-y-1 hover:border-blue-200 cursor-pointer relative">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
             <div className="p-6 relative">
-              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-105 group-hover:rotate-6 transition-all duration-300 group-hover:shadow-lg">
                 <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -204,10 +204,10 @@ export default function EmployeeDashboard() {
           </div>
 
           {/* Tasks Status Card */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-2 hover:border-blue-200 cursor-pointer relative">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden group hover:shadow-lg transition-all hover:-translate-y-1 hover:border-blue-200 cursor-pointer relative">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 transition-all duration-500"></div>
             <div className="p-6 relative">
-              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 group-hover:shadow-lg">
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl flex items-center justify-center group-hover:scale-105 group-hover:rotate-6 transition-all duration-300 group-hover:shadow-lg">
                 <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
@@ -245,7 +245,7 @@ const MyTasks = ({ taskdetails }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="lg:col-span-1 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col min-h-[420px] overflow-hidden hover:shadow-2xl transition-shadow">
+    <div className="lg:col-span-1 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col min-h-[420px] overflow-hidden hover:shadow-lg transition-shadow">
       <div className="p-6 bg-gradient-to-r from-slate-50 to-blue-50/30 border-b border-slate-100 flex justify-between items-center">
         <div>
           <h3 className="text-slate-900 font-bold text-lg flex items-center gap-2">
@@ -262,8 +262,8 @@ const MyTasks = ({ taskdetails }) => {
           aria-label="Add task"
           className="h-10 w-10 flex items-center justify-center
                rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 
-               hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl 
-               transition-all hover:scale-105"
+               hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-lg 
+               transition-all hover:scale-102"
         >
           <Plus className="h-5 w-5 text-white" />
         </button>
@@ -398,7 +398,7 @@ const SalaryHistory = ({ salarydetails }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex flex-col hover:shadow-2xl transition-shadow">
+    <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-xl border border-slate-100 flex flex-col hover:shadow-lg transition-shadow">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <div className="flex items-center gap-3">
@@ -413,7 +413,7 @@ const SalaryHistory = ({ salarydetails }) => {
           </div>
         </div>
 
-        <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold flex gap-2 items-center w-full sm:w-auto justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105">
+        <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold flex gap-2 items-center w-full sm:w-auto justify-center shadow-lg hover:shadow-lg transition-all hover:scale-102">
           <Download size={18} /> Download Payslip
         </button>
       </div>
@@ -530,7 +530,7 @@ const SalaryRow = ({ month, year, baseSalary, taxApply, deduction, net, status, 
 );
 
 const MobileSalaryCard = ({ month, year, base, deduction, net, status }) => (
-  <div className="border-2 border-slate-100 rounded-2xl p-5 bg-gradient-to-br from-white to-slate-50/50 hover:shadow-lg transition-all hover:border-blue-200">
+  <div className="border-2 border-slate-100 rounded-2xl p-5 bg-gradient-to-br from-white to-slate-50/50 hover:shadow-md transition-all hover:border-blue-200">
     <div className="flex justify-between items-center mb-4">
       <div>
         <p className="font-bold text-slate-900 text-lg">{month}</p>
