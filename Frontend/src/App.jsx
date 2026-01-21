@@ -27,7 +27,7 @@ import MyProfile from "./pages/employee/MyProfile";
 import Register from "./pages/auth/Register";
 import Tasks from "./pages/admin/Tasks/Tasks";
 import CreatePasswordForm from "./pages/auth/CreatePasswordForm";
-
+import NotFound from "./pages/common/NotFoundPage";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
@@ -62,6 +62,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+
+
 function App() {
   return (
     <AuthProvider>
@@ -73,62 +75,22 @@ function App() {
           <Route path="/employee-login" element={<EmployeeLogin />} />
           <Route path="/create-password" element={<CreatePasswordForm />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Navigate to="/" replace />} /> 
-
-
-
-          {/* <Route path="/admin/employee/123" element={<EmployeeProfile/>}/>
-           <Route path="/admin/employee/add" element={< AddEmployee/>} />
-<Route path="/admin/employees/:id/edit" element={<EmployeeEdit />} />  */}
-
-{/* admin pages */}
-         
-          {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />
-
-          <Route path="/admin/employees" element={<EmployeesList />} />
-
-          <Route path="/admin/employee/:id" element={<EmployeeProfile />} />
-          <Route path="/admin/employee/add" element={<AddEmployee />} />
-
-          {/* <Route path="/admin/attendance" element={<EmployeeAttendance />} /> */}
-{/* 
-          <Route
-            path="/admin/employees/salary"
-            element={<SalaryManagement />}
-          />
-
-          <Route path="/admin/employees/leaves" element={<LeaveRecord />} />
-
-<Route path="/admin/employees/:id/edit" element={<EmployeeEdit />} />  */}
-
-          {/*employee side pages*/}
-
-          {/* <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-          <Route path="/employee/profile" element={<MyProfile />} />
-                    <Route path="/employee/mytasks" element={<MyTasks />} />
-<Route path="/employee/apply-leave" element={<EmployeeLeave />} /> 
-<Route path="/employee/support-system" element={<Support/>} />  */}
-
-
-
-
+          <Route path="/login" element={<Navigate to="/" replace />} />
 
           {/* Protected Admin Routes */}
-
           <Route 
             path="/admin/dashboard" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <AdminDashboard />
               </ProtectedRoute>
             } 
           />
 
-          
           <Route 
             path="/admin/employees" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <EmployeesList />
               </ProtectedRoute>
             } 
@@ -137,7 +99,7 @@ function App() {
           <Route 
             path="/admin/employees/:id" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <EmployeeProfile />
               </ProtectedRoute>
             } 
@@ -146,32 +108,34 @@ function App() {
           <Route 
             path="/admin/employees/add" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <AddEmployee />
               </ProtectedRoute>
             } 
           /> 
 
-           <Route 
+          <Route 
             path="/admin/employees/:id/edit" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <EmployeeEdit/>
               </ProtectedRoute>
             } 
           /> 
-           <Route 
+
+          <Route 
             path="/admin/employees/leaves" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <LeaveRecord />
               </ProtectedRoute>
             } 
           /> 
-           <Route 
+
+          <Route 
             path="/admin/employees/tasks" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <Tasks />
               </ProtectedRoute>
             } 
@@ -180,14 +144,19 @@ function App() {
           <Route 
             path="/admin/employees/salary" 
             element={
-              <ProtectedRoute allowedRoles={['Admin' , 'Department Head']}>
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <SalaryManagement />
               </ProtectedRoute>
             } 
           /> 
 
-        
-{/* employes protected route */}
+          {/* Default Admin Route - redirect /admin to /admin/dashboard */}
+          <Route 
+            path="/admin" 
+            element={<Navigate to="/admin/dashboard" replace />} 
+          />
+
+          {/* Employee Protected Routes */}
           <Route 
             path="/employee/dashboard" 
             element={
@@ -206,7 +175,6 @@ function App() {
             } 
           />
 
-          
           <Route 
             path="/employee/support-system" 
             element={
@@ -215,20 +183,12 @@ function App() {
               </ProtectedRoute>
             } 
           />
- <Route 
+
+          <Route 
             path="/employee/apply-leave" 
             element={
               <ProtectedRoute allowedRoles={['employee']}>
                 <EmployeeLeave/>
-              </ProtectedRoute>
-            } 
-          />
-
-           <Route 
-            path="/employee/support-system" 
-            element={
-              <ProtectedRoute allowedRoles={['employee']}>
-                <Support/>
               </ProtectedRoute>
             } 
           />
@@ -242,6 +202,14 @@ function App() {
             } 
           />
 
+          {/* Default Employee Route - redirect /employee to /employee/dashboard */}
+          {/* <Route 
+            path="/employee" 
+            element={<Navigate to="/employee/dashboard" replace />} 
+          /> */}
+
+          {/* Catch-all route for 404 - Must be last */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider>
