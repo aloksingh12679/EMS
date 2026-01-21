@@ -1,6 +1,15 @@
 import api from './api';
 
 export const employeeService = {
+    getRecentActivities : async () => {
+         try {
+            const response = await api.get('/admin/recent-activities');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+    ,
     getTickets : async () => {
         try {
             const response = await api.get('/admin/tickets');

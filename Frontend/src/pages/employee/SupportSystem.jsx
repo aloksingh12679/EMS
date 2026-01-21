@@ -14,26 +14,77 @@ const Support = () => {
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   const [loading, setLoading] = useState(false);
-
-  const [activeIndex, setActivateIndex] = useState("0");
+  const [myTickets, setMyTickets] = useState([]);
+  const [showTicketsModal, setShowTicketsModal] = useState(false);
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
   };
 
-  const quickLinks = ["type & reason", "Date Range", "Days", "Status"];
+  useEffect(() => {
+    fetchMytickets();
+  }, []);
 
-  const [activate, setActivate] = useState("type");
-  const links = [
-    {
-      id: "type",
-      label: "Types & Reason",
-    },
-    { id: "date", label: "Date" },
-    { id: "days", label: "Days" },
-    { id: "status", label: "Status" },
-  ];
+  const fetchMytickets = async () => {
+    try {
+      setLoading(true);
+      const result = await ticketService.getMyTickets();
+      console.log(result);
+
+      if (result.success && result.data) {
+        setMyTickets(result.data);
+      }
+    } catch (err) {
+      console.log("get my tickets error", err);
+      showToast("Failed to load tickets", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Open":
+        return "#3b82f6";
+      case "In Progress":
+        return "#f59e0b";
+      case "Resolved":
+        return "#10b981";
+      case "Closed":
+        return "#6b7280";
+      case "Reopened":
+        return "#ef4444";
+      default:
+        return "#6b7280";
+    }
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "Low":
+        return "#10b981";
+      case "Medium":
+        return "#f59e0b";
+      case "High":
+        return "#ef4444";
+      case "Urgent":
+        return "#dc2626";
+      default:
+        return "#6b7280";
+    }
+  };
 
   const contacts = [
     {
@@ -48,12 +99,6 @@ const Support = () => {
       avatar: "MC",
       online: true,
     },
-  ];
-
-  const faqs = [
-    { id: 1, question: "How do I request time off?" },
-    { id: 2, question: "Why can't I access my pay stub?" },
-    { id: 3, question: "Resetting MFA Token" },
   ];
 
   const handleSubmit = async () => {
@@ -92,11 +137,12 @@ const Support = () => {
 
       if (response.success) {
         showToast("Your query submitted successfully!", "success");
-
         setSubject("");
         setCategory("");
         setPriority("Medium");
         setDescription("");
+      
+        fetchMytickets();
       }
     } catch (err) {
       console.error("Error submitting ticket:", err);
@@ -104,7 +150,7 @@ const Support = () => {
         err.response?.data?.message ||
           err.message ||
           "Failed to submit ticket. Please try again.",
-        "error",
+        "error"
       );
     } finally {
       setLoading(false);
@@ -117,21 +163,7 @@ const Support = () => {
     setPriority("Medium");
     setDescription("");
   };
-  //  useEffect(() => {
-  //      fetchTickets();
-  //    }, []);
 
-  //    const fetchTickets = async () => {
-  //      try {
-  //       //  setLoading(true);
-  //        const result = await employeeService.getTickets();
-  //       console.log(result);
-
-  //      } catch (error) {
-  //        console.error("tickets Error:", error);
-
-  //      }
-  //    };
   return (
     <>
       {/* Toast Notification */}
@@ -149,6 +181,408 @@ const Support = () => {
           >
             ✕
           </button>
+        </div>
+      )}
+
+      {/* Tickets Modal */}
+      {showTicketsModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+          onClick={() => setShowTicketsModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "12px",
+              maxWidth: "1200px",
+              width: "100%",
+              maxHeight: "90vh",
+              overflow: "auto",
+              padding: "0",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: "20px 24px",
+                borderBottom: "1px solid #e5e7eb",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                position: "sticky",
+                top: 0,
+                backgroundColor: "#fff",
+                zIndex: 1,
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: "600" }}>
+                My Support Tickets ({myTickets.length})
+              </h2>
+              <button
+                onClick={() => setShowTicketsModal(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "24px",
+                  cursor: "pointer",
+                  color: "#6b7280",
+                  padding: "0",
+                  width: "32px",
+                  height: "32px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div style={{ padding: "24px" }}>
+              {loading ? (
+                <div style={{ textAlign: "center", padding: "40px" }}>
+                  <p>Loading tickets...</p>
+                </div>
+              ) : myTickets.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px" }}>
+                  <svg
+                    width="64"
+                    height="64"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#d1d5db"
+                    strokeWidth="2"
+                    style={{ margin: "0 auto 16px" }}
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  <h3 style={{ color: "#6b7280", fontSize: "18px" }}>
+                    No tickets found
+                  </h3>
+                  <p style={{ color: "#9ca3af", fontSize: "14px" }}>
+                    You haven't created any support tickets yet.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <thead>
+                      <tr style={{ backgroundColor: "#f9fafb" }}>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Ticket ID
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Subject
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Category
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Priority
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Status
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Read by Admin
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Created Date
+                        </th>
+                        <th
+                          style={{
+                            padding: "12px 16px",
+                            textAlign: "left",
+                            fontWeight: "600",
+                            color: "#374151",
+                            borderBottom: "2px solid #e5e7eb",
+                          }}
+                        >
+                          Assigned To
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {myTickets.map((ticket, index) => (
+                        <tr
+                          key={ticket._id}
+                          style={{
+                            backgroundColor: index % 2 === 0 ? "#fff" : "#f9fafb",
+                            transition: "background-color 0.2s",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor = "#f3f4f6")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                              index % 2 === 0 ? "#fff" : "#f9fafb")
+                          }
+                        >
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                              color: "#6b7280",
+                              fontSize: "12px",
+                              fontFamily: "monospace",
+                            }}
+                          >
+                            #{ticket._id.slice(-6).toUpperCase()}
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                              color: "#111827",
+                              fontWeight: "500",
+                              maxWidth: "200px",
+                            }}
+                          >
+                            {ticket.subject}
+                            <div
+                              style={{
+                                fontSize: "12px",
+                                color: "#6b7280",
+                                marginTop: "4px",
+                              }}
+                            >
+                              {ticket.description.length > 50
+                                ? ticket.description.substring(0, 50) + "..."
+                                : ticket.description}
+                            </div>
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                              color: "#374151",
+                            }}
+                          >
+                            {ticket.category}
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                            }}
+                          >
+                            <span
+                              style={{
+                                padding: "4px 12px",
+                                borderRadius: "12px",
+                                fontSize: "12px",
+                                fontWeight: "500",
+                                backgroundColor:
+                                  getPriorityColor(ticket.priority) + "20",
+                                color: getPriorityColor(ticket.priority),
+                                display: "inline-block",
+                              }}
+                            >
+                              {ticket.priority}
+                            </span>
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                            }}
+                          >
+                            <span
+                              style={{
+                                padding: "4px 12px",
+                                borderRadius: "12px",
+                                fontSize: "12px",
+                                fontWeight: "500",
+                                backgroundColor:
+                                  getStatusColor(ticket.status) + "20",
+                                color: getStatusColor(ticket.status),
+                                display: "inline-block",
+                              }}
+                            >
+                              {ticket.status}
+                            </span>
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                              textAlign: "center",
+                            }}
+                          >
+                            {ticket.isReadByAdmin ? (
+                              <span
+                                style={{
+                                  color: "#10b981",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "4px",
+                                }}
+                              >
+                                <svg
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Read
+                              </span>
+                            ) : (
+                              <span
+                                style={{
+                                  color: "#ef4444",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "4px",
+                                }}
+                              >
+                                <svg
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <circle cx="12" cy="12" r="10"></circle>
+                                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                                  <line
+                                    x1="12"
+                                    y1="16"
+                                    x2="12.01"
+                                    y2="16"
+                                  ></line>
+                                </svg>
+                                Unread
+                              </span>
+                            )}
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                              color: "#6b7280",
+                              fontSize: "13px",
+                            }}
+                          >
+                            {formatDate(ticket.createdAt)}
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: "1px solid #e5e7eb",
+                              color: "#374151",
+                            }}
+                          >
+                            {ticket.assignedTo ? (
+                              <div>
+                                <div style={{ fontWeight: "500" }}>
+                                  {ticket.assignedTo.role}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    color: "#6b7280",
+                                    marginTop: "2px",
+                                  }}
+                                >
+                                  {ticket.assignedTo.email}
+                                </div>
+                              </div>
+                            ) : (
+                              <span style={{ color: "#9ca3af" }}>
+                                Not assigned
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -175,7 +609,10 @@ const Support = () => {
                 </svg>
                 Knowledge Base
               </button>
-              {/* <button className="support-btn-secondary">
+              <button
+                className="support-btn-secondary"
+                onClick={() => setShowTicketsModal(true)}
+              >
                 <svg
                   width="20"
                   height="20"
@@ -186,8 +623,8 @@ const Support = () => {
                 >
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
-                My Tickets
-              </button> */}
+                My Tickets ({myTickets.length})
+              </button>
             </div>
           </div>
         </div>
@@ -363,42 +800,6 @@ const Support = () => {
                     Ext. 4004 (24/7)
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="support-sidebar-section">
-              <h3>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                Request History
-              </h3>
-              
-              <div className="quick-links">
-                <ul className="links">
-                  {quickLinks.map((link, index) => (
-                    <li
-                      key={index}
-                      className={`link ${activeIndex === index ? "active" : ""}`}
-                      onClick={() => setActivateIndex(index)}
-                    >
-                      {link}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="support-history-data">
-                <h2>No History Found Yet</h2>
               </div>
             </div>
           </div>

@@ -9,5 +9,13 @@ export const ticketService = {
                   throw error;
               }
     },
+    getMyTickets : async() => {
+        try {
+                  const response = await api.get("/employee/support/tickets");
+                  return response.data;
+              } catch (error) {
+                  throw error;
+              }
+    }
     
 }

@@ -168,7 +168,7 @@ export default function SecureSalaryManagement() {
       const response = await paymentService.UpdateBankDetails(editingEmployeeId, bankDetails);
       
       if (response && response.success) {
-        await fetchEmployeesSalary(); // Refresh employee data
+        await fetchEmployeesSalary(); 
         setShowBankDetailsModal(false);
         showToast("Bank details saved successfully!", "success");
       }
@@ -209,7 +209,7 @@ export default function SecureSalaryManagement() {
       const response = await salaryService.runEmployeePayroll(dueEmployees);
 
       if (response && response.success) {
-        // Update local state
+       
         const updatedEmployees = employees.map((emp) =>
           emp.Status.toLowerCase() === "due" && emp.employee.bankDetails
             ? { ...emp, Status: "Paid" }
@@ -387,7 +387,7 @@ export default function SecureSalaryManagement() {
     .filter((emp) => emp.Status.toLowerCase() === "due" && emp.employee.bankDetails)
     .reduce((sum, emp) => sum + parseFloat(emp.netSalary), 0);
 
-  // Payment Mode View (Without Sidebar - Full Screen)
+
   if (isPaymentMode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
