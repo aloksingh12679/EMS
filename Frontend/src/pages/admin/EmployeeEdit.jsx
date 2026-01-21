@@ -3,8 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Camera, X } from "lucide-react";
 import AdminSidebar from "../../Components/AdminSidebar";
 import { employeeService } from "../../services/employeeServices";
-import { MdPerson, MdBadge, MdAttachMoney, MdCheckCircle, MdEmail, MdPersonAdd, MdClose } from "react-icons/md";
-
+import "../../assets/styles/EmployeeProfileCSS/EmployeeEdit.css";
+import {
+  MdPerson,
+  MdBadge,
+  MdAttachMoney,
+  MdCheckCircle,
+  MdEmail,
+  MdPersonAdd,
+  MdClose,
+} from "react-icons/md";
 
 export default function EmployeeEdit() {
   const { id } = useParams();
@@ -14,8 +22,7 @@ export default function EmployeeEdit() {
   const [profilePhotoPreview, setProfilePhotoPreview] = useState(null);
   const [profilePhotoFile, setProfilePhotoFile] = useState(null);
   const fileInputRef = useRef(null);
-      const [toast, setToast] = useState({ show: false, message: "", type: "" });
-
+  const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -29,7 +36,7 @@ export default function EmployeeEdit() {
     gender: "",
     address: "",
     position: "",
-    currentProfilePhoto: ""
+    currentProfilePhoto: "",
   });
 
   useEffect(() => {
@@ -46,15 +53,16 @@ export default function EmployeeEdit() {
           contactNumber: employee.contactNumber || "",
           department: employee.department.name || "",
           jobType: employee.jobType || "",
-          joiningDate: employee.joiningDate ? employee.joiningDate.split('T')[0] : "",
-          dob: employee.dob ? employee.dob.split('T')[0] : "",
+          joiningDate: employee.joiningDate
+            ? employee.joiningDate.split("T")[0]
+            : "",
+          dob: employee.dob ? employee.dob.split("T")[0] : "",
           gender: employee.gender || "",
           address: employee.address || "",
           position: employee.position || "",
-          currentProfilePhoto: employee.profilePhoto || null
+          currentProfilePhoto: employee.profilePhoto || null,
         });
 
-       
         if (employee.profilePhoto) {
           setProfilePhotoPreview(employee.profilePhoto.url);
         }
@@ -66,52 +74,50 @@ export default function EmployeeEdit() {
       }
     };
 
-        setDepartments([
-          { _id: "1", name: "Information Technology" },
-          { _id: "2", name: "Human Resources" },
-          { _id: "3", name: "Finance" },
-          { _id: "4", name: "Sales" },
-          { _id: "5", name: "Marketing" },
-        { _id: "6", name: "Operations" }
-
-        ]);
-     
+    setDepartments([
+      { _id: "1", name: "Information Technology" },
+      { _id: "2", name: "Human Resources" },
+      { _id: "3", name: "Finance" },
+      { _id: "4", name: "Sales" },
+      { _id: "5", name: "Marketing" },
+      { _id: "6", name: "Operations" },
+    ]);
 
     fetchEmployeeData();
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-   const showToast = (message, type = "error") => {
-        setToast({ show: true, message, type });
-        setTimeout(() => {
-            setToast({ show: false, message: "", type: "" });
-        }, 3000);
-    };
+  const showToast = (message, type = "error") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "" });
+    }, 3000);
+  };
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file");
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB');
+        alert("File size should be less than 5MB");
         return;
       }
 
       setProfilePhotoFile(file);
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePhotoPreview(reader.result);
@@ -124,55 +130,51 @@ export default function EmployeeEdit() {
     setProfilePhotoFile(null);
     setProfilePhotoPreview(formData.currentProfilePhoto || null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    let result;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      let result;
 
-    
-    if (profilePhotoFile) {
-      const formDataWithFile = new FormData();
-      
-     
-      formDataWithFile.append('profilePhoto', profilePhotoFile);
-      
-     
-      Object.keys(formData).forEach(key => {
-        
-        if (typeof formData[key] === 'object' && formData[key] !== null) {
-          formDataWithFile.append(key, JSON.stringify(formData[key]));
-        } else {
-          formDataWithFile.append(key, formData[key]);
-        }
-      });
-      
-      
-      result = await employeeService.updateEmployee(id, formDataWithFile);
-    } else {
-     
-      result = await employeeService.updateEmployee(id, formData);
+      if (profilePhotoFile) {
+        const formDataWithFile = new FormData();
+
+        formDataWithFile.append("profilePhoto", profilePhotoFile);
+
+        Object.keys(formData).forEach((key) => {
+          if (typeof formData[key] === "object" && formData[key] !== null) {
+            formDataWithFile.append(key, JSON.stringify(formData[key]));
+          } else {
+            formDataWithFile.append(key, formData[key]);
+          }
+        });
+
+        result = await employeeService.updateEmployee(id, formDataWithFile);
+      } else {
+        result = await employeeService.updateEmployee(id, formData);
+      }
+
+      console.log("result", result);
+
+      if (result.success) {
+        showToast(`Employee Updated Successfully`, "success");
+        setTimeout(() => {
+          navigate(`/admin/employees/${id}`);
+        }, 1500);
+      }
+    } catch (err) {
+      console.error("Error updating employee:", err);
+      showToast(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to update employee",
+        "error",
+      );
     }
-    
-    console.log("result", result);
-    
-    if (result.success) {
-      showToast(`Employee Updated Successfully`, "success");
-      setTimeout(() => {
-        navigate(`/admin/employees/${id}`);
-      }, 1500);
-    }
-  } catch (err) {
-    console.error("Error updating employee:", err);
-    showToast(
-      err.response?.data?.message || err.message || "Failed to update employee",
-      "error"
-    );
-  }
-};
+  };
 
   if (loading) {
     return (
@@ -187,26 +189,28 @@ export default function EmployeeEdit() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-          {/* Toast Notification */}
-                    {toast.show && (
-                        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-lg animate-slideLeft ${
-                            toast.type === "error" 
-                                ? "bg-red-500 text-white" 
-                                : "bg-green-500 text-white"
-                        } max-w-xs sm:max-w-md w-full sm:w-auto`}>
-                            <div className="flex-1 text-sm sm:text-base font-medium">
-                                {toast.message}
-                            </div>
-                            <button 
-                                onClick={() => setToast({ show: false, message: "", type: "" })}
-                                className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
-                            >
-                                <MdClose size={20} />
-                            </button>
-                        </div>
-                    )}
-        
-                    <style>{`
+      {/* Toast Notification */}
+      {toast.show && (
+        <div
+          className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-lg animate-slideLeft ${
+            toast.type === "error"
+              ? "bg-red-500 text-white"
+              : "bg-green-500 text-white"
+          } max-w-xs sm:max-w-md w-full sm:w-auto`}
+        >
+          <div className="flex-1 text-sm sm:text-base font-medium">
+            {toast.message}
+          </div>
+          <button
+            onClick={() => setToast({ show: false, message: "", type: "" })}
+            className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+          >
+            <MdClose size={20} />
+          </button>
+        </div>
+      )}
+
+      <style>{`
                         @keyframes slideLeft {
                             from {
                                 opacity: 0;
@@ -222,19 +226,21 @@ export default function EmployeeEdit() {
                         }
                     `}</style>
       <AdminSidebar />
-      
+
       <div className="flex-1 w-full min-w-0 lg:ml-64">
         <div className="p-4 pt-16 md:p-6 md:pt-6 lg:p-8 lg:pt-8">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="mb-6 text-center">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Edit Employee</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                Edit Employee
+              </h1>
               <p className="text-gray-600 mt-2">Update employee information</p>
             </div>
 
             {/* Form Card */}
-            <div className="bg-white rounded-lg shadow-md border border-gray-200">
-              <form onSubmit={handleSubmit} className="p-6 md:p-8">
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200">
+              <form onSubmit={handleSubmit} className="p-6 md:p-8 profile-edit-form">
                 {/* Profile Photo Section */}
                 <div className="mb-8">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
@@ -244,14 +250,15 @@ export default function EmployeeEdit() {
                     <div className="relative">
                       <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                         {profilePhotoPreview ? (
-                          <img 
-                            src={profilePhotoPreview} 
-                            alt="" 
+                          <img
+                            src={profilePhotoPreview}
+                            alt=""
                             className="w-full h-full object-cover"
                           />
                         ) : (
                           <span className="text-4xl text-gray-400">
-                            {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
+                            {formData.firstName.charAt(0)}
+                            {formData.lastName.charAt(0)}
                           </span>
                         )}
                       </div>
@@ -265,7 +272,7 @@ export default function EmployeeEdit() {
                         </button>
                       )}
                     </div>
-                    
+
                     <div className="flex-1 text-center md:text-left">
                       <input
                         ref={fileInputRef}
@@ -280,7 +287,7 @@ export default function EmployeeEdit() {
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer font-medium"
                       >
                         <Camera size={18} />
-                        {profilePhotoPreview ? 'Change Photo' : 'Upload Photo'}
+                        {profilePhotoPreview ? "Change Photo" : "Upload Photo"}
                       </label>
                       <p className="text-sm text-gray-500 mt-2">
                         JPG, PNG or GIF. Max size 5MB
@@ -416,17 +423,17 @@ export default function EmployeeEdit() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Current Department : {formData.department} <span className="text-red-500"> *</span>
+                        Current Department : {formData.department}{" "}
+                        <span className="text-red-500"> *</span>
                       </label>
                       <select
                         name="department"
-                       
                         value={formData.department}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                       >
                         <option value="">Update Department</option>
-                        {departments.map(dept => (
+                        {departments.map((dept) => (
                           <option key={dept._id} value={dept.name}>
                             {dept.name}
                           </option>
@@ -441,7 +448,6 @@ export default function EmployeeEdit() {
                       <input
                         type="text"
                         name="position"
-                      
                         value={formData.position}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
@@ -451,11 +457,11 @@ export default function EmployeeEdit() {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Contract Type : {formData.jobType}<span className="text-red-500"> *</span>
+                        Contract Type : {formData.jobType}
+                        <span className="text-red-500"> *</span>
                       </label>
                       <select
                         name="jobType"
-                      
                         value={formData.jobType}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
@@ -474,7 +480,6 @@ export default function EmployeeEdit() {
                       <input
                         type="date"
                         name="joiningDate"
-                       
                         value={formData.joiningDate}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
