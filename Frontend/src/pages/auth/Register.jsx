@@ -111,7 +111,7 @@ export default function CreateAccount() {
       }
     } catch (error) {
       console.error("Registration error:", error);
-      showToast(error.message || "Registration failed. Please try again.", "error");
+      showToast(error.response.data.message || "Registration failed. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
