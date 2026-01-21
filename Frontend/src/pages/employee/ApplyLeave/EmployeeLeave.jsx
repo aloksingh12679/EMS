@@ -161,16 +161,16 @@ const EmployeeLeave = () => {
                 </div>
                 <div className='right-main lg:w-[100%]  md:px-[30px] '>
 
-                    <div className='main-1 md:mt-[35px]'>
-                        <div className='h-[130px] mt-5'>
-                            <span className='text-[25px] md:text-[32px] font-bold px-[30px]'>
+                    <div className='main-1 md:mt-[35px] '>
+                        <div className='h-[130px] mt-5 '>
+                            <span className='text-[25px] md:text-[32px] font-bold px-[30px] '>
                                 Leave Management
                             </span>
                             <div className=' md:flex justify-between px-[30px]'>
                                 <p className='text-sm md:text-lg text-slate-700 mb-2'>
                                     Request time off, track your balance and view request history.
                                 </p>
-                                <span className='border s bg-[white] text-sm text-slate-600 rounded-full px-3 py-1.5 shadow-sm'>Current Cycle: 2026-2027</span>
+                                <span className='border-1 border-blue-500 bg-blue-50 text-sm text-slate-600 rounded-full px-3 py-1.5 shadow-sm'>Current Cycle: 2026-2027</span>
                             </div>
                         </div>
 
@@ -179,19 +179,16 @@ const EmployeeLeave = () => {
                     </div>
                     <div className="right-main-2 md:mx-[17px] md:flex">
 
-                        <div className="  max-w-screen-sm md:w-[50%] m-[15px] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className=" max-w-screen-sm md:w-[50%] m-[15px] bg-white rounded-2xl border-1 border-blue-200    overflow-hidden">
 
                             {/* HEADER */}
-                            <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400
- px-6 py-5 text-white">
+                            <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 px-6 py-5 text-white">
                                 <h3 className="text-[15px] md:text-lg font-semibold">New Request</h3>
-                                <p className="text-[13px] md:text-sm text-white">Git
-                                    Submit a new leave application
-                                </p>
+                                <p className="text-[13px] md:text-sm text-white">Submit a new leave application</p>
                             </div>
 
                             {/* BODY */}
-                            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                            <form onSubmit={handleSubmit} className="p-6 space-y-5 ">
 
                                 {/* LEAVE TYPE */}
                                 <div>
@@ -207,7 +204,7 @@ const EmployeeLeave = () => {
                                     >
                                         <option value="annual">Annual Leave</option>
                                         <option value="sick">Sick Leave</option>
-                                        <option value="personal">Personal Leave</option>
+                                        <option value="personal">Casual Leave</option>
                                     </select>
                                 </div>
 
@@ -282,8 +279,7 @@ const EmployeeLeave = () => {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400
- text-white py-3 rounded-xl font-semibold hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-semibold hover:opacity-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                         disabled={loading}
                                     >
                                         {loading ? "Submitting..." : "Submit Request"}
