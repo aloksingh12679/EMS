@@ -13,6 +13,7 @@ export default function MyProfile() {
     const fetchProfile = async () => {
         try {
             const result = await employeeService.getProfile();
+            console.log(result);
             if (result.success) {
                 setProfileData(result.data);
             }

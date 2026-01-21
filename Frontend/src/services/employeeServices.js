@@ -162,7 +162,7 @@ return response.data;
         }
     }
     ,
-    getProfile : async(ticketId) => {
+    getProfile : async() => {
         try{
 const response = await api.get(`/employee/me`);
 return response.data;
