@@ -68,7 +68,7 @@ const Navbar_ = () => {
         <div className="animated-navbar-container">
           {/* Logo */}
           <div className="navbar-logo">
-            <img src="logo.png" alt="logo" className='logo'/>
+            <img src="navbarLogo.png" alt="logo" className='logo'/>
           </div>
 
           <ul className="animated-navbar-links" role="menubar">

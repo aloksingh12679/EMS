@@ -54,11 +54,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 160px !important;
-  height: 42px !important;
+  width: 180px !important;
   object-fit: cover !important;
-  object-position: top !important;
-  margin-top: -10px;
+  /* object-position: top !important; */
+  /* margin-top: -10px; */
   /* filter: brightness(0) saturate(100%); */
 }
 
@@ -434,10 +433,9 @@ body {
 
 
 
-  /* .logo{
-    width: 180px !important;
-    height: 45px !important;
-  } */
+  .logo{
+    width: 170px !important;
+  }
 
   .animated-navbar-links {
     display: none;
