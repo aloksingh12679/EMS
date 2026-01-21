@@ -19,6 +19,8 @@ router.route("/support/tickets")
 .get(getMyTickets)
 .post(createTicket);
 
+router.get("/me" , getProfile);
+
 router.route("/apply-leave")
 .get(getAppliedLeave)
 .post(applyLeave);
