@@ -38,7 +38,7 @@ const leaveSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Calculate total days before saving
+// Calculating total days before saving
 leaveSchema.pre('save', function() {
     if (this.startDate && this.endDate) {
         const diffTime = Math.abs(this.endDate - this.startDate);

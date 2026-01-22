@@ -1,9 +1,9 @@
 // controllers/activityController.js
 const Activity = require('../models/Activity');
 
-// @desc    Get recent activities
-// @route   GET /api/activities/recent
-// @access  Admin
+//   Get recent activities
+//   GET /api/activities/recent
+//   Admin
 exports.getRecentActivities = async (req, res) => {
     try {
         const { limit = 10 } = req.query;
@@ -32,9 +32,9 @@ exports.getRecentActivities = async (req, res) => {
 
 
 
-// @desc    Create activity log
-// @route   POST /api/activities
-// @access  Private
+// Create activity log
+// POST /api/activities
+// Private
 exports.createActivity = async (req, res) => {
 
     try {
@@ -56,10 +56,3 @@ exports.createActivity = async (req, res) => {
     }
 };
 
-// exports.logActivity = async (data) => {
-//     try {
-//         await Activity.create(data);
-//     } catch (error) {
-//         console.error('Log activity error:', error);
-//     }
-// };

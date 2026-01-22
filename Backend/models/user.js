@@ -148,11 +148,8 @@ const userSchema = new mongoose.Schema({
         type: Date
     },
 
-    //  For password reset functionality
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
 
-    //  Bank details - for salary processing
+    //  Bank details - for salary processing (when implementing a payment gateway )
     bankDetails: {
         accountHolderName: {
             type: String,
@@ -210,7 +207,7 @@ userSchema.pre('save', async function(next) {
             }
         }
 
-        // Update bankDetails.updatedAt when bank details are modified
+        // Updatiing bankDetails.updatedAt when bank details are modified
         if (this.isModified('bankDetails') && this.bankDetails && this.bankDetails.accountNumber) {
             this.bankDetails.updatedAt = new Date();
         }

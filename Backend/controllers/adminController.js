@@ -200,12 +200,12 @@ const createEmployee = async (req, res, next) => {
       }
     });
 
-    // Return employee data
+   
     const savedEmployee = await User.findById(employee._id)
       .select('employeeId firstName lastName personalEmail position')
       .populate('department', 'name');
 
-    res.status(201).json({ // Use 201 for created
+    res.status(201).json({ // Using 201 for created
       success: true,
       message: "Employee created successfully",
       data: savedEmployee
@@ -382,11 +382,11 @@ const deleteEmployee = async(req,res) => {
           await Task.deleteMany({ employee: employee._id });
           await Leave.deleteMany({employee : employee._id});
           await SupportTicket.deleteMany({employee : employee._id});
-await logActivity('employee_deleted', req.user._id, {  // Changed from employee._id to req.user._id
+await logActivity('employee_deleted', req.user._id, { 
     relatedModel: 'User',
     relatedId: id,
     metadata: {
-        employeeName : employee?.firstName,  // Add employee name
+        employeeName : employee?.firstName, 
         department: employee?.department?.name,  
         email: employee?.personalEmail, 
         deletionType: 'permanent'
@@ -577,7 +577,7 @@ const getAllEmployees = async(req,res) => {
     // Status filter
     if (status && status !== 'all') {
       let statusValue = status.toLowerCase();
-      // Convert frontend status to backend status
+      // Converting frontend status to backend status
       if (statusValue === 'on leave') statusValue = 'on_leave';
       filter.status = statusValue;
     }
@@ -655,7 +655,7 @@ const leaveAction = async (req, res) => {
     }
 
     if (action === 'Approved' || action === 'approved') {
-      // Get the employee's current leave balance
+      
       const employee = await User.findById(updatedLeave.employee._id).select('leaveBalance firstName lastName');
       
       if (employee) {

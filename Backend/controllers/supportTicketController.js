@@ -2,6 +2,7 @@
 const User = require('../models/user.js');
 const SupportTicket = require('../models/supportTicket.js');
 
+
 const Department = require('../models/Department.js');
 
 // @desc    Create a new support ticket

@@ -8,7 +8,9 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import "./App.css";
 import "./index.css";
 
+
 // pages
+
 import EmployeeLogin from "./pages/auth/EmployeeLogin";
 import EmployeesList from "./pages/admin/EmployeesList";
 import AdminLogin from "./pages/auth/AdminLogin";
@@ -208,7 +210,7 @@ function App() {
             element={<Navigate to="/employee/dashboard" replace />} 
           /> */}
 
-          {/* Catch-all route for 404 - Must be last */}
+          {/* Catch-all route for 404*/}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

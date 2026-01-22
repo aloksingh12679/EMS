@@ -64,7 +64,7 @@ const activitySchema = new mongoose.Schema({
 activitySchema.index({ createdAt: -1 });
 activitySchema.index({ type: 1 });
 
-// delete documents after 2 days (172800 seconds)
+// deleting documents after 2 days (172800 seconds)
 activitySchema.index({ createdAt: 1 }, { expireAfterSeconds: 172800 });
 
 module.exports = mongoose.model('Activity', activitySchema);

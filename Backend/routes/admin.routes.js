@@ -26,44 +26,48 @@ const { protect} = require('../middleware/auth');
 const { getAdminTickets, updateTicket } = require('../controllers/supportTicketController.js');
 const {ActivatePaymentMode ,  UpdateBankDetails} = require("../controllers/paymentController.js");
 const { getRecentActivities } = require('../controllers/activityController.js');
-
+// middleware
 router.use(protect);
 
-
+// Admin AUTHORIZED AREA ROUTES
 
 // Dashboard routes
-
 router.get("/dashboard/stats" , getDashboardstats);
 router.get("/recent-activities" , getRecentActivities);
 router.get("/tickets" ,getAdminTickets);
 router.patch("/support-tickets/:id/mark-read",updateTicket);
 
-// Employee management routes
 
+// Employee management routes
 router.route("/employees")
 .get(getAllEmployees)
 .post(upload.single('profilePhoto') , createEmployee);
 
-// after registraion
+
+
+// after registraion (after adding employee)
 router.post("/employees/sent-email" , sentEmail );
 
 
+// profile -> edit profile -> delete employee routes
 router.route("/employee/:id")
 .get(getEmployeebyId)
 .put(upload.single('profilePhoto'),updateEmployee)
 .delete(deleteEmployee);
 
 
-
+// tasks , based on Head and Admin
 router.get("/employees/tasks" , getDepartmentTasks);
 
+
+// task adding to employee (Department head Authorized routes)
 router.post("/employee/:id/addtask", addTask);
 
 
 
 
 
-
+// getting all employees salary  , updating salary
 router.route("/employees/salary")
 .get(getEmployeesSalary)
 .post(updateSalary);
@@ -72,24 +76,26 @@ router.route("/employees/salary")
 
 
 
-
+// secureDashboard routes
 router.post("/employees/salary/run-payroll" , runPayroll);
 // router.get("/employees/salary" ,getEmployeesSalary);
 // router.post("/employees/salary/" , updateSalary);
 
 
-// leaves detail
+// leaves detail 
 router.route("/employees/leaves")
 .get(getleavesDetail)
 .post(leaveAction);
 
-// bank secure activity
+
+// bank secure activity (access with payment keyWord)
 router.route("/employees/salary/paymentmode")
 .post(ActivatePaymentMode)
 .put(UpdateBankDetails);
 
-// Department management routes
 
+
+// Department management routes (not imlemented in current application)
 router.route("/departments")
 .get(getAlldepartments)
 .post(createDepartment);

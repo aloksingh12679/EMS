@@ -556,7 +556,7 @@ const createPassword = async (req, res) => {
       });
     }
 
-    // 4️⃣ Prevent resetting if password already exists
+    // Prevent resetting if password already exists
     if (employee.password) {
       return res.status(400).json({
         success: false,

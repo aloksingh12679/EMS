@@ -143,11 +143,11 @@ const sendEmployeeRegistrationEmail = async (employeeData) => {
   const { email, employeeId, name } = employeeData;
   
 
-  const passwordCreationLink = `${process.env.FRONTEND_URL}/create-password?employeeId=${employeeId}`;
+  const passwordCreationLink = `${process.env.FRONTEND_URL}create-password?employeeId=${employeeId}`;
   
   const mailOptions = {
-    from: process.env.EMAIL_USER, // Simplified from format
-    to: email.trim(), // Remove any whitespace
+    from: process.env.EMAIL_USER,
+    to: email.trim(), 
     subject: 'Welcome to Graphura HR - Create Your Password',
     html: `
       <!DOCTYPE html>
@@ -365,6 +365,8 @@ const sendEmployeeRegistrationEmail = async (employeeData) => {
   }
 };
 
+
+
 // Case 2: Salary Payment Email with PDF
 const sendSalaryReceiptEmail = async (salaryData, pdfBuffer) => {
   const { email, employeeName, employeeId, amount, month, year } = salaryData;
@@ -455,6 +457,8 @@ const sendSalaryReceiptEmail = async (salaryData, pdfBuffer) => {
     throw error;
   }
 };
+
+
 
 // Verify email configuration
 const verifyEmailConfig = async () => {
