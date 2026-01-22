@@ -117,8 +117,8 @@ const AdminSidebar = () => {
                             <span className="text-white font-bold text-sm">{user?.firstName.charAt(0) || "Admin"}</span>
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{user?.firstName}</p>
-                            <p className="text-xs text-gray-500 font-medium">Super Admin</p>
+                            <p className="text-base font-semibold text-gray-900 truncate">{user?.firstName}</p>
+                            <p className="text-sm text-gray-500 font-medium">Super Admin</p>
                         </div>
                     </div>
 
@@ -128,7 +128,7 @@ const AdminSidebar = () => {
                         className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl 
     bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 
     text-white hover:from-blue-700 hover:via-blue-600 hover:to-blue-500 
-    active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
+    active:scale-[0.97] transition-all duration-200 font-semibold text-base shadow-md hover:shadow-lg"
                     >
 
                         <MdLogout size={18} />
@@ -207,7 +207,7 @@ const MenuItem = ({ icon, label, active, onClick }) => (
         <div className={`text-lg transition-colors ${active ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"}`}>
             {icon}
         </div>
-        <span className="text-sm font-medium">{label}</span>
+        <span className="text-base font-medium">{label}</span>
 
         {/* Hover effect */}
         {!active && (

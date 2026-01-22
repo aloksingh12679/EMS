@@ -4,6 +4,8 @@ import Footer from "../../Components/Footer";
 import { Link } from "react-router-dom";
 import Navbar_ from "../../Components/Navbar_";
 
+import { Lock, CalendarDays, IndianRupee, TrendingUp } from "lucide-react";
+
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -95,22 +97,22 @@ export default function HomePage() {
             <div className="features-grid">
               {[
                 {
-                  icon: <i className="fa-solid fa-lock"></i>,
+                  icon: <Lock size={28} strokeWidth={2} />,
                   title: "Secure Login",
                   desc: "Bank-grade security with Multi-factor authentication (MFA) & Single Sign-On (SSO) readiness.",
                 },
                 {
-                  icon: <i className="fa-solid fa-calendar-check"></i>,
+                  icon: <CalendarDays size={28} strokeWidth={2} />,
                   title: "Attendance Tracking",
                   desc: "Seamless biometric integration with real-time tracking of employee hours and overtime.",
                 },
                 {
-                  icon: <i className="fa-solid fa-money-bill-wave"></i>,
+                  icon: <IndianRupee size={28} strokeWidth={2} />,
                   title: "Salary Management",
                   desc: "Automated global payroll processing, tax compliance, and instant payslip generation.",
                 },
                 {
-                  icon: <i className="fa-solid fa-chart-line"></i>,
+                  icon: <TrendingUp size={28} strokeWidth={2} />,
                   title: "Performance",
                   desc: "Data-driven KPI tracking, 360-degree feedback loops, and quarterly review cycles.",
                 },
@@ -127,7 +129,7 @@ export default function HomePage() {
           </div>
         </section>
         {/* CTA Section */}
-        {/* <section className="cta-section">
+        <section className="cta-section">
           <div className="cta-container">
             <h2>Ready to optimize your workforce?</h2>
             <p>
@@ -136,13 +138,13 @@ export default function HomePage() {
             </p>
 
             <div className="cta-buttons">
-              <button className="btn-cta-primary">Get Started Now</button>
-              <button className="btn-cta-secondary">Book a Demo</button>
+              <button className="btn-cta-primary">Join Now</button>
+              <button className="btn-cta-secondary">Watch videos</button>
             </div>
 
             <p className="cta-note">No credit card required for trial.</p>
           </div>
-        </section> */}
+        </section>
         <Footer />
       </div>
     </>

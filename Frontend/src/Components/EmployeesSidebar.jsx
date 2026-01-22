@@ -110,8 +110,8 @@ const EmployeesSidebar = () => {
                             <span className="text-white font-bold text-sm">{capitalize(user?.firstName.charAt(0) + user?.lastName.charAt(0))}</span>
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{capitalize(user?.firstName + " " + user?.lastName || "E")}</p>
-                            <p className="text-xs text-blue-600 font-medium">Employee</p>
+                            <p className="text-base font-semibold text-gray-900 truncate">{capitalize(user?.firstName + " " + user?.lastName || "E")}</p>
+                            <p className="text-sm text-blue-600 font-medium">Employee</p>
                         </div>
                     </div>
 
@@ -121,7 +121,7 @@ const EmployeesSidebar = () => {
                         className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl 
     bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 
     text-white hover:from-blue-700 hover:via-blue-600 hover:to-blue-500 
-    active:scale-[0.97] transition-all duration-200 font-semibold text-sm shadow-md hover:shadow-lg"
+    active:scale-[0.97] transition-all duration-200 font-semibold text-base shadow-md hover:shadow-lg"
                     >
                         <MdLogout size={18} />
                         <span>Logout</span>
@@ -171,7 +171,7 @@ const MenuItem = ({ icon, label, active, onClick }) => (
         <div className={`${active ? "text-blue-600" : "text-gray-600"}`}>
             {icon}
         </div>
-        <span className="text-sm">{label}</span>
+        <span className="text-base">{label}</span>
     </button>
 );
 
