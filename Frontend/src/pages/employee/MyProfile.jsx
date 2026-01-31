@@ -68,18 +68,18 @@ export default function MyProfile() {
         );
     }
 
+    // Get leave balance values with fallback to 0
+    const annualLeave = profileData.leaveBalance?.annual || 0;
+    const sickLeave = profileData.leaveBalance?.sick || 0;
+    const personalLeave = profileData.leaveBalance?.personal || 0;
+    const totalLeave = annualLeave + sickLeave + personalLeave;
+
     return (
         <div className="flex min-h-screen bg-gray-100">
             <EmployeesSidebar />
             
             <div className="flex-1 w-full ml-0 lg:ml-64">
                 <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-                    {/* Page Header */}
-                    <div className="mb-8">
-                        {/* <h1 className="text-4xl font-bold text-gray-900">My Profile</h1>
-                        <p className="text-gray-600 mt-2">View and manage your personal and professional information</p> */}
-                    </div>
-
                     {/* Profile Header Card */}
                     <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 transform transition-all hover:shadow-blue-500/40 hover:shadow-2xl group mb-8">
                         {/* Animated shimmer effect */}
@@ -139,57 +139,50 @@ export default function MyProfile() {
                                         </div>
                                     </div>
                                     
-                                    {/* Stats Bar */}
+                                    {/* Stats Bar - Dynamic Leave Balance */}
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {/* Annual Leave */}
                                         <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/20 rounded-xl"></div>
                                             <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <p className="text-4xl font-extrabold text-white drop-shadow-lg">{profileData.leaveBalance?.annual || 0}</p>
-                                                    <span className="text-white/60 text-sm font-semibold">/ 24</span>
+                                                <div className="flex justify-center items-center mb-2">
+                                                    <p className="text-4xl font-extrabold text-white drop-shadow-lg">{annualLeave}</p>
                                                 </div>
-                                                <div className="w-full bg-white/20 rounded-full h-2 mb-3 overflow-hidden">
-                                                    <div className="bg-white h-full rounded-full shadow-lg transition-all duration-500" style={{width: `${((profileData.leaveBalance?.annual || 0) / 24) * 100}%`}}></div>
-                                                </div>
-                                                <p className="text-white font-semibold text-sm mt-auto">Annual Leave</p>
+                                                <p className="text-white font-semibold text-sm text-center mt-auto">Annual Leave</p>
                                             </div>
                                         </div>
+
+                                        {/* Sick Leave */}
                                         <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/20 rounded-xl"></div>
                                             <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <p className="text-4xl font-extrabold text-white drop-shadow-lg">{profileData.leaveBalance?.sick || 0}</p>
-                                                    <span className="text-white/60 text-sm font-semibold">/ 15</span>
+                                                <div className="flex justify-center items-center mb-2">
+                                                    <p className="text-4xl font-extrabold text-white drop-shadow-lg">{sickLeave}</p>
                                                 </div>
-                                                <div className="w-full bg-white/20 rounded-full h-2 mb-3 overflow-hidden">
-                                                    <div className="bg-white h-full rounded-full shadow-lg transition-all duration-500" style={{width: `${((profileData.leaveBalance?.sick || 0) / 15) * 100}%`}}></div>
-                                                </div>
-                                                <p className="text-white font-semibold text-sm mt-auto">Sick Leave</p>
+                                                <p className="text-white font-semibold text-sm text-center mt-auto">Sick Leave</p>
                                             </div>
                                         </div>
+
+                                        {/* Personal Leave */}
                                         <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/20 rounded-xl"></div>
                                             <div className="relative p-6 bg-white/10 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <p className="text-4xl font-extrabold text-white drop-shadow-lg">{profileData.leaveBalance?.personal || 0}</p>
-                                                    <span className="text-white/60 text-sm font-semibold">/ 16</span>
+                                                <div className="flex justify-center items-center mb-2">
+                                                    <p className="text-4xl font-extrabold text-white drop-shadow-lg">{personalLeave}</p>
                                                 </div>
-                                                <div className="w-full bg-white/20 rounded-full h-2 mb-3 overflow-hidden">
-                                                    <div className="bg-white h-full rounded-full shadow-lg transition-all duration-500" style={{width: `${((profileData.leaveBalance?.personal || 0) / 16) * 100}%`}}></div>
-                                                </div>
-                                                <p className="text-white font-semibold text-sm mt-auto">Personal Leave</p>
+                                                <p className="text-white font-semibold text-sm text-center mt-auto">Personal Leave</p>
                                             </div>
                                         </div>
+
+                                        {/* Total Leave */}
                                         <div className="relative overflow-hidden group h-full">
                                             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/30 rounded-xl"></div>
                                             <div className="relative p-6 bg-white/15 backdrop-blur-md rounded-xl border border-white/30 hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl h-full flex flex-col justify-center">
-                                                <p className="text-5xl font-extrabold text-white drop-shadow-2xl mb-3">
-                                                    {(profileData.leaveBalance?.annual || 0) + 
-                                                     (profileData.leaveBalance?.sick || 0) + 
-                                                     (profileData.leaveBalance?.personal || 0)}
+                                                <p className="text-5xl font-extrabold text-white drop-shadow-2xl mb-3 text-center">
+                                                    {totalLeave}
                                                 </p>
-                                                <p className="text-white font-bold text-sm uppercase tracking-wider">Days</p>
-                                                <p className="text-white/90 text-xs font-medium mt-1">Total Leave</p>
+                                                <p className="text-white font-bold text-sm uppercase tracking-wider text-center">Days</p>
+                                                <p className="text-white/90 text-xs font-medium mt-1 text-center">Total Leave</p>
                                             </div>
                                         </div>
                                     </div>

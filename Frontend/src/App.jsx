@@ -171,7 +171,14 @@ function App() {
               </ProtectedRoute>
             } 
           /> 
-
+ <Route 
+            path="/admin/tickets/:id" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
+                <Tickets />
+              </ProtectedRoute>
+            } 
+          /> 
           {/* Default Admin Route - redirect /admin to /admin/dashboard */}
           <Route 
             path="/admin" 

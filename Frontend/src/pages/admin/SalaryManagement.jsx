@@ -452,7 +452,7 @@ export default function SecureSalaryManagement() {
     (emp) => !emp?.employee?.bankDetails?.accountNumber
   ).length;
   const totalPayableSalary = employees
-    .filter((emp) => emp.Status.toLowerCase() === "due" && emp.employee.bankDetails)
+    .filter((emp) => emp.Status.toLowerCase() === "due" && emp?.employee?.bankDetails)
     .reduce((sum, emp) => sum + parseFloat(emp.netSalary), 0);
 
 
@@ -1577,7 +1577,7 @@ export default function SecureSalaryManagement() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold flex-shrink-0">
-                          {emp.employee.firstName.charAt(0)}
+                          {emp?.employee?.firstName.charAt(0)}
                         </div>
                         <div className="min-w-0 flex-1">
                           <h3 className="font-semibold text-gray-800 text-sm truncate">

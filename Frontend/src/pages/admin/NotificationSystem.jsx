@@ -1,19 +1,7 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useState, useEffect, useRef } from 'react';
 import { FiBell, FiX } from 'react-icons/fi';
 import { HiOutlineTicket } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
 import { employeeService } from '../../services/employeeServices';
 
 const NotificationSystem = () => {
@@ -21,10 +9,14 @@ const NotificationSystem = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Fetch notifications on component mount
   useEffect(() => {
     fetchNotifications();
+    // Optional: Set up polling to refresh notifications
+    const interval = setInterval(fetchNotifications, 60000); // Refresh every minute
+    return () => clearInterval(interval);
   }, []);
 
   // Close dropdown when clicking outside
@@ -41,9 +33,7 @@ const NotificationSystem = () => {
 
   const fetchNotifications = async () => {
     try {
-     
       const result = await employeeService.getTickets();
-     
       
       if (result.success) {
         setNotifications(result.tickets || []);
@@ -56,25 +46,15 @@ const NotificationSystem = () => {
     }
   };
 
-  const handleNotificationClick = async (notification) => {
-    try {
-      // Mark as read
-      const token = localStorage.getItem('token');
-    const result = await employeeService.updateTicket(notification._id);
+  const handleNotificationClick = (notification) => {
+    setIsOpen(false);
+    // Navigate to tickets page with the specific ticket ID
+    navigate(`/admin/tickets/${notification._id}`);
+  };
 
-      // Update local state
-      setNotifications(prev =>
-        prev.map(n =>
-          n._id === notification._id ? { ...n, isReadByAdmin: true } : n
-        )
-      );
-      setUnreadCount(prev => Math.max(0, prev - 1));
-
-      // Navigate to ticket details or handle as needed
-      // navigate(`/admin/support-tickets/${notification._id}`);
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-    }
+  const handleViewAllTickets = () => {
+    setIsOpen(false);
+    navigate('/admin/tickets');
   };
 
   const formatTimeAgo = (date) => {
@@ -146,7 +126,7 @@ const NotificationSystem = () => {
           {/* Notifications List */}
           <div className="overflow-y-auto max-h-[400px]">
             {notifications.length > 0 ? (
-              notifications.map((notification) => (
+              notifications.slice(0, 5).map((notification) => (
                 <div
                   key={notification._id}
                   onClick={() => handleNotificationClick(notification)}
@@ -219,11 +199,7 @@ const NotificationSystem = () => {
           {notifications.length > 0 && (
             <div className="px-4 py-3 border-t border-slate-200 bg-slate-50">
               <button
-                onClick={() => {
-                  setIsOpen(false);
-                  // Navigate to all notifications page
-                  // navigate('/admin/support-tickets');
-                }}
+                onClick={handleViewAllTickets}
                 className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium"
               >
                 View all tickets
@@ -237,4 +213,3 @@ const NotificationSystem = () => {
 };
 
 export default NotificationSystem;
-

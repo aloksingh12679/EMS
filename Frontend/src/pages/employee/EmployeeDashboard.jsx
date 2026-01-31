@@ -413,9 +413,9 @@ const SalaryHistory = ({ salarydetails }) => {
           </div>
         </div>
 
-        <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold flex gap-2 items-center w-full sm:w-auto justify-center shadow-lg hover:shadow-lg transition-all hover:scale-102">
+        {/* <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold flex gap-2 items-center w-full sm:w-auto justify-center shadow-lg hover:shadow-lg transition-all hover:scale-102">
           <Download size={18} /> Download Payslip
-        </button>
+        </button> */}
       </div>
 
       {/* ================= TABLE VIEW (Tablet + Desktop) ================= */}
@@ -493,12 +493,12 @@ const SalaryHistory = ({ salarydetails }) => {
         )}
       </div>
 
-      {/* FOOTER */}
+      {/* FOOTER
       <div className="mt-6 p-4 bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-xl">
         <button className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-semibold hover:bg-blue-50 py-2 rounded-lg transition-all">
           View All Payslips ({salarydetails?.length || 0})
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

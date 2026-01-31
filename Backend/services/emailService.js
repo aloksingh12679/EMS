@@ -236,7 +236,7 @@ const sendEmployeeRegistrationEmail = async (employeeData) => {
           .button { 
             display: inline-block; 
             padding: 16px 40px; 
-            background: linear-gradient(135deg, #1b1c1f 0%, #4d556f 100%);
+            background: linear-gradient(135deg, #3e65d7 0%, #4d556f 100%);
             color: white; 
             text-decoration: none; 
             border-radius: 8px;
@@ -247,7 +247,7 @@ const sendEmployeeRegistrationEmail = async (employeeData) => {
           }
           .button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 6px 20px rgba(22, 60, 143, 0.4);
           }
           .link-section {
             background-color: #f8fafc;
