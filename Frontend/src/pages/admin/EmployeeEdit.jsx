@@ -12,6 +12,7 @@ import {
   MdEmail,
   MdPersonAdd,
   MdClose,
+  MdEventAvailable,
 } from "react-icons/md";
 
 export default function EmployeeEdit() {
@@ -37,6 +38,10 @@ export default function EmployeeEdit() {
     address: "",
     position: "",
     currentProfilePhoto: "",
+    // Leave balance fields
+    personalLeave: "",
+    sickLeave: "",
+    annualLeave: "",
   });
 
   useEffect(() => {
@@ -44,7 +49,7 @@ export default function EmployeeEdit() {
       try {
         const result = await employeeService.getDetailsbyId(id);
         const employee = result.data;
-        // console.log(employee.department.name);
+        console.log(employee);
 
         setFormData({
           firstName: employee.firstName || "",
@@ -61,6 +66,10 @@ export default function EmployeeEdit() {
           address: employee.address || "",
           position: employee.position || "",
           currentProfilePhoto: employee.profilePhoto || null,
+          // Leave balance
+          personalLeave: employee.leaveBalance?.personal || 0,
+          sickLeave: employee.leaveBalance?.sick || 0,
+          annualLeave: employee.leaveBalance?.annual || 0,
         });
 
         if (employee.profilePhoto) {
@@ -106,13 +115,13 @@ export default function EmployeeEdit() {
     if (file) {
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
+        showToast("Please select an image file", "error");
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert("File size should be less than 5MB");
+        showToast("File size should be less than 5MB", "error");
         return;
       }
 
@@ -423,8 +432,7 @@ export default function EmployeeEdit() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Current Department : {formData.department}{" "}
-                        <span className="text-red-500"> *</span>
+                        Current Department: <span className="text-blue-600">{formData.department}</span>
                       </label>
                       <select
                         name="department"
@@ -457,8 +465,7 @@ export default function EmployeeEdit() {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Contract Type : {formData.jobType}
-                        <span className="text-red-500"> *</span>
+                        Current Type: <span className="text-blue-600 capitalize">{formData.jobType}</span>
                       </label>
                       <select
                         name="jobType"
@@ -467,9 +474,9 @@ export default function EmployeeEdit() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                       >
                         <option value="">Update Contract Type</option>
-                        <option value="full-time">full Time</option>
-                        <option value="part-time">part Time</option>
-                        <option value="internship">Intern</option>
+                        <option value="full-time">Full Time</option>
+                        <option value="part-time">Part Time</option>
+                        <option value="intern">Intern</option>
                       </select>
                     </div>
 
@@ -484,6 +491,109 @@ export default function EmployeeEdit() {
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                       />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Leave Balance Section */}
+                <div className="mb-8">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
+                    <MdEventAvailable className="text-blue-600" size={24} />
+                    Leave Balance Quota
+                  </h2>
+                  
+                  {/* Info Box */}
+                  <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      <strong>Note:</strong> Update the leave quota allocated to this employee. These values represent the total days available for each leave type.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Personal Leave (Days)
+                      </label>
+                      <input
+                        type="number"
+                        name="personalLeave"
+                        min="0"
+                        value={formData.personalLeave}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        placeholder="e.g., 12"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Currently allocated: {formData.personalLeave || 0} days
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Sick Leave (Days)
+                      </label>
+                      <input
+                        type="number"
+                        name="sickLeave"
+                        min="0"
+                        value={formData.sickLeave}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        placeholder="e.g., 10"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Currently allocated: {formData.sickLeave || 0} days
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Annual Leave (Days)
+                      </label>
+                      <input
+                        type="number"
+                        name="annualLeave"
+                        min="0"
+                        value={formData.annualLeave}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        placeholder="e.g., 15"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Currently allocated: {formData.annualLeave || 0} days
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Leave Summary Card */}
+                  <div className="mt-4 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Current Leave Balance Summary</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="bg-white rounded-lg p-3 border border-green-100">
+                        <p className="text-xs text-gray-600 mb-1">Personal Leave</p>
+                        <p className="text-2xl font-bold text-blue-600">{formData.personalLeave || 0}</p>
+                        <p className="text-xs text-gray-500">days available</p>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-green-100">
+                        <p className="text-xs text-gray-600 mb-1">Sick Leave</p>
+                        <p className="text-2xl font-bold text-purple-600">{formData.sickLeave || 0}</p>
+                        <p className="text-xs text-gray-500">days available</p>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-green-100">
+                        <p className="text-xs text-gray-600 mb-1">Annual Leave</p>
+                        <p className="text-2xl font-bold text-green-600">{formData.annualLeave || 0}</p>
+                        <p className="text-xs text-gray-500">days available</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-green-200">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-gray-900">Total Leave Days:</span>
+                        <span className="text-lg font-bold text-gray-900">
+                          {(parseInt(formData.personalLeave) || 0) + 
+                           (parseInt(formData.sickLeave) || 0) + 
+                           (parseInt(formData.annualLeave) || 0)} days
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

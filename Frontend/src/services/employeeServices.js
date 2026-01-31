@@ -94,6 +94,22 @@ return response.data;
         }
     },
 
+      updateProfile : async(formDatatoSend) => {
+               try{
+const response = await api.put(`/admin/me` , formDatatoSend,{
+            headers: {
+                'Content-Type': 'multipart/form-data'  // Override default
+            }
+        });
+return response.data;
+
+        }catch(error){
+         throw error;
+        }
+    },
+
+
+
     deleteEmployee : async(id ,password ,hardDelete , status) => {
         
    try{

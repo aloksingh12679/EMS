@@ -3,17 +3,34 @@ import { emailService } from "../../services/emailServices";
 
 /* 🔹 IMAGE */
 import sideImage from "../../assets/images/pass.png";
+import {useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const CreatePasswordForm = () => {
+  const [searchParams] = useSearchParams();
+  const employeeId = searchParams.get("employeeId");
+  
   const [formData, setFormData] = useState({
     employeeId: "",
     password: "",
     confirmPassword: ""
   });
 
+ useEffect(() => {
+  setFormData((prev) => ({
+    ...prev,
+    employeeId: employeeId
+  }));
+}, [employeeId]);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+    const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  
+const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: "", type: "" }), 4000);
+  };
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
@@ -34,19 +51,52 @@ const CreatePasswordForm = () => {
       setError("Passwords do not match");
       return;
     }
+try {
+  const response = await emailService.createPassword(formData);
 
-    await emailService.createPassword(formData);
+  if (response.success) {
+    showToast("Password created successfully", "success");
     setSuccess("Password created successfully!");
 
     setFormData({
-      employeeId: "",
+      employeeId,
       password: "",
       confirmPassword: ""
     });
+  }
+} catch (err) {
+  console.error("Password creation error:", err);
+  showToast(
+    err.response?.data?.message || "Password Creation failed",
+    "error"
+  );
+}
+
+ 
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[#EEF2F7]">
+       {toast.show && (
+        <div
+          className={`fixed top-6 right-6 z-50 animate-slideIn ${
+            toast.type === "error" ? "bg-red-500" : "bg-green-500"
+          } text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[280px] max-w-md`}
+        >
+          <div
+            className={`w-2 h-2 rounded-full ${
+              toast.type === "error" ? "bg-red-300" : "bg-green-300"
+            }`}
+          ></div>
+          <span className="font-medium">{toast.message}</span>
+          <button
+            onClick={() => setToast({ show: false, message: "", type: "" })}
+            className="ml-auto text-white/80 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       {/* MAIN CARD */}
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
 
@@ -85,9 +135,10 @@ const CreatePasswordForm = () => {
               <input
                 type="text"
                 name="employeeId"
-                placeholder="EMP-001"
+                placeholder="#EMP-001"
                 value={formData.employeeId}
                 onChange={handleChange}
+                readOnly
                 className="w-full h-11 px-4 bg-blue-50 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-600"
               />
             </div>

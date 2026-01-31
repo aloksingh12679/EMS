@@ -3,15 +3,16 @@ import api from './api';
 
 
 export const authService = {
-    login : async(email,password,employeeId , role) => {
+    login : async(email,password,accessKey,employeeId , loginType) => {
         
       
             
             const response = await api.post('/auth/login', {
                 email,
                 password,
+                accessKey,
                 employeeId,
-                role
+                loginType
             });
 
             if (response.data.success) {

@@ -161,7 +161,8 @@ const resetPassword = async (req, res) => {
     
     if (userType === 'Admin') {
       // Verify admin secret key
-      if (adminSecretkey !== process.env.ADMIN_SECRET_KEY) {
+      const savedUser = User.findOne({email , role : "Admin"});
+      if (adminSecretkey !== savedUser.AccessKey) {
         return res.status(401).json({
           success: false,
           message: 'Invalid admin secret key'
@@ -234,124 +235,189 @@ const resetPassword = async (req, res) => {
 };
 
 // api = api/v1/auth/login
-const login = async(req,res,next) => {
-try {
-    console.log("here");
- const {email , password , employeeId , role} = req.body;
-    if(!email && !employeeId){
-        return res.status(400).json({"message" : "please fill all given fields"});
+const login = async (req, res, next) => {
+  try {
+    console.log("Login attempt:", req.body);
+    const { email, password, employeeId, loginType , accessKey } = req.body;
+
+    // Validation
+    if (!email && !employeeId) {
+      return res.status(400).json({ message: "Please fill all given fields" });
     }
-console.log(employeeId);
- let currUser;
- let loginType;
 
-    if(role === "Admin" && email){
-        console.log(role);
-        if(!password){
-            return res.status(400).json({"message" : "Password is required"})
-        }
-         
-        currUser = await  User.findOne({email : email});
-        loginType = 'email';
+   
+    console.log(employeeId);
+    let currUser;
+    let loginWay;
 
-        if(!currUser){
-        return res.status(404).json({"message" : "Wrong email or Password"});
-        }
-         
-        if(currUser.role === 'employee' ){
-        return res.status(403).json({"message" : "Access Denied ! only admin can login"});
-
-        }
-
-        const isPasswordValid = await currUser.comparePassword(password);
-        // console.log(isPasswordValid);
-        if(!isPasswordValid){
-            return res.status(400).json({"message" : "wrong Password"});
-        }
-
-
-    }else if(role === "employee" && employeeId){
-        currUser = await User.findOne({employeeId : employeeId});
-      console.log(currUser);
-        loginType = 'employeeId' ; 
-
-        if(!currUser) {
-        return res.status(400).json({"message" : "Invalid Employee ID"});
-        }
-        if(currUser.personalEmail !== email){
-            return res.status(400).json({"message" : "Invalid email Id"});
-        }
-
-        if(currUser.role !== "employee") {
-            return res.status(403).json({"message" : "Access Denied ! only Employee can login"});
-
-        }
-        if(password){
-        const isPasswordValid = await currUser.comparePassword(password);
-        if(!isPasswordValid){
-            return res.status(400).json({"message" : "wrong Password"});
-        }
-
-        }else{
-                        return res.status(403).json({"message" : "Enter password"});
-
-        }
+    // Admin Login
+    if (loginType === "Admin" && email) {
+      console.log("Admin login attempt for:", loginType);
       
-        
+      if (!password) {
+        return res.status(400).json({ message: "Password is required" });
+      }
+ if (!accessKey) {
+      return res.status(400).json({ message: "Access key is required" });
     }
 
-    if(currUser.isActive === false){
-         return res.status(403).json({"message" : "Account is deactivated.  please contact administrator"});
+      currUser = await User.findOne({ email: email });
+      loginWay = 'email';
+
+      if (!currUser) {
+        return res.status(404).json({ message: "Wrong email or password" });
+      }
+
+      if (currUser.role !== 'Admin') {
+        return res.status(403).json({ message: "Access Denied! Only Admin can login with Admin credentials" });
+      }
+
+      // Validate Admin Access Key
+      if (!currUser.AccessKey) {
+        return res.status(403).json({ message: "Admin access key not configured. Contact system administrator" });
+      }
+
+      if (currUser.AccessKey !== accessKey) {
+        return res.status(403).json({ message: "Invalid Admin access key" });
+      }
+
+      const isPasswordValid = await currUser.comparePassword(password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Wrong password" });
+      }
+    } 
+    // Department Head Login
+    else if (loginType === "Department Head" && email) {
+      console.log("Department Head login attempt");
+       if (!accessKey) {
+      return res.status(400).json({ message: "Access key is required" });
     }
 
+      if (!password) {
+        return res.status(400).json({ message: "Password is required" });
+      }
+
+      currUser = await User.findOne({ email: email });
+      loginWay = 'email';
+
+      if (!currUser) {
+        return res.status(404).json({ message: "Wrong email or password" });
+      }
+
+      if (currUser.role !== 'Department Head') {
+        return res.status(403).json({ message: "Access Denied! Only Department Heads can login with these credentials" });
+      }
+
+      // Validate Department Head Access Key
+      if (!currUser.AccessKey) {
+        return res.status(403).json({ message: "Department access key not configured. Contact administrator" });
+      }
+
+      if (currUser.AccessKey !== accessKey) {
+        return res.status(403).json({ message: "Invalid Department Head access key" });
+      }
+
+      const isPasswordValid = await currUser.comparePassword(password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Wrong password" });
+      }
+    }
+    // Employee Login
+    else if (loginType === "employee" && employeeId) {
+      currUser = await User.findOne({ employeeId: employeeId });
+      console.log("Employee login:", currUser);
+      loginWay = 'employeeId';
+
+      if (!currUser) {
+        return res.status(400).json({ message: "Invalid Employee ID" });
+      }
+
+      if (currUser.personalEmail !== email) {
+        return res.status(400).json({ message: "Invalid email ID" });
+      }
+
+      if (currUser.role !== "employee") {
+        return res.status(403).json({ message: "Access Denied! Only employees can login with Employee ID" });
+      }
+
+      // Employee doesn't use access keys
+      if (password) {
+        const isPasswordValid = await currUser.comparePassword(password);
+        if (!isPasswordValid) {
+          return res.status(400).json({ message: "Wrong password" });
+        }
+      } else {
+        return res.status(403).json({ message: "Enter password" });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid login credentials" });
+    }
+
+    // Check if account is active
+    if (currUser.isActive === false) {
+      return res.status(403).json({ message: "Account is deactivated. Please contact administrator" });
+    }
+
+    // Update last login
     currUser.lastLogin = new Date();
     await currUser.save();
 
+    // Create token payload
     const tokenPayload = {
-        userId : currUser._id,
-        role : currUser.role,
-        email : currUser.email, // if logintype email
-        employeeId : currUser.employeeId, // if logintype employeeId,
-        name : `${currUser.firstName} ${currUser.lastName}`
+      userId: currUser._id,
+      role: currUser.role,
+      email: currUser.email,
+      employeeId: currUser.employeeId,
+      name: `${currUser.firstName} ${currUser.lastName}`
     };
 
-    const tokenExpiry = currUser.role === 'admin' ? `24h` : `8h`;
+    const tokenExpiry = currUser.role === 'Admin' ? '24h' : '8h';
 
     const token = jwt.sign(
-        tokenPayload,
-        process.env.JWT_SECRET,
-        {expiresIn : tokenExpiry}
+      tokenPayload,
+      process.env.JWT_SECRET,
+      { expiresIn: tokenExpiry }
     );
 
-    const redirectTo = currUser.role === 'Admin' ? '/admin/dashboard' : '/employee/dashboard';
-
-    const userResponse = {
-        id : currUser._id,
-        firstName : currUser.firstName,
-        lastName : currUser.lastName,
-        fullName : currUser.fullName,
-        email : currUser.email,
-        employeeId : currUser.employeeId,
-        role : currUser.role,
-        isActive : currUser.isActive,
-        lastLogin : currUser.lastLogin
+    // Determine redirect URL
+    let redirectTo;
+    if (currUser.role === 'Admin') {
+      redirectTo = '/admin/dashboard';
+    } else if (currUser.role === 'Department Head') {
+      redirectTo = '/admin/dashboard';
+    } else {
+      redirectTo = '/employee/dashboard';
     }
 
+    const userResponse = {
+      id: currUser._id,
+      firstName: currUser.firstName,
+      lastName: currUser.lastName,
+      fullName: currUser.fullName,
+      email: currUser.email,
+      employeeId: currUser.employeeId,
+      role: currUser.role,
+      isActive: currUser.isActive,
+      lastLogin: currUser.lastLogin
+    };
+
     res.status(200).json({
-        success : true,
-        message : 'login succesfully',
-        token,
-        user : userResponse,
-        redirectTo,
-        loginType,
-        expiresIn : tokenExpiry
+      success: true,
+      message: 'Login successful',
+      token,
+      user: userResponse,
+      redirectTo,
+      loginType,
+      expiresIn: tokenExpiry
     });
-}catch(err){
-    console.log(err);
-        return res.status(400).json({"message" : `${err.message}`});
+
+  } catch (err) {
+    console.log("Login error:", err);
+    return res.status(500).json({ message: `Server error: ${err.message}` });
+  }
 };
 
-}
+
 
 
 const logout = (req, res) => {
@@ -401,7 +467,7 @@ const register = async (req, res) => {
             mobileNumber, 
             password, //admin123
             confirmPassword,
-            department, 
+          
             registerAs, 
             secretKey 
         } = form;
@@ -444,7 +510,7 @@ const register = async (req, res) => {
         if (!['Department Head', 'Admin'].includes(registerAs)) {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid registration type. Must be HR or Admin'
+                message: 'Invalid registration type. Must be Department Head or Admin'
             });
         }
 
@@ -456,9 +522,13 @@ const register = async (req, res) => {
             });
         }
 
-         const nameParts = fullName.trim().split(' ');
-        const firstName = nameParts[0];
-        const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+         const nameParts = fullName.trim().split(/\s+/);
+
+const firstName = nameParts[0];
+const lastName = nameParts.length > 1
+  ? nameParts.slice(1).join(' ')
+  : "";
+
 
         const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
         const DEPARTMENT_HEAD_SECRET_KEY= process.env.DEPARTMENT_HEAD_SECRET_KEY;
@@ -472,7 +542,8 @@ const register = async (req, res) => {
     password, // Will be hashed by pre-save middleware
     role: registerAs,
     isActive: true,
-    status: 'active'
+    status: 'active',
+    AccessKey : ADMIN_SECRET_KEY
 });
            
         }else if(registerAs === 'Department Head' && secretKey === DEPARTMENT_HEAD_SECRET_KEY){
@@ -484,28 +555,26 @@ const user = await User.create({
     password, // Will be hashed by pre-save middleware
     role: registerAs,
     isActive: true,
-    status: 'active'
+    status: 'active',
+    AccessKey : DEPARTMENT_HEAD_SECRET_KEY
 });
-const departmentInfo = await Department.findOneAndUpdate(
-    { name : department }, 
-    { manager: user._id }, 
-    { 
-        new: true, 
-        upsert: false 
-    }
-);
+// const departmentInfo = await Department.findOneAndUpdate(
+//     { name : department }, 
+//     { manager: user._id }, 
+//     { 
+//         new: true, 
+//         upsert: false 
+//     }
+// );
 
-console.log(departmentInfo);
+// console.log(departmentInfo);
         
        
-const employees = await User.updateMany(
-      { department: departmentInfo._id }, 
-  { $set: {reportingManager: fullName } }
-)
+
         }else{
              return res.status(403).json({
                 success: false,
-                message: 'Invalid secret key. Only authorized HRs can register.'
+                message: 'Invalid secret key. Only authorized Head can register.'
             });
         }
 
@@ -547,8 +616,8 @@ const createPassword = async (req, res) => {
     }
 
    
-    const employee = await User.findOne({ employeeId });
-
+    const employee = await User.findOne({ employeeId }).select('password');
+console.log(employee);
     if (!employee) {
       return res.status(404).json({
         success: false,

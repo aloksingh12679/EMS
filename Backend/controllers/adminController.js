@@ -81,7 +81,13 @@ const createEmployee = async (req, res, next) => {
       taxApply,
       joinningDate,
       netSalary,
-      jobType = 'full-time'
+      jobType = 'full-time',
+      // Bank details fields
+      accountHolderName,
+      accountNumber,
+      ifscCode,
+      bankName,
+      branchName
     } = req.body;
 
     console.log(address);
@@ -138,15 +144,16 @@ const createEmployee = async (req, res, next) => {
 
     console.log(departmentInfo);
 
-  
-    // let parsedAddress = address;
-    // if (typeof address === 'string') {
-    //   try {
-    //     parsedAddress = JSON.parse(address);
-    //   } catch (e) {
-    //     parsedAddress = address; 
-    //   }
-    // }
+    // Prepare bank details object (only if data is provided)
+    const bankDetails = {};
+    if (accountHolderName || accountNumber || ifscCode || bankName || branchName) {
+      if (accountHolderName) bankDetails.accountHolderName = accountHolderName;
+      if (accountNumber) bankDetails.accountNumber = accountNumber;
+      if (ifscCode) bankDetails.ifscCode = ifscCode.toUpperCase();
+      if (bankName) bankDetails.bankName = bankName;
+      if (branchName) bankDetails.branchName = branchName;
+      bankDetails.addedAt = new Date();
+    }
 
     // Create employee
     const employee = new User({
@@ -171,9 +178,11 @@ const createEmployee = async (req, res, next) => {
         filename: filename
       } : null,
       isActive: true,
+      // Add bank details if provided
+      ...(Object.keys(bankDetails).length > 0 && { bankDetails })
     });
 
-  const emp =  await employee.save();
+    const emp = await employee.save();
 
     const salaryDetail = new Salary({
       employee: emp._id, 
@@ -220,6 +229,7 @@ const createEmployee = async (req, res, next) => {
     });
   }
 };
+
 
 const sentEmail = async(req,res) => {
   try {
@@ -299,63 +309,225 @@ Salaries :  employeeSalaries
   }
 }
 
-const updateEmployee = async(req,res) => {
- try{
-  const {id} = req.params;
-  const updatedData = req.body;
+const updateEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+    console.log("Update Data:", updatedData);
 
-  const {department} = updatedData;
-  
- const departmentInfo = await Department.findOne({name : department}).populate("manager" , "firstName lastName");
+    const { 
+      department, 
+      personalLeave, 
+      sickLeave, 
+      annualLeave,
+      ...otherData 
+    } = updatedData;
 
-let profilePhoto;
-    if (typeof req.file != "undefined") {
-        let url = req.file.path;
-        let filename = req.file.filename;
-       profilePhoto = { url, filename };
+    // Prepare update object
+    const updateFields = { ...otherData };
+
+    // Handle department update
+    if (department) {
+      const departmentInfo = await Department.findOne({ name: department }).populate("manager", "firstName lastName");
+      
+      if (departmentInfo) {
+        updateFields.department = departmentInfo._id;
+        updateFields.reportingManager = departmentInfo?.manager 
+          ? `${departmentInfo.manager.firstName} ${departmentInfo.manager.lastName}` 
+          : "NOT ALLOTED";
+      }
     }
 
+    // Handle profile photo update
+    if (typeof req.file !== "undefined") {
+      let url = req.file.path;
+      let filename = req.file.filename;
+      updateFields.profilePhoto = { url, filename };
+    }
 
-  const employee = await User.findByIdAndUpdate(id , { ...updatedData , department : departmentInfo._id , 
-        reportingManager : `${departmentInfo?.manager?.firstName || "NOT AllOTED"}`,
-        profilePhoto
+    // Handle leave balance update
+    if (personalLeave !== undefined || sickLeave !== undefined || annualLeave !== undefined) {
+      // Get current employee to preserve existing leave balance
+      const currentEmployee = await User.findById(id);
+      
+      updateFields.leaveBalance = {
+        personal: personalLeave !== undefined ? parseInt(personalLeave) : (currentEmployee?.leaveBalance?.personal || 0),
+        sick: sickLeave !== undefined ? parseInt(sickLeave) : (currentEmployee?.leaveBalance?.sick || 0),
+        annual: annualLeave !== undefined ? parseInt(annualLeave) : (currentEmployee?.leaveBalance?.annual || 0)
+      };
+      
+      console.log("Updated Leave Balance:", updateFields.leaveBalance);
+    }
 
-  } , {new :true , runValidators : true})
-  .select('-password').populate('department' , 'name');
+    // Update employee
+    const employee = await User.findByIdAndUpdate(
+      id,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    )
+    .select('-password')
+    .populate('department', 'name');
 
-console.log(employee);
-  if(!employee){
-    return res.status(status.NOT_FOUND).json({
-                success: false,
-                message: 'Employee not found'
-            });
+    console.log("Updated Employee:", employee);
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: 'Employee not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Employee updated successfully',
+      data: employee
+    });
+
+  } catch (err) {
+    console.log("Update employee error:", err);
+    
+    if (err.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid employee ID'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error updating employee',
+      error: err.message
+    });
   }
+};
 
-   res.status(status.OK).json({
-            success: true,
-            message: 'Employee updated successfully',
+
+const updateProfile = async (req, res) => {
+  try {
+    console.log("Update Profile Request");
+    console.log("Request Body:", req.body);
+    console.log("Request File:", req.file);
+
+    const userId = req.user._id; // Get user ID from authenticated user
+    const { 
+      firstName, 
+      lastName, 
+      email, 
+      contactNumber, 
+      position, 
+      AccessKey, 
+      address 
+    } = req.body;
+
+    // Find the current user
+    const currentUser = await User.findById(userId);
+    
+    if (!currentUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // // Verify AccessKey if provided (for security - optional)
+    // if (AccessKey) {
+    //   const isAccessKeyValid = await .compare(currentUser.password);
+      
+    //   if (!isAccessKeyValid) {
+    //     return res.status(401).json({
+    //       success: false,
+    //       message: 'Invalid Access Key. Please enter correct password.'
+    //     });
+    //   }
+    // }
+
+    // Check if email is being changed and if it already exists
+    if (email && email !== currentUser.email) {
+      const existingUser = await User.findOne({ 
+        email, 
+        _id: { $ne: userId } 
+      });
+      
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already exists'
         });
- }catch(err){
+      }
+    }
 
+    // Prepare update object
+    const updateFields = {};
 
-  console.log("update employee error" , err);
-  if (err.name === 'CastError') {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid employee ID'
-            });
-        }
+    if (firstName) updateFields.firstName = firstName;
+    if (lastName) updateFields.lastName = lastName;
+    if (email) updateFields.email = email;
+    if (contactNumber) updateFields.contactNumber = contactNumber;
+    if (position) updateFields.position = position;
+    if (address) updateFields.address = address;
+    if (AccessKey) updateFields.AccessKey =  AccessKey;
 
+    // Handle profile photo update
+    if (typeof req.file !== "undefined") {
+      const url = req.file.path;
+      const filename = req.file.filename;
+      updateFields.profilePhoto = { url, filename };
+      
+      console.log("Profile Photo Updated:", updateFields.profilePhoto);
+    }
 
-         res.status(500).json({
-            success: false,
-            message: 'Error updating employee'
-        });
+    // Update user profile
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    )
+    .select('-password') // Exclude password from response
+    .populate('department', 'name code');
 
+    console.log("Updated User:", updatedUser);
 
- }
-}
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'Failed to update profile'
+      });
+    }
 
+    return res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: updatedUser
+    });
+
+  } catch (err) {
+    console.error("Update profile error:", err);
+    
+    // Handle specific errors
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors
+      });
+    }
+
+    if (err.code === 11000) {
+      // Duplicate key error
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists'
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Error updating profile',
+      error: err.message
+    });
+  }
+};
 
 const deleteEmployee = async(req,res) => {
   try{
@@ -493,7 +665,7 @@ const getAlldepartments =  async(req,res) => {
     const departments = await Department.find({isActive : true})
     .populate('manager' , 'firstName lastname email')
     .sort({name : 1});
-
+console.log()
     res.status(status.OK).json({
       success : true,
       data : departments
@@ -509,46 +681,244 @@ const getAlldepartments =  async(req,res) => {
 }
 
 
-const createDepartment = async (req,res) => {
-  try{
-    const {name , code , description , budget , manager} = req.body;
+const createDepartment = async (req, res) => {
+  try {
+    const { name, code, description, budget, manager } = req.body;
+    console.log(req.body);
 
-     if(!name && !code && !description){
+    // Validation
+    if (!name || !code || !description) {
       return res.status(400).json({
-        success :false,
-        message : "name , code and decription are required"
-      })
-     }
-      const department = new Department({
-            name,
-            code,
-            description,
-            manager,
-            budget
+        success: false,
+        message: "Name, code and description are required"
+      });
+    }
+
+    // If manager is provided, validate
+    if (manager) {
+      // Check if the user exists and is a Department Head
+      const managerUser = await User.findById(manager);
+      
+      if (!managerUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Selected manager not found"
         });
-        
-        await department.save();
-         res.status(status.OK).json({
-            success: true,
-            message: 'Department created successfully',
-            data: department
+      }
+
+      // Check if user is a Department Head
+      if (managerUser.role !== "Department Head" && managerUser.position !== "Department Head") {
+        return res.status(400).json({
+          success: false,
+          message: "Selected employee is not a Department Head"
         });
-  }catch(err){
- console.error('Create department error:', error);
-        
-        if (err.code === 11000) {
-            return res.status(400).json({
-                success: false,
-                message: 'Department name or code already exists'
-            });
-        }
-        
-        res.status(500).json({
-            success: false,
-            message: 'Error creating department'
+      }
+
+      // Check if this Department Head is already managing another department
+      const existingDepartment = await Department.findOne({ 
+        manager: manager,
+        isActive: true 
+      });
+
+      if (existingDepartment) {
+        return res.status(400).json({
+          success: false,
+          message: `This Department Head is already managing ${existingDepartment.name} department`
         });
+      }
+    }
+
+    // Create department
+    const department = new Department({
+      name,
+      code,
+      description,
+      manager: manager || null,
+      budget: budget || 0
+    });
+
+   const departmentInfo =  await department.save();
+
+    // Populate manager details for response
+    await department.populate('manager', 'firstName lastName email employeeId');
+
+    res.status(201).json({
+      success: true,
+      message: 'Department created successfully',
+      data: department
+    });
+
+  } catch (err) {
+    console.error('Create department error:', err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Department name or code already exists'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error creating department',
+      error: err.message
+    });
   }
-}
+};
+const deleteDepartment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find department
+    const department = await Department.findById(id);
+    if (!department) {
+      return res.status(404).json({
+        success: false,
+        message: 'Department not found'
+      });
+    }
+
+    // Check if there are employees in this department
+    const employeeCount = await User.countDocuments({ department: id });
+    console.log(employeeCount);
+    if (employeeCount > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete department. ${employeeCount} employee(s) are assigned to this department. Please reassign or remove employees first.`
+      });
+    }
+
+    // Delete department
+    await Department.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Department deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Error deleting department:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete department',
+      error: error.message
+    });
+  }
+};
+
+
+const updateDepartment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, code, description, budget, manager } = req.body;
+
+    // Find existing department
+    const existingDept = await Department.findById(id);
+    if (!existingDept) {
+      return res.status(404).json({
+        success: false,
+        message: "Department not found"
+      });
+    }
+
+    let managerChanged = false;
+    let newManagerFullName = "NOT ALLOTED";
+
+    // If manager is being updated, validate
+    if (manager && manager !== existingDept.manager?.toString()) {
+      // Check if the new manager exists and is a Department Head
+      const managerUser = await User.findById(manager);
+      
+      if (!managerUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Selected manager not found"
+        });
+      }
+
+      // Check if user is a Department Head
+      if (managerUser.role !== "Department Head" && managerUser.position !== "Department Head") {
+        return res.status(400).json({
+          success: false,
+          message: "Selected employee is not a Department Head"
+        });
+      }
+
+      // Check if this Department Head is already managing another department
+      const otherDepartment = await Department.findOne({ 
+        manager: manager,
+        _id: { $ne: id },  // Exclude current department
+        isActive: true 
+      });
+
+      if (otherDepartment) {
+        return res.status(400).json({
+          success: false,
+          message: `This Department Head is already managing ${otherDepartment.name} department`
+        });
+      }
+
+      // Set flag and manager name
+      managerChanged = true;
+      newManagerFullName = `${managerUser.firstName} ${managerUser.lastName}`;
+    }
+
+    // If manager is being removed (set to null or empty)
+    if (manager === null || manager === "" || manager === undefined) {
+      if (existingDept.manager) {
+        managerChanged = true;
+        newManagerFullName = "NOT ALLOTED";
+      }
+    }
+
+    // Update department
+    const updateData = {
+      name: name || existingDept.name,
+      code: code || existingDept.code,
+      description: description || existingDept.description,
+      budget: budget !== undefined ? budget : existingDept.budget,
+      manager: manager || null
+    };
+
+    const updatedDepartment = await Department.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('manager', 'firstName lastName email employeeId');
+
+    // Update all employees' reporting manager if manager changed
+    if (managerChanged) {
+      await User.updateMany(
+        { department: updatedDepartment._id },
+        { $set: { reportingManager: newManagerFullName } }
+      );
+      
+      console.log(`Updated reporting manager to "${newManagerFullName}" for all employees in ${updatedDepartment.name}`);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Department updated successfully',
+      data: updatedDepartment
+    });
+
+  } catch (err) {
+    console.error('Update department error:', err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Department name or code already exists'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error updating department',
+      error: err.message
+    });
+  }
+};
 
 //todo getAllEmployees 
 const getAllEmployees = async(req,res) => {
@@ -634,6 +1004,10 @@ const getleavesDetail = async (req,res) => {
       error: error.message
     });
   }
+}
+
+const updateLeavebalance = async(req,res) => {
+
 }
 
 const leaveAction = async (req, res) => {
@@ -880,10 +1254,12 @@ const getDepartmentTasks = async(req,res) => {
      let departmentDetails;
      let departmentEmployees;
      let departmentTasks;
-     if(req.user.role === "Admin"){
+     if(req.user.role === "Admin" || req.user.role === "Department Head"){
        departmentDetails = await Department.find({}).populate("manager" , "firstName lastName");
-      departmentEmployees = await User.find({role : "employee"});
-     }else{
+departmentEmployees = await User.find({
+  role: { $in: ["employee", "Department Head"] }
+});   
+  }else{
  departmentDetails = await Department.findOne({
   manager: new mongoose.Types.ObjectId(id)
 }).populate("manager", "firstName lastName");
@@ -929,7 +1305,71 @@ const getDepartmentTasks = async(req,res) => {
 
 
 
+const payIndividual = async (req, res) => {
+  try {
+    const { salaryId } = req.params;
+    console.log(salaryId);
 
+    // Find the salary record
+    const salaryRecord = await Salary.findById(salaryId).populate('employee');
+    
+    if (!salaryRecord) {
+      return res.status(404).json({
+        success: false,
+        message: 'Salary record not found'
+      });
+    }
+
+    // Check if already paid
+    if (salaryRecord.Status.toLowerCase() === 'paid') {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment already processed for this employee'
+      });
+    }
+
+    // Check if bank details exist
+    if (!salaryRecord.employee.bankDetails || !salaryRecord.employee.bankDetails.accountNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bank details not found for this employee'
+      });
+    }
+
+    // Update status to Paid
+    salaryRecord.Status = 'paid';
+    salaryRecord.paymentDate = new Date();
+    await salaryRecord.save();
+
+    // Send confirmation email to employee
+    // const emailSent = await sendPaymentConfirmationEmail(
+    //   salaryRecord.employee.email,
+    //   {
+    //     employeeName: `${salaryRecord.employee.firstName} ${salaryRecord.employee.lastName}`,
+    //     amount: salaryRecord.netSalary,
+    //     month: salaryRecord.month,
+    //     accountNumber: salaryRecord.employee.bankDetails.accountNumber.slice(-4),
+    //     bankName: salaryRecord.employee.bankDetails.bankName
+    //   }
+    // );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Payment processed successfully',
+      data: {
+        salaryRecord,
+      }
+    });
+
+  } catch (error) {
+    console.error('Error processing individual payment:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to process payment',
+      error: error.message
+    });
+  }
+};
 
 
 
@@ -950,12 +1390,16 @@ module.exports = {
     deleteEmployee,
     getAlldepartments,
     createDepartment,
+    deleteDepartment,
+    updateDepartment,
     getleavesDetail,
     getEmployeesSalary,
     updateSalary,
     addTask,
+    updateProfile,
     runPayroll,
     leaveAction,
     sentEmail,
-    getDepartmentTasks
+    getDepartmentTasks,
+    payIndividual
 }

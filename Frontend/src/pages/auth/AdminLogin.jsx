@@ -15,10 +15,16 @@ import AdminSidePic from "../../assets/images/Admin.jpg";
 export default function AdminLogin() {
   const [view, setView] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  const [showAccessKey, setShowAccessKey] = useState(false);
   const {login} = useAuth();
+  
+  // Login form states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginType, setLoginType] = useState("Admin");
+  const [accessKey, setAccessKey] = useState("");
+  
+  // Forgot password states
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -49,27 +55,31 @@ export default function AdminLogin() {
       errors.password = "Password is required!";
     } else if (values.password.length < 4) {
       errors.password = "Password must be at least 4 characters";
-    } else if (values.password.length > 10) {
-      errors.password = "Password cannot exceed 10 characters";
+    } else if (values.password.length > 15) {
+      errors.password = "Password cannot exceed 15 characters";
+    }
+
+    if (!values.accessKey) {
+      errors.accessKey = `${values.loginType} Access Key is required!`;
     }
     
     return errors;
   };
 
   const handleLoginSubmit = async () => {
-    const errors = validate({ email, password });
+    const errors = validate({ email, password, accessKey, loginType });
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
       setIsLoading(true);
       
       try {
-        const result = await login(email, password, false, "Admin");
+        const result = await login(email, password, accessKey, null ,loginType);
         console.log(result);
         if(result.success){
-          showToast('Login successfully! Redirecting...', 'success');
+          showToast('Login successful! Redirecting...', 'success');
           setTimeout(() => {
-            window.location.href = "/admin/dashboard";
+            window.location.href = loginType === "Admin" ? "/admin/dashboard" : "/admin/dashboard";
           }, 1500); 
         }
       } catch (error) {
@@ -275,9 +285,29 @@ export default function AdminLogin() {
                 </div>
 
                 <div className="space-y-5">
+                  {/* Login Type Selection */}
                   <div>
                     <label className="block text-sm font-semibold text-blue-900 mb-2">
-                      Work Email
+                      Login Type <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={loginType}
+                      onChange={(e) => {
+                        setLoginType(e.target.value);
+                        setAccessKey("");
+                        if (formErrors.accessKey) setFormErrors({ ...formErrors, accessKey: "" });
+                      }}
+                      disabled={isLoading}
+                      className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      <option value="Admin">Admin</option>
+                      <option value="Department Head">Department Head</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      Work Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
@@ -311,7 +341,7 @@ export default function AdminLogin() {
 
                   <div>
                     <label className="block text-sm font-semibold text-blue-900 mb-2">
-                      Password
+                      Password <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <input
@@ -353,8 +383,56 @@ export default function AdminLogin() {
                     )}
                   </div>
 
+                  {/* Access Key Field */}
+                  <div>
+                    <label className="block text-sm font-semibold text-blue-900 mb-2">
+                      {loginType} Access Key <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showAccessKey ? "text" : "password"}
+                        name="accessKey"
+                        placeholder="Enter your access key"
+                        value={accessKey}
+                        onChange={(e) => {
+                          setAccessKey(e.target.value);
+                          if (formErrors.accessKey) setFormErrors({ ...formErrors, accessKey: "" });
+                        }}
+                        disabled={isLoading}
+                        className={`
+                          w-full px-4 py-3 pr-12
+                          bg-blue-50
+                          border-2 
+                          ${formErrors.accessKey ? 'border-red-500' : 'border-blue-200'}
+                          rounded-lg
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          transition-all
+                          text-sm font-medium
+                        `}
+                        autoComplete="off"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAccessKey(!showAccessKey)}
+                        disabled={isLoading}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-700 hover:text-blue-900 disabled:opacity-50"
+                      >
+                        {showAccessKey ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                      </button>
+                    </div>
+                    {formErrors.accessKey && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <span>⚠</span> {formErrors.accessKey}
+                      </p>
+                    )}
+                    <p className="text-xs text-blue-600 mt-1.5 flex items-center gap-1">
+                      <BsShieldLock size={12} />
+                      Unique key for {loginType} authentication
+                    </p>
+                  </div>
+
                   <div className="flex justify-end">
-                   
                     <button
                       type="button"
                       onClick={() => setView("forgotPassword")}
@@ -624,7 +702,7 @@ export default function AdminLogin() {
                   <button
                     onClick={handleResetPassword}
                     disabled={isLoading}
-                    className="w-full h-12 bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold rounded-lg shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]"
+                    className="w-full h-12 bg-gradient-to-r from-blue-900 to-blue-800 text-white font-semibold rounded-lg shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0-98]"
                   >
                     {isLoading ? "Resetting Password..." : "Reset Password"}
                   </button>

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import AdminSidebar from "../../Components/AdminSidebar";
-import { MdPerson, MdBadge, MdAttachMoney, MdCheckCircle, MdEmail, MdPersonAdd, MdClose } from "react-icons/md";
+import { MdPerson, MdBadge, MdAttachMoney, MdCheckCircle, MdEmail, MdPersonAdd, MdClose, MdAccountBalance } from "react-icons/md";
 import {employeeService} from '../../services/employeeServices.js';
 import { emailService } from "../../services/emailServices.js";
+import { useEffect } from "react";
+
 export default function AddEmployee() {
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -11,9 +13,21 @@ export default function AddEmployee() {
     const [profilePhoto, setProfilePhoto] = useState(null);
     const [profilePhotoPreview, setProfilePhotoPreview] = useState(null);
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-const [photoUploadError, setPhotoUploadError] = useState("");
-const [isSubmitting, setIsSubmitting] = useState(false);
- const [isSendingEmail, setIsSendingEmail] = useState(false);
+    const [photoUploadError, setPhotoUploadError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
+   const [departmentNames, setDepartmentNames] = useState([]);
+
+useEffect(() => {
+  fetchDepartmentsName();
+}, []);
+
+const fetchDepartmentsName = async () => {
+  const result = await employeeService.getDepartmentTasks();
+  console.log(result);
+  setDepartmentNames(result?.data?.departmentDetails || []);
+};
+    
     const [formData, setFormData] = useState({
         // Step 1 - Personal
         firstName: "",
@@ -32,13 +46,20 @@ const [isSubmitting, setIsSubmitting] = useState(false);
         baseSalary: "",
         taxApply: "",
         allowances: "",
-        deductions: ""
+        deductions: "",
+        // Step 4 - Bank Details
+        accountHolderName: "",
+        accountNumber: "",
+        ifscCode: "",
+        bankName: "",
+        branchName: ""
     });
 
     const steps = [
         { number: 1, label: "Personal", icon: <MdPerson /> },
         { number: 2, label: "Job Details", icon: <MdBadge /> },
         { number: 3, label: "Salary Info", icon: <MdAttachMoney /> },
+        { number: 4, label: "Bank Details", icon: <MdAccountBalance /> },
     ];
 
     const handleInputChange = (e) => {
@@ -48,30 +69,30 @@ const [isSubmitting, setIsSubmitting] = useState(false);
         });
     };
 
-   const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-            showToast('Please select an image file', 'error');
-            return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('File size should be less than 5MB', 'error');
-            return;
-        }
+    const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file', 'error');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('File size should be less than 5MB', 'error');
+                return;
+            }
 
-        setProfilePhoto(file);
-        setPhotoUploadError("");
+            setProfilePhoto(file);
+            setPhotoUploadError("");
 
-        // Create preview only - no upload yet
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setProfilePhotoPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-    }
-};
+            // Create preview only - no upload yet
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfilePhotoPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const showToast = (message, type = "error") => {
         setToast({ show: true, message, type });
@@ -132,13 +153,24 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                 showToast("Please enter a valid tax percentage");
                 return false;
             }
+        } else if (step === 4) {
+          
+            if (formData.accountNumber.trim() && !formData.ifscCode.trim()) {
+                showToast("Please enter IFSC code");
+                return false;
+            }
+            // Validate IFSC code format if provided
+            if (formData.ifscCode.trim() && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifscCode.toUpperCase())) {
+                showToast("Please enter a valid IFSC code (e.g., SBIN0001234)");
+                return false;
+            }
         }
         return true;
     };
 
     const handleNextStep = () => {
         if (validateStep(currentStep)) {
-            if (currentStep < 3) {
+            if (currentStep < 4) {
                 setCurrentStep(currentStep + 1);
             }
         }
@@ -149,81 +181,88 @@ const [isSubmitting, setIsSubmitting] = useState(false);
             setCurrentStep(currentStep - 1);
         }
     };
-   const handleSubmit = async(e) => {
-    e.preventDefault();
 
-    if (validateStep(3)) {
-        setIsSubmitting(true);
-        if (profilePhoto) {
-            setIsUploadingPhoto(true);
-        }
-        
-        try {
-            const data = new FormData();
-    
-            // Append all text fields
-            data.append('firstName', formData.firstName);
-            data.append('lastName', formData.lastName);
-            data.append('personalEmail', formData.personalEmail);
-            data.append('contactNumber', formData.contactNumber);
-            data.append('dob', formData.dob);
-            data.append('gender', formData.gender);
-            data.append('address', formData.address);
-            data.append('department', formData.department);
-            data.append('jobType', formData.jobType);
-            data.append('position', formData.position);
-            data.append('joiningDate', formData.joiningDate);
-            data.append('baseSalary', formData.baseSalary);
-            data.append('taxApply', formData.taxApply);
-            data.append('allowances', formData.allowances);
-            data.append('deductions', formData.deductions);
-    
-            const baseSalary = parseFloat(formData.baseSalary) || 0;
-            const allowances = parseFloat(formData.allowances) || 0;
-            const deductions = parseFloat(formData.deductions) || 0;
-            const taxApply = parseFloat(formData.taxApply) || 0;
+    const handleSubmit = async(e) => {
+        e.preventDefault();
 
-            const netSalary = (
-                baseSalary + 
-                allowances - 
-                deductions -
-                (baseSalary * taxApply / 100)
-            ).toFixed(2);
-
-            data.append('netSalary', netSalary);
-
+        if (validateStep(4)) {
+            setIsSubmitting(true);
             if (profilePhoto) {
-                data.append('profilePhoto', profilePhoto);
+                setIsUploadingPhoto(true);
             }
+            
+            try {
+                const data = new FormData();
+        
+                // Append all text fields
+                data.append('firstName', formData.firstName);
+                data.append('lastName', formData.lastName);
+                data.append('personalEmail', formData.personalEmail);
+                data.append('contactNumber', formData.contactNumber);
+                data.append('dob', formData.dob);
+                data.append('gender', formData.gender);
+                data.append('address', formData.address);
+                data.append('department', formData.department);
+                data.append('jobType', formData.jobType);
+                data.append('position', formData.position);
+                data.append('joiningDate', formData.joiningDate);
+                data.append('baseSalary', formData.baseSalary);
+                data.append('taxApply', formData.taxApply);
+                data.append('allowances', formData.allowances);
+                data.append('deductions', formData.deductions);
+        
+                // Append bank details (only if provided)
+                if (formData.accountHolderName) data.append('accountHolderName', formData.accountHolderName);
+                if (formData.accountNumber) data.append('accountNumber', formData.accountNumber);
+                if (formData.ifscCode) data.append('ifscCode', formData.ifscCode.toUpperCase());
+                if (formData.bankName) data.append('bankName', formData.bankName);
+                if (formData.branchName) data.append('branchName', formData.branchName);
 
-            const result = await employeeService.addEmployee(data);
-            
-            setIsUploadingPhoto(false);
-            setIsSubmitting(false);
-            
-            if (result.success) {
-                setEmployeeId(result.data.employeeId);
-                setIsSubmitted(true);
-                showToast(result.message, 'success');
-            }
-           
-        } catch(err) {
-            setIsUploadingPhoto(false);
-            setIsSubmitting(false);
-            
-           
-            if (err.message === 'Network Error' || !err.response) {
-                setPhotoUploadError("Network connection weak. Please try again.");
-                showToast('Upload failed. Network connection weak. Please check your internet.', 'error');
-            } else {
-                showToast(err.response?.data?.message || err.message || 'Failed to add employee', 'error');
+                const baseSalary = parseFloat(formData.baseSalary) || 0;
+                const allowances = parseFloat(formData.allowances) || 0;
+                const deductions = parseFloat(formData.deductions) || 0;
+                const taxApply = parseFloat(formData.taxApply) || 0;
+
+                const netSalary = (
+                    baseSalary + 
+                    allowances - 
+                    deductions -
+                    (baseSalary * taxApply / 100)
+                ).toFixed(2);
+
+                data.append('netSalary', netSalary);
+
+                if (profilePhoto) {
+                    data.append('profilePhoto', profilePhoto);
+                }
+
+                const result = await employeeService.addEmployee(data);
+                
+                setIsUploadingPhoto(false);
+                setIsSubmitting(false);
+                
+                if (result.success) {
+                    setEmployeeId(result.data.employeeId);
+                    setIsSubmitted(true);
+                    showToast(result.message, 'success');
+                }
+               
+            } catch(err) {
+                setIsUploadingPhoto(false);
+                setIsSubmitting(false);
+                
+                if (err.message === 'Network Error' || !err.response) {
+                    setPhotoUploadError("Network connection weak. Please try again.");
+                    showToast('Upload failed. Network connection weak. Please check your internet.', 'error');
+                } else {
+                    showToast(err.response?.data?.message || err.message || 'Failed to add employee', 'error');
+                }
             }
         }
-    }
-};
+    };
 
     const handleEmailEmployee = async() => {
-        setIsSendingEmail(true); // Start loading
+        setIsSendingEmail(true);
         
         try {
             const response = await emailService.registraionEmail(formData, employeeId);
@@ -238,7 +277,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                 "error"
             );
         } finally {
-            setIsSendingEmail(false); // Stop loading
+            setIsSendingEmail(false);
         }
     };
 
@@ -258,7 +297,12 @@ const [isSubmitting, setIsSubmitting] = useState(false);
             baseSalary: "",
             taxApply: "",
             allowances: "",
-            deductions: ""
+            deductions: "",
+            accountHolderName: "",
+            accountNumber: "",
+            ifscCode: "",
+            bankName: "",
+            branchName: ""
         });
         setProfilePhoto(null);
         setProfilePhotoPreview(null);
@@ -283,7 +327,12 @@ const [isSubmitting, setIsSubmitting] = useState(false);
             baseSalary: "",
             taxApply: "",
             allowances: "",
-            deductions: ""
+            deductions: "",
+            accountHolderName: "",
+            accountNumber: "",
+            ifscCode: "",
+            bankName: "",
+            branchName: ""
         });
         setProfilePhoto(null);
         setProfilePhotoPreview(null);
@@ -326,18 +375,17 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                     animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 }
             `}</style>
-             {/* Email Sending Loading Overlay */}
+
+            {/* Email Sending Loading Overlay */}
             {isSendingEmail && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
                         <div className="flex flex-col items-center gap-5">
-                            {/* Animated Mail Icon */}
                             <div className="relative">
                                 <MdEmail className="text-blue-500 animate-pulse" size={64} />
                                 <div className="absolute -bottom-2 -right-2 w-6 h-6 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                             </div>
                             
-                            {/* Loading Text */}
                             <div className="text-center">
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                                     Sending Email...
@@ -350,7 +398,6 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                 </p>
                             </div>
                             
-                            {/* Animated Dots */}
                             <div className="flex gap-2">
                                 <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
                                 <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
@@ -390,7 +437,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                             </div>
                         </div>
 
-                        {/* Step Progress - Hidden on mobile when submitted */}
+                        {/* Step Progress */}
                         {!isSubmitted && (
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 overflow-x-auto">
                                 <div className="flex items-center justify-between min-w-max sm:min-w-0">
@@ -419,18 +466,16 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                             </div>
                         )}
 
-                        {/* Success Message - Step 4 */}
+                        {/* Success Message */}
                         {isSubmitted && (
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 sm:p-12">
                                 <div className="text-center space-y-6">
-                                    {/* Success Icon */}
                                     <div className="flex justify-center">
                                         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
                                             <MdCheckCircle className="text-green-600 text-5xl" />
                                         </div>
                                     </div>
 
-                                    {/* Success Message */}
                                     <div>
                                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                                             Employee Added Successfully!
@@ -440,13 +485,11 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                         </p>
                                     </div>
 
-                                    {/* Employee ID Card */}
                                     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-6 inline-block mx-auto">
                                         <p className="text-sm text-gray-600 mb-2">Employee ID</p>
                                         <p className="text-2xl font-bold text-blue-600">{employeeId}</p>
                                     </div>
 
-                                    {/* Employee Details Summary */}
                                     <div className="bg-gray-50 rounded-lg p-6 text-left space-y-3 max-w-md mx-auto">
                                         <div className="flex justify-between">
                                             <span className="text-sm text-gray-600">Name:</span>
@@ -458,17 +501,18 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                             <span className="text-sm text-gray-600">Email:</span>
                                             <span className="text-sm font-semibold text-gray-900">{formData.personalEmail}</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-sm text-gray-600">Position:</span>
-                                            <span className="text-sm font-semibold text-gray-900">{formData.position}</span>
-                                        </div>
+                                        <div className="flex justify-between items-center">
+   <span className="text-sm text-gray-600">position:</span>
+                                            <span className="text-sm font-semibold text-gray-900 capitalize">{formData.position}</span>
+
+ 
+</div>
                                         <div className="flex justify-between">
                                             <span className="text-sm text-gray-600">Department:</span>
                                             <span className="text-sm font-semibold text-gray-900 capitalize">{formData.department}</span>
                                         </div>
                                     </div>
 
-                                    {/* Action Buttons */}
                                     <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                                         <button
                                             onClick={handleEmailEmployee}
@@ -674,36 +718,47 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                     {/* Department & Position */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-900 mb-2">
-                                                Department Name <span className="text-red-500">*</span>
-                                            </label>
-                                            <select
-                                                name="department"
-                                                value={formData.department}
-                                                onChange={handleInputChange}
-                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-600"
-                                            >
-                                                <option value="">Select department</option>
-                                                <option value="Information Technology">Information Technology</option>
-                                                <option value="Human Resources">Human Resources</option>
-                                                <option value="Finance">Finance</option>
-                                                <option value="Sales">Sales</option>
-                                                <option value="Marketing">Marketing</option>
-                                                <option value="Operations">Operations</option>
-                                            </select>
-                                        </div>
+  <label className="block text-sm font-medium text-gray-900 mb-2">
+    Department Name <span className="text-red-500">*</span>
+  </label>
+
+  <select
+    name="department"
+    value={formData.department}
+    onChange={handleInputChange}
+    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-600"
+  >
+    <option value="">Select department</option>
+
+    {departmentNames.map((dept) => (
+      <option key={dept._id} value={dept.name}>
+        {dept.name}
+      </option>
+    ))}
+  </select>
+</div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-900 mb-2">
-                                                Position <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="position"
-                                                value={formData.position}
-                                                onChange={handleInputChange}
-                                                placeholder="e.g. Senior Developer"
-                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                            />
+                                           <label className="block text-sm font-medium text-gray-900 mb-2">
+    Position <span className="text-red-500">*</span>
+  </label>
+
+  <select
+    name="position"
+    value={formData.position}
+    onChange={handleInputChange}
+    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-700"
+  >
+    <option value="">Select position</option>
+    <option value="Frontend Developer">Frontend Developer</option>
+    <option value="Backend Developer">Backend Developer</option>
+    <option value="Full Stack Developer">Full Stack Developer</option>
+    <option value="Team Leader">Team Leader</option>
+    <option value="UI/UX Designer">UI/UX Designer</option>
+    <option value="Quality Analyst">Quality Analyst</option>
+    <option value="DevOps Engineer">DevOps Engineer</option>
+    <option value="Software Tester">Software Tester</option>
+    <option value="Project Manager">Project Manager</option>
+  </select>
                                         </div>
                                     </div>
 
@@ -928,89 +983,192 @@ const [isSubmitting, setIsSubmitting] = useState(false);
                                         <span>←</span>
                                         Previous
                                     </button>
-                                   <button
-    onClick={handleSubmit}
-    disabled={isSubmitting}
-    className={`w-full sm:w-auto px-8 py-3 text-sm font-medium text-white rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md ${
-        isSubmitting 
-            ? 'bg-gray-400 cursor-not-allowed' 
-            : 'bg-green-600 hover:bg-green-700'
-    }`}
->
-    {isSubmitting ? (
-        <>
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            {isUploadingPhoto ? 'Uploading Photo...' : 'Submitting...'}
-        </>
-    ) : (
-        <>
-            Submit Employee
-            <span>✓</span>
-        </>
-    )}
-</button>
+                                    <button
+                                        onClick={handleNextStep}
+                                        className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        Next Step
+                                        <span>→</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* STEP 4 - Bank Details */}
+                        {currentStep === 4 && !isSubmitted && (
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8">
+                                <h2 className="text-lg font-bold text-gray-900 mb-2">Bank Details</h2>
+                                <p className="text-sm text-gray-500 mb-4 sm:mb-6">Bank details are optional but recommended for salary processing</p>
+                                
+                                <div className="space-y-4 sm:space-y-6">
+                                    {/* Account Holder Name */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-900 mb-2">
+                                            Account Holder Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="accountHolderName"
+                                            value={formData.accountHolderName}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter account holder name"
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                        />
+                                    </div>
+
+                                    {/* Account Number & IFSC Code */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-900 mb-2">
+                                                Account Number
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="accountNumber"
+                                                value={formData.accountNumber}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter account number"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-900 mb-2">
+                                                IFSC Code
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="ifscCode"
+                                                value={formData.ifscCode}
+                                                onChange={handleInputChange}
+                                                placeholder="e.g., SBIN0001234"
+                                                maxLength="11"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm uppercase"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Bank Name & Branch Name */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-900 mb-2">
+                                                Bank Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="bankName"
+                                                value={formData.bankName}
+                                                onChange={handleInputChange}
+                                                placeholder="e.g., State Bank of India"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-900 mb-2">
+                                                Branch Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="branchName"
+                                                value={formData.branchName}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter branch name"
+                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Info Box */}
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
+                                        <MdAccountBalance className="text-blue-600 text-xl flex-shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium text-blue-900 mb-1">Why we need this?</p>
+                                            <p className="text-xs text-blue-700">
+                                                Bank details are required for salary processing and direct deposit. You can add or update these details later from the employee profile.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 sm:mt-8 pt-6 border-t border-gray-200">
+                                    <button
+                                        onClick={handlePreviousStep}
+                                        className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <span>←</span>
+                                        Previous
+                                    </button>
+                                    <button
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting}
+                                        className={`w-full sm:w-auto px-8 py-3 text-sm font-medium text-white rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md ${
+                                            isSubmitting 
+                                                ? 'bg-gray-400 cursor-not-allowed' 
+                                                : 'bg-green-600 hover:bg-green-700'
+                                        }`}
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                {isUploadingPhoto ? 'Uploading Photo...' : 'Submitting...'}
+                                            </>
+                                        ) : (
+                                            <>
+                                                Submit Employee
+                                                <span>✓</span>
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
                             </div>
                         )}
                     </div>
-                    {/* {isSubmitting && (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
-            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {isUploadingPhoto ? 'Uploading Photo...' : 'Submitting Employee Data...'}
-            </h3>
-            <p className="text-sm text-gray-500">
-                Please wait, this may take a moment
-            </p>
-        </div>
-    </div>
-)} */}
-<style>{`
-                @keyframes slideLeft {
-                    from {
-                        opacity: 0;
-                        transform: translateX(100%);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(0);
-                    }
-                }
-                .animate-slideLeft {
-                    animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-                @keyframes spin {
-                    to {
-                        transform: rotate(360deg);
-                    }
-                }
-                .animate-spin {
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes bounce {
-                    0%, 100% {
-                        transform: translateY(0);
-                    }
-                    50% {
-                        transform: translateY(-10px);
-                    }
-                }
-                .animate-bounce {
-                    animation: bounce 1s infinite;
-                }
-                @keyframes pulse {
-                    0%, 100% {
-                        opacity: 1;
-                    }
-                    50% {
-                        opacity: 0.5;
-                    }
-                }
-                .animate-pulse {
-                    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-            `}</style>
+
+                    <style>{`
+                        @keyframes slideLeft {
+                            from {
+                                opacity: 0;
+                                transform: translateX(100%);
+                            }
+                            to {
+                                opacity: 1;
+                                transform: translateX(0);
+                            }
+                        }
+                        .animate-slideLeft {
+                            animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                        }
+                        @keyframes spin {
+                            to {
+                                transform: rotate(360deg);
+                            }
+                        }
+                        .animate-spin {
+                            animation: spin 1s linear infinite;
+                        }
+                        @keyframes bounce {
+                            0%, 100% {
+                                transform: translateY(0);
+                            }
+                            50% {
+                                transform: translateY(-10px);
+                            }
+                        }
+                        .animate-bounce {
+                            animation: bounce 1s infinite;
+                        }
+                        @keyframes pulse {
+                            0%, 100% {
+                                opacity: 1;
+                            }
+                            50% {
+                                opacity: 0.5;
+                            }
+                        }
+                        .animate-pulse {
+                            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                        }
+                    `}</style>
                 </main>
             </div>
         </>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { 
   Users, 
@@ -11,9 +10,13 @@ import {
   Calendar,
   AlertCircle,
   Building2,
-  UserCircle
+  UserCircle,
+  Edit,
+  Trash2,
+  Save
 } from "lucide-react";
 import { employeeService } from "../../../services/employeeServices";
+import { departmentService } from "../../../services/departmentService";
 import AdminSidebar from "../../../Components/AdminSidebar";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -21,6 +24,7 @@ export default function Tasks() {
   const [departmentDetails, setDepartmentDetails] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [departmentHeads, setDepartmentHeads] = useState([]);
   const [allTasks, setAllTasks] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -28,7 +32,22 @@ export default function Tasks() {
   const [isLoading, setIsLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("All");
   const { user } = useAuth();
-  const [role , setRole] = useState();
+  const [role, setRole] = useState();
+
+  // Department CRUD States
+  const [showAddDepartmentModal, setShowAddDepartmentModal] = useState(false);
+  const [showEditDepartmentModal, setShowEditDepartmentModal] = useState(false);
+  const [showDeleteDepartmentModal, setShowDeleteDepartmentModal] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Department Form Data
+  const [departmentForm, setDepartmentForm] = useState({
+    name: "",
+    code: "",
+    description: "",
+    manager: ""
+  });
 
   // New Task Form
   const [newTask, setNewTask] = useState({
@@ -84,6 +103,12 @@ export default function Tasks() {
           setDepartments(result.data.departmentDetails || []);
           setEmployees(result.data.departmentEmployees || []);
           setAllTasks(result.data.departmentTasks || []);
+          
+          // Filter only Department Heads
+          const heads = result.data.departmentEmployees.filter(emp => 
+            emp.role === "Department Head" || emp.position === "Department Head"
+          );
+          setDepartmentHeads(heads);
         }
       }
     } catch (err) {
@@ -129,6 +154,102 @@ export default function Tasks() {
       console.log("Error adding task:", err);
       showToast("Failed to add task", "error");
     }
+  };
+
+  // Department CRUD Operations
+  const handleAddDepartment = async (e) => {
+    e.preventDefault();
+    
+    if (!departmentForm.name || !departmentForm.code || !departmentForm.description) {
+      showToast("Please fill all required fields", "error");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const result = await departmentService.createDepartment(departmentForm);
+      console.log(result);
+      
+      if (result && result.success) {
+        showToast("Department created successfully!", "success");
+        setShowAddDepartmentModal(false);
+        setDepartmentForm({ name: "", code: "", description: "", manager: "" });
+        getDepartmentTasks();
+      }
+    } catch (err) {
+      console.log("Error creating department:", err);
+      showToast(err?.response?.data?.message || "Failed to create department", "error");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleEditDepartment = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("hit edit");
+    
+    if (!departmentForm.name || !departmentForm.code || !departmentForm.description) {
+      showToast("Please fill all required fields", "error");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const result = await departmentService.updateDepartment(
+        selectedDepartment._id,
+        departmentForm
+      );
+      console.log(result);
+      if (result && result.success) {
+        showToast("Department updated successfully!", "success");
+        setShowEditDepartmentModal(false);
+        setDepartmentForm({ name: "", code: "", description: "", manager: "" });
+        setSelectedDepartment(null);
+        getDepartmentTasks();
+      }
+    } catch (err) {
+      console.log("Error updating department:", err);
+      showToast(err.response?.data?.message || "Failed to update department", "error");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDeleteDepartment = async () => {
+    try {
+      setIsProcessing(true);
+      console.log("hit");
+      const result = await departmentService.deleteDepartment(selectedDepartment._id);
+      
+      if (result && result.success) {
+        showToast("Department deleted successfully!", "success");
+        setShowDeleteDepartmentModal(false);
+        setSelectedDepartment(null);
+        getDepartmentTasks();
+      }
+    } catch (err) {
+      console.log("Error deleting department:", err);
+      showToast(err.response?.data?.message || "Failed to delete department", "error");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const openEditModal = (dept) => {
+    setSelectedDepartment(dept);
+    setDepartmentForm({
+      name: dept.name,
+      code: dept.code,
+      description: dept.description || "",
+      manager: dept.manager?._id || ""
+    });
+    setShowEditDepartmentModal(true);
+  };
+
+  const openDeleteModal = (dept) => {
+    setSelectedDepartment(dept);
+    setShowDeleteDepartmentModal(true);
   };
 
   const getTaskStats = (employee) => {
@@ -198,7 +319,7 @@ export default function Tasks() {
     );
   }
 
-  // Admin View - Department Cards
+  // Admin View - Department Cards with CRUD
   if (role === "Admin") {
     return (
       <>
@@ -214,18 +335,339 @@ export default function Tasks() {
           </div>
         )}
 
+        {/* Add Department Modal */}
+        {showAddDepartmentModal && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white p-6 border-b rounded-t-xl">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold text-gray-900">Add New Department</h3>
+                  <button
+                    onClick={() => {
+                      setShowAddDepartmentModal(false);
+                      setDepartmentForm({ name: "", code: "", description: "", manager: "" });
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              </div>
+
+              <form onSubmit={handleAddDepartment} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Department Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={departmentForm.name}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, name: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g., Engineering"
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Department Code <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={departmentForm.code}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, code: e.target.value.toUpperCase() })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                    placeholder="e.g., ENG"
+                    maxLength="10"
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Description <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={departmentForm.description}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, description: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    placeholder="Enter department description"
+                    rows="3"
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Assign Manager (Optional)
+                  </label>
+                  <select
+                    value={departmentForm.manager}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, manager: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={isProcessing}
+                  >
+                    <option value="">Select Department Head</option>
+                    {departmentHeads.map((head) => (
+                      <option key={head._id} value={head._id}>
+                        {head.firstName} {head.lastName} - {head.employeeId || head.email}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Only employees with "Department Head" role are shown
+                  </p>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddDepartmentModal(false);
+                      setDepartmentForm({ name: "", code: "", description: "", manager: "" });
+                    }}
+                    disabled={isProcessing}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isProcessing}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:bg-gray-400 flex items-center justify-center gap-2"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Save size={18} />
+                        Create Department
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Department Modal */}
+        {showEditDepartmentModal && selectedDepartment && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white p-6 border-b rounded-t-xl">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold text-gray-900">Edit Department</h3>
+                  <button
+                    onClick={() => {
+                      setShowEditDepartmentModal(false);
+                      setSelectedDepartment(null);
+                      setDepartmentForm({ name: "", code: "", description: "", manager: "" });
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              </div>
+
+              <form onSubmit={handleEditDepartment} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Department Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={departmentForm.name}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, name: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g., Engineering"
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Department Code <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={departmentForm.code}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, code: e.target.value.toUpperCase() })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                    placeholder="e.g., ENG"
+                    maxLength="10"
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Description <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={departmentForm.description}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, description: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    placeholder="Enter department description"
+                    rows="3"
+                    disabled={isProcessing}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Assign Manager (Optional)
+                  </label>
+                  <select
+                    value={departmentForm.manager}
+                    onChange={(e) => setDepartmentForm({ ...departmentForm, manager: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={isProcessing}
+                  >
+                    <option value="">Select Department Head</option>
+                    {departmentHeads.map((head) => (
+                      <option key={head._id} value={head._id}>
+                        {head.firstName} {head.lastName} - {head.employeeId || head.email}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Only employees with "Department Head" role are shown
+                  </p>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditDepartmentModal(false);
+                      setSelectedDepartment(null);
+                      setDepartmentForm({ name: "", code: "", description: "", manager: "" });
+                    }}
+                    disabled={isProcessing}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isProcessing}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:bg-gray-400 flex items-center justify-center gap-2"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <Save size={18} />
+                        Update Department
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Department Modal */}
+        {showDeleteDepartmentModal && selectedDepartment && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full max-w-md">
+              <div className="p-6 border-b">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold text-gray-900">Delete Department</h3>
+                  <button
+                    onClick={() => {
+                      setShowDeleteDepartmentModal(false);
+                      setSelectedDepartment(null);
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                  <AlertCircle className="text-red-600" size={32} />
+                </div>
+                
+                <p className="text-center text-gray-700 mb-2">
+                  Are you sure you want to delete department:
+                </p>
+                <p className="text-center text-lg font-bold text-gray-900 mb-4">
+                  {selectedDepartment.name} ({selectedDepartment.code})?
+                </p>
+                <p className="text-center text-sm text-red-600 mb-6">
+                  This action cannot be undone. All associated data will be removed.
+                </p>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDeleteDepartmentModal(false);
+                      setSelectedDepartment(null);
+                    }}
+                    disabled={isProcessing}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteDepartment}
+                    disabled={isProcessing}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:bg-gray-400 flex items-center justify-center gap-2"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 size={18} />
+                        Delete Department
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="min-h-screen bg-gray-50">
           <AdminSidebar />
           
           <div className="lg:ml-64 p-3 sm:p-6 lg:p-8">
             {/* Header */}
-            <div className="text-center mb-5 sm:mb-6">
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
-                Department Tasks Overview
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                Manage tasks across all departments
-              </p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div className="text-center sm:text-left">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
+                  Department Management
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  Manage departments and assign heads
+                </p>
+              </div>
+              
+              <button
+                onClick={() => setShowAddDepartmentModal(true)}
+                className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+              >
+                <Plus size={20} />
+                Add Department
+              </button>
             </div>
 
             {/* Department Cards */}
@@ -240,25 +682,46 @@ export default function Tasks() {
                   >
                     {/* Department Header */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                           <Building2 className="w-6 h-6 text-blue-600" />
                         </div>
-                        <div>
-                          <h3 className="font-bold text-gray-900 text-base sm:text-lg">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-gray-900 text-base sm:text-lg truncate">
                             {dept.name}
                           </h3>
                           <p className="text-xs text-gray-500">{dept.code}</p>
                         </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex gap-2 ml-2 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => openEditModal(dept)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Edit Department"
+                        >
+                          <Edit size={18} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => openDeleteModal(dept)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete Department"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
                     </div>
 
                     {/* Department Head */}
                     <div className="mb-4 pb-4 border-b border-gray-200">
                       <div className="flex items-center gap-2 text-sm">
-                        <UserCircle className="w-4 h-4 text-gray-400" />
+                        <UserCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
                         <span className="text-gray-600">Head:</span>
-                        <span className={`font-semibold ${dept.manager ? 'text-gray-900' : 'text-orange-600'}`}>
+                        <span className={`font-semibold truncate ${dept.manager ? 'text-gray-900' : 'text-orange-600'}`}>
                           {getDepartmentHead(dept)}
                         </span>
                       </div>
@@ -325,8 +788,13 @@ export default function Tasks() {
     );
   }
 
+  // Department Head View continues with the rest of the existing code...
+  // (The rest remains the same as in your original file)
+
+
   const totalStats = getTotalStats();
 
+  // Department Head View (unchanged)
   return (
     <>
       {/* Toast */}
@@ -557,46 +1025,59 @@ export default function Tasks() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {employees.map((employee) => {
-                        const stats = getTaskStats(employee);
-                        
-                        return (
-                          <tr key={employee._id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
-                                  {employee.firstName.charAt(0)}
-                                </div>
-                                <div>
-                                  <p className="font-semibold text-gray-900 text-sm">
-                                    {employee.firstName} {employee.lastName}
-                                  </p>
-                                  <p className="text-xs text-gray-600">
-                                    {employee.employeeId} • {employee.position}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="text-base font-bold text-gray-900">{stats.total}</span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="text-base font-bold text-green-600">{stats.completed}</span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <span className="text-base font-bold text-orange-600">{stats.pending}</span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <button
-                                onClick={() => setSelectedEmployee(employee)}
-                                className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                              >
-                                View Tasks
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {employees
+  .filter((employee) => employee.role === "employee")
+  .map((employee) => {
+    const stats = getTaskStats(employee);
+
+    return (
+      <tr key={employee._id} className="hover:bg-gray-50 transition-colors">
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
+              {employee.firstName.charAt(0)}
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">
+                {employee.firstName} {employee.lastName}
+              </p>
+              <p className="text-xs text-gray-600">
+                {employee.employeeId} • {employee.position}
+              </p>
+            </div>
+          </div>
+        </td>
+
+        <td className="px-4 py-3 text-center">
+          <span className="text-base font-bold text-gray-900">
+            {stats.total}
+          </span>
+        </td>
+
+        <td className="px-4 py-3 text-center">
+          <span className="text-base font-bold text-green-600">
+            {stats.completed}
+          </span>
+        </td>
+
+        <td className="px-4 py-3 text-center">
+          <span className="text-base font-bold text-orange-600">
+            {stats.pending}
+          </span>
+        </td>
+
+        <td className="px-4 py-3 text-center">
+          <button
+            onClick={() => setSelectedEmployee(employee)}
+            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            View Tasks
+          </button>
+        </td>
+      </tr>
+    );
+  })}
+
                     </tbody>
                   </table>
                 </div>

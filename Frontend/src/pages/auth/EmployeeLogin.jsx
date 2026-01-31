@@ -38,7 +38,7 @@ export default function EmployeeLogin() {
     setIsLoading(true);
 
     try {
-      const result = await login(email, password, employeeId, "employee");
+      const result = await login(email, password, null ,employeeId, "employee");
       console.log(result);
       if(result.success){
         showToast('Login successfully! Redirecting!', 'success');

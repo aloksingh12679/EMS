@@ -23,5 +23,13 @@ export const paymentService = {
               } catch (error) {
                   throw error;
               }
-    }
+    },
+     payIndividual: async(salaryId) => {
+ try {
+                  const response = await api.post(`/admin/salary/pay-individual/${salaryId}`);
+                  return response.data;
+              } catch (error) {
+                  throw error;
+              }
+    },
 }

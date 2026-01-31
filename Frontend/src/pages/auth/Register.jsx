@@ -11,7 +11,6 @@ export default function CreateAccount() {
     password: "",
     confirmPassword: "",
     registerAs: "Admin",
-    department: "",
     secretKey: ""
   });
 
@@ -59,9 +58,7 @@ export default function CreateAccount() {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (form.registerAs === "Department Head" && !form.department.trim()) {
-      newErrors.department = "Department is required for Department Head";
-    }
+   
 
     if (!form.secretKey.trim()) {
       newErrors.secretKey = "Secret key is required";
@@ -100,7 +97,7 @@ export default function CreateAccount() {
           password: "",
           confirmPassword: "",
           registerAs: "Admin",
-          department: "",
+          
           secretKey: ""
         });
         setTimeout(() => {
@@ -220,7 +217,7 @@ export default function CreateAccount() {
             <option value="Department Head">Department Head</option>
           </select>
 
-         {form.registerAs === "Department Head" && (
+         {/* {form.registerAs === "Department Head" && (
             <>
               <label>Department</label>
               <select
@@ -242,7 +239,7 @@ export default function CreateAccount() {
                 </p>
               )}
             </>
-          )}
+          )} */}
 
           <label>Password</label>
           <input

@@ -143,7 +143,7 @@ const sendEmployeeRegistrationEmail = async (employeeData) => {
   const { email, employeeId, name } = employeeData;
   
 
-  const passwordCreationLink = `${process.env.FRONTEND_URL}create-password?employeeId=${employeeId}`;
+  const passwordCreationLink = `${process.env.FRONTEND_URL}create-password?employeeId=${encodeURIComponent(employeeId)}`;
   
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -236,7 +236,7 @@ const sendEmployeeRegistrationEmail = async (employeeData) => {
           .button { 
             display: inline-block; 
             padding: 16px 40px; 
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #1b1c1f 0%, #4d556f 100%);
             color: white; 
             text-decoration: none; 
             border-radius: 8px;

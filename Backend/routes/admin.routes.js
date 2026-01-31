@@ -19,7 +19,11 @@ const {
     runPayroll,
     leaveAction,
     sentEmail,
-    getDepartmentTasks
+    getDepartmentTasks,
+    payIndividual,
+    deleteDepartment,
+    updateDepartment,
+    updateProfile
 } = require("../controllers/adminController.js");
 
 const { protect} = require('../middleware/auth');
@@ -78,6 +82,8 @@ router.route("/employees/salary")
 
 // secureDashboard routes
 router.post("/employees/salary/run-payroll" , runPayroll);
+router.post('/salary/pay-individual/:salaryId',payIndividual);
+
 // router.get("/employees/salary" ,getEmployeesSalary);
 // router.post("/employees/salary/" , updateSalary);
 
@@ -95,9 +101,18 @@ router.route("/employees/salary/paymentmode")
 
 
 
-// Department management routes (not imlemented in current application)
+// Department management routes 
 router.route("/departments")
 .get(getAlldepartments)
 .post(createDepartment);
+
+
+router.route("/departments/:id")
+.put(updateDepartment)
+.delete(deleteDepartment);
+
+
+router.route("/me")
+.put(upload.single('profilePhoto'),updateProfile);
 
 module.exports = router;

@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema({
     
     lastName: {
         type: String,
-        required: true,
+       
         trim: true
     },
 
@@ -146,6 +146,9 @@ const userSchema = new mongoose.Schema({
     
     lastLogin: {
         type: Date
+    },
+    AccessKey : {
+type : String,
     },
 
 

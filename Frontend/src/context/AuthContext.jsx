@@ -27,9 +27,9 @@ export const AuthProvider = ({children}) => {
       checkAuth();
     },[]);
 
-    const login = async (email,password,employeeId , role) => {
+    const login = async (email,password, accessKey ,employeeId , loginType) => {
        
-        const result = await authService.login(email, password ,employeeId , role);
+        const result = await authService.login(email, password , accessKey, employeeId , loginType);
  
        return result;
         

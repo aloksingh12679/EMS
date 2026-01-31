@@ -16,7 +16,8 @@ import {
   Users,
   Wallet,
   TrendingUp,
-  ChevronDown
+  ChevronDown,
+  CheckCircle
 } from "lucide-react";
 import jsPDF from "jspdf";
 
@@ -50,6 +51,11 @@ export default function SecureSalaryManagement() {
     bankName: "",
     branchName: "",
   });
+
+  // Individual Payment States
+  const [showPaymentConfirmModal, setShowPaymentConfirmModal] = useState(false);
+  const [paymentEmployee, setPaymentEmployee] = useState(null);
+  const [isProcessingIndividualPayment, setIsProcessingIndividualPayment] = useState(false);
 
   // Organization Balance
   const [organizationBalance, setOrganizationBalance] = useState(5250000);
@@ -181,6 +187,68 @@ export default function SecureSalaryManagement() {
     }
   };
 
+  const handleIndividualPay = (employee) => {
+    if (!employee.employee.bankDetails?.accountNumber) {
+      showToast("Please add bank details first!", "error");
+      return;
+    }
+    if (employee.Status.toLowerCase() === "paid") {
+      showToast("Payment already processed for this employee!", "error");
+      return;
+    }
+    setPaymentEmployee(employee);
+    setShowPaymentConfirmModal(true);
+  };
+
+  const handleConfirmIndividualPayment = async () => {
+    try {
+      setIsProcessingIndividualPayment(true);
+
+      const paymentAmount = parseFloat(paymentEmployee.netSalary);
+
+      if (paymentAmount > organizationBalance) {
+        showToast("Insufficient organization balance!", "error");
+        setIsProcessingIndividualPayment(false);
+        return;
+      }
+
+      const response = await paymentService.payIndividual(paymentEmployee._id);
+
+      if (response && response.success) {
+        // Update local state
+        const updatedEmployees = employees.map((emp) =>
+          emp._id === paymentEmployee._id
+            ? { ...emp, Status: "Paid" }
+            : emp
+        );
+
+        setEmployees(updatedEmployees);
+        
+        // Update selected employee if it's the one being paid
+        if (selectedEmployee._id === paymentEmployee._id) {
+          setSelectedEmployee({ ...selectedEmployee, Status: "Paid" });
+        }
+
+        setOrganizationBalance(organizationBalance - paymentAmount);
+        setShowPaymentConfirmModal(false);
+        setPaymentEmployee(null);
+
+        showToast(
+          `Payment of ${"₹" + paymentAmount.toLocaleString()} processed successfully!`,
+          "success"
+        );
+      }
+    } catch (err) {
+      console.log("Error processing individual payment", err);
+      showToast(
+        err.response?.data?.message || "Failed to process payment",
+        "error"
+      );
+    } finally {
+      setIsProcessingIndividualPayment(false);
+    }
+  };
+
   const handleProcessPayment = async () => {
     try {
       setIsProcessingPayment(true);
@@ -296,14 +364,14 @@ export default function SecureSalaryManagement() {
       
       doc.text("Base Salary", 20, 115);
       doc.text(
-        `$${baseSalary.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+        `&#8377;${baseSalary.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
         190,
         115,
         { align: "right" }
       );
       doc.text("Allowances & Bonuses", 20, 122);
       doc.text(
-        `$${allowances.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+        `&#8377;${allowances.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
         190,
         122,
         { align: "right" }
@@ -564,6 +632,126 @@ export default function SecureSalaryManagement() {
           </div>
         )}
 
+        {/* Individual Payment Confirmation Modal */}
+        {showPaymentConfirmModal && paymentEmployee && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <CheckCircle className="text-green-600" size={24} />
+                  Confirm Payment
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowPaymentConfirmModal(false);
+                    setPaymentEmployee(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                  disabled={isProcessingIndividualPayment}
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-gray-800 mb-3">Employee Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Name:</span>
+                    <span className="font-medium">
+                      {capitalize(paymentEmployee.employee.firstName)} {capitalize(paymentEmployee.employee.lastName)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Employee ID:</span>
+                    <span className="font-medium">{paymentEmployee.employeeId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Position:</span>
+                    <span className="font-medium">{capitalize(paymentEmployee.employee.position)}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2 mt-2">
+                    <span className="text-gray-600">Payment Amount:</span>
+                    <span className="font-bold text-green-600 text-lg">
+                      &#8377;{parseFloat(paymentEmployee.netSalary).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <CreditCard className="text-blue-600" size={18} />
+                  Bank Details (Read-only)
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Account Holder:</span>
+                    <span className="font-medium">
+                      {paymentEmployee.employee.bankDetails.accountHolderName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Account Number:</span>
+                    <span className="font-medium font-mono">
+                      •••• •••• •••• {paymentEmployee.employee.bankDetails.accountNumber.slice(-4)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">IFSC Code:</span>
+                    <span className="font-medium font-mono">
+                      {paymentEmployee.employee.bankDetails.ifscCode}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Bank Name:</span>
+                    <span className="font-medium">
+                      {paymentEmployee.employee.bankDetails.bankName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Branch:</span>
+                    <span className="font-medium">
+                      {paymentEmployee.employee.bankDetails.branchName}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPaymentConfirmModal(false);
+                    setPaymentEmployee(null);
+                  }}
+                  disabled={isProcessingIndividualPayment}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmIndividualPayment}
+                  disabled={isProcessingIndividualPayment}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:bg-gray-400 flex items-center justify-center gap-2"
+                >
+                  {isProcessingIndividualPayment ? (
+                    <>
+                      <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign size={20} />
+                      Pay Now
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Payment Dashboard Content - Keep existing Payment Mode UI */}
         {/* (Rest of your Payment Mode UI code stays the same) */}
         <div className="p-4 sm:p-6">
@@ -615,7 +803,7 @@ export default function SecureSalaryManagement() {
                 <div>
                   <p className="text-gray-600 text-xs sm:text-sm">Total Payable</p>
                   <p className="text-2xl sm:text-3xl font-bold text-orange-600">
-                    ${totalPayableSalary.toLocaleString()}
+                    &#8377;{totalPayableSalary.toLocaleString()}
                   </p>
                 </div>
                 <TrendingUp className="text-orange-500 flex-shrink-0" size={32} />
@@ -682,7 +870,7 @@ export default function SecureSalaryManagement() {
                           {emp.employeeId} • {capitalize(emp.employee.position)}
                         </p>
                         <p className="text-xs sm:text-sm font-semibold text-blue-600 mt-1">
-                          Net Salary: ${emp.netSalary.toLocaleString()}
+                          Net Salary: &#8377;{emp.netSalary.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -709,7 +897,7 @@ export default function SecureSalaryManagement() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
                         <button
                           onClick={() => handleAddBankDetails(emp?.employee?._id)}
                           className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 text-sm ${
@@ -721,6 +909,41 @@ export default function SecureSalaryManagement() {
                           <Edit size={14} />
                           {emp?.employee?.bankDetails?.accountNumber ? "Edit" : "Add"}
                         </button>
+
+                        {/* Individual Payment Button */}
+                        {emp.Status.toLowerCase() === "due" && (
+                          <button
+                            onClick={() => handleIndividualPay(emp)}
+                            disabled={
+                              !emp?.employee?.bankDetails?.accountHolderName ||
+                              !emp?.employee?.bankDetails?.accountNumber ||
+                              !emp?.employee?.bankDetails?.ifscCode ||
+                              !emp?.employee?.bankDetails?.bankName ||
+                              !emp?.employee?.bankDetails?.branchName
+                            }
+                            className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 text-sm ${
+                              !emp?.employee?.bankDetails?.accountHolderName ||
+                              !emp?.employee?.bankDetails?.accountNumber ||
+                              !emp?.employee?.bankDetails?.ifscCode ||
+                              !emp?.employee?.bankDetails?.bankName ||
+                              !emp?.employee?.bankDetails?.branchName
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-green-600 text-white hover:bg-green-700"
+                            }`}
+                            title={
+                              !emp?.employee?.bankDetails?.accountHolderName ||
+                              !emp?.employee?.bankDetails?.accountNumber ||
+                              !emp?.employee?.bankDetails?.ifscCode ||
+                              !emp?.employee?.bankDetails?.bankName ||
+                              !emp?.employee?.bankDetails?.branchName
+                                ? "Complete all bank details to enable payment"
+                                : "Pay employee"
+                            }
+                          >
+                            <DollarSign size={14} />
+                            Pay
+                          </button>
+                        )}
 
                         <span
                           className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -750,7 +973,7 @@ export default function SecureSalaryManagement() {
                 </h2>
                 <p className="text-blue-100 mb-2 sm:mb-4 text-sm sm:text-base">
                   {dueCount - employeesWithoutBank} employees ready for payment •
-                  Total: ${totalPayableSalary.toLocaleString()}
+                  Total: &#8377;{totalPayableSalary.toLocaleString()}
                 </p>
                 {employeesWithoutBank > 0 && (
                   <p className="text-yellow-300 text-xs sm:text-sm flex items-center gap-2">
@@ -981,7 +1204,7 @@ export default function SecureSalaryManagement() {
               >
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Base Salary ($)
+                    Base Salary (&#8377;)
                   </label>
                   <input
                     type="number"
@@ -1002,7 +1225,7 @@ export default function SecureSalaryManagement() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Allowances ($)
+                    Allowances (&#8377;)
                   </label>
                   <input
                     type="number"
@@ -1045,7 +1268,7 @@ export default function SecureSalaryManagement() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Deductions ($)
+                    Deductions (&#8377;)
                   </label>
                   <input
                     type="number"
@@ -1069,7 +1292,7 @@ export default function SecureSalaryManagement() {
                     Calculated Net Salary:
                   </p>
                   <p className="text-xl sm:text-2xl font-bold text-blue-600">
-                    $
+                    &#8377;
                     {(
                       (parseFloat(updateFormData.baseSalary) || 0) +
                       (parseFloat(updateFormData.allowances) || 0) -
@@ -1097,6 +1320,126 @@ export default function SecureSalaryManagement() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Individual Payment Confirmation Modal */}
+        {showPaymentConfirmModal && paymentEmployee && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <CheckCircle className="text-green-600" size={24} />
+                  Confirm Payment
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowPaymentConfirmModal(false);
+                    setPaymentEmployee(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                  disabled={isProcessingIndividualPayment}
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-gray-800 mb-3">Employee Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Name:</span>
+                    <span className="font-medium">
+                      {capitalize(paymentEmployee.employee.firstName)} {capitalize(paymentEmployee.employee.lastName)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Employee ID:</span>
+                    <span className="font-medium">{paymentEmployee.employeeId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Position:</span>
+                    <span className="font-medium">{capitalize(paymentEmployee.employee.position)}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2 mt-2">
+                    <span className="text-gray-600">Payment Amount:</span>
+                    <span className="font-bold text-green-600 text-lg">
+                      &#8377;{parseFloat(paymentEmployee.netSalary).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <CreditCard className="text-blue-600" size={18} />
+                  Bank Details (Read-only)
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Account Holder:</span>
+                    <span className="font-medium">
+                      {paymentEmployee.employee.bankDetails.accountHolderName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Account Number:</span>
+                    <span className="font-medium font-mono">
+                      •••• •••• •••• {paymentEmployee.employee.bankDetails.accountNumber.slice(-4)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">IFSC Code:</span>
+                    <span className="font-medium font-mono">
+                      {paymentEmployee.employee.bankDetails.ifscCode}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Bank Name:</span>
+                    <span className="font-medium">
+                      {paymentEmployee.employee.bankDetails.bankName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Branch:</span>
+                    <span className="font-medium">
+                      {paymentEmployee.employee.bankDetails.branchName}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPaymentConfirmModal(false);
+                    setPaymentEmployee(null);
+                  }}
+                  disabled={isProcessingIndividualPayment}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmIndividualPayment}
+                  disabled={isProcessingIndividualPayment}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:bg-gray-400 flex items-center justify-center gap-2"
+                >
+                  {isProcessingIndividualPayment ? (
+                    <>
+                      <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign size={20} />
+                      Pay Now
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1162,7 +1505,7 @@ export default function SecureSalaryManagement() {
                     Total Payable
                   </p>
                   <p className="text-2xl sm:text-3xl font-bold text-green-600">
-                    ${totalPayableSalary.toLocaleString()}
+                    &#8377;{totalPayableSalary.toLocaleString()}
                   </p>
                 </div>
                 <DollarSign className="text-green-500 flex-shrink-0" size={32} />
@@ -1249,7 +1592,7 @@ export default function SecureSalaryManagement() {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-gray-800 text-sm">
-                          ${emp.netSalary.toLocaleString()}
+                          &#8377;{emp.netSalary.toLocaleString()}
                         </p>
                         <span
                           className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
@@ -1304,7 +1647,7 @@ export default function SecureSalaryManagement() {
                           Base Salary
                         </p>
                         <p className="text-base sm:text-lg font-bold text-gray-800">
-                          ${selectedEmployee.baseSalary.toLocaleString()}
+                          &#8377;{selectedEmployee.baseSalary.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-green-50 p-3 rounded-lg">
@@ -1312,7 +1655,7 @@ export default function SecureSalaryManagement() {
                           Allowances
                         </p>
                         <p className="text-base sm:text-lg font-bold text-green-600">
-                          +${selectedEmployee.allowances.toLocaleString()}
+                          +&#8377;{selectedEmployee.allowances.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-red-50 p-3 rounded-lg">
@@ -1320,7 +1663,7 @@ export default function SecureSalaryManagement() {
                           Tax ({selectedEmployee.taxApply}%)
                         </p>
                         <p className="text-base sm:text-lg font-bold text-red-600">
-                          -$
+                          -&#8377;
                           {(
                             (selectedEmployee.baseSalary *
                               selectedEmployee.taxApply) /
@@ -1333,7 +1676,7 @@ export default function SecureSalaryManagement() {
                           Deductions
                         </p>
                         <p className="text-base sm:text-lg font-bold text-red-600">
-                          -${selectedEmployee.deductions.toLocaleString()}
+                          -&#8377;{selectedEmployee.deductions.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -1343,34 +1686,46 @@ export default function SecureSalaryManagement() {
                         Net Salary
                       </p>
                       <p className="text-2xl sm:text-3xl font-bold text-blue-600">
-                        ${selectedEmployee.netSalary.toLocaleString()}
+                        &#8377;{selectedEmployee.netSalary.toLocaleString()}
                       </p>
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      setUpdateFormData({
-                        id: selectedEmployee._id,
-                        baseSalary: selectedEmployee.baseSalary.toString(),
-                        allowances: selectedEmployee.allowances.toString(),
-                        taxApply: selectedEmployee.taxApply.toString(),
-                        deductions: selectedEmployee.deductions.toString(),
-                      });
-                      setShowUpdateModal(true);
-                    }}
-                    className="w-full mb-4 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm sm:text-base"
-                  >
-                    Update Salary Details
-                  </button>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => {
+                        setUpdateFormData({
+                          id: selectedEmployee._id,
+                          baseSalary: selectedEmployee.baseSalary.toString(),
+                          allowances: selectedEmployee.allowances.toString(),
+                          taxApply: selectedEmployee.taxApply.toString(),
+                          deductions: selectedEmployee.deductions.toString(),
+                        });
+                        setShowUpdateModal(true);
+                      }}
+                      className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm sm:text-base"
+                    >
+                      Update Salary Details
+                    </button>
 
-                  <button
-                    onClick={handleDownloadPayslip}
-                    className="w-full px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
-                  >
-                    <Download size={18} />
-                    Download Payslip PDF
-                  </button>
+                    {/* {selectedEmployee.Status.toLowerCase() === "due" && selectedEmployee.employee.bankDetails?.accountNumber && (
+                      <button
+                        onClick={() => handleIndividualPay(selectedEmployee)}
+                        className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm sm:text-base flex items-center justify-center gap-2"
+                      >
+                        <DollarSign size={18} />
+                        Pay Employee
+                      </button>
+                    )} */}
+
+                    <button
+                      onClick={handleDownloadPayslip}
+                      className="w-full px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
+                    >
+                      <Download size={18} />
+                      Download Payslip PDF
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-gray-400">

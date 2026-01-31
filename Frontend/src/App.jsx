@@ -30,6 +30,8 @@ import Register from "./pages/auth/Register";
 import Tasks from "./pages/admin/Tasks/Tasks";
 import CreatePasswordForm from "./pages/auth/CreatePasswordForm";
 import NotFound from "./pages/common/NotFoundPage";
+import AdminProfile from './pages/admin/profile';
+import Tickets from "./pages/admin/Ticekts";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
@@ -148,6 +150,24 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
                 <SalaryManagement />
+              </ProtectedRoute>
+            } 
+          /> 
+
+           <Route 
+            path="/admin/me" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
+                <AdminProfile />
+              </ProtectedRoute>
+            } 
+          /> 
+
+          <Route 
+            path="/admin/tickets" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin', 'Department Head']}>
+                <Tickets />
               </ProtectedRoute>
             } 
           /> 
