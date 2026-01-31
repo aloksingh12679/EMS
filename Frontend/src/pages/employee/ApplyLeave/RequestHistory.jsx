@@ -127,11 +127,6 @@ const RequestHistory = ({ requestedLeaves = [] }) => {
                                         {capitalizeFirst(item.status)}
                                     </span>
                                 </div>
-
-                                {/* MENU */}
-                                <div className="flex justify-end">
-                                    <FiMoreVertical className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors" />
-                                </div>
                             </div>
                         );
                     })

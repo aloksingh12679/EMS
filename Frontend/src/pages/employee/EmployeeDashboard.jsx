@@ -160,7 +160,7 @@ export default function EmployeeDashboard() {
               <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Current Salary</p>
               <div className="flex items-baseline gap-2 mb-3">
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">
-                  ${(salarydetails[0]?.baseSalary)?.toLocaleString() || "0"}
+                 ₹{Number(salarydetails[0]?.baseSalary || 0).toLocaleString("en-IN")}
                 </h3>
                 <span className="text-slate-400 text-sm group-hover:text-slate-600 transition-colors">/ month</span>
               </div>
@@ -258,7 +258,7 @@ const MyTasks = ({ taskdetails }) => {
           </h3>
           <p className="text-slate-500 text-sm mt-1">Assigned for this week</p>
         </div>
-        <button
+        {/* <button
           aria-label="Add task"
           className="h-10 w-10 flex items-center justify-center
                rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 
@@ -266,7 +266,7 @@ const MyTasks = ({ taskdetails }) => {
                transition-all hover:scale-102"
         >
           <Plus className="h-5 w-5 text-white" />
-        </button>
+        </button> */}
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-3 overflow-y-auto bg-gradient-to-b from-slate-50/50 to-white">
