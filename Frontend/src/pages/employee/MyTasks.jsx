@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  CheckCircle2, 
-  Circle, 
+import {
+  Calendar,
+  Clock,
+  CheckCircle2,
+  Circle,
   AlertCircle,
   Filter,
   Search,
   ChevronDown,
-  TrendingUp,
-  ListTodo,
-  Sparkles,
   Activity,
-  BarChart3,
-  ClipboardList,
+  Flag,
+  ArrowUpCircle,
+  MinusCircle,
+  ArrowDownCircle,
+  Loader,
   FolderKanban,
   Zap,
-  Award,
+  BarChart3,
   TrendingDown,
   PlayCircle
 } from 'lucide-react';
+
 import EmployeesSidebar from '../../Components/EmployeesSidebar';
 import { employeeService } from '../../services/employeeServices';
 
@@ -38,14 +39,14 @@ export default function MyTasks() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      
+
       const response = await employeeService.getTasks();
       console.log(response);
-      if(response.success){
-setTasks(response.data.taskDetails);
+      if (response.success) {
+        setTasks(response.data.taskDetails);
       }
 
-      
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -56,24 +57,24 @@ setTasks(response.data.taskDetails);
   const handleCompleteTask = async (taskId) => {
     try {
       // Update UI optimistically
-      setTasks(tasks.map(task => 
-        task._id === taskId 
+      setTasks(tasks.map(task =>
+        task._id === taskId
           ? { ...task, status: 'Completed' }
           : task
       ));
 
       // Call API to update task status
-    const response =  await employeeService.updateTask(taskId);
+      const response = await employeeService.updateTask(taskId);
 
       console.log(response);
-      if(response.success){
-        
+      if (response.success) {
+
         console.log("updated task");
         fetchTasks();
       }
     } catch (error) {
       console.error('Error completing task:', error);
-      
+
       fetchTasks();
     }
   };
@@ -121,18 +122,18 @@ setTasks(response.data.taskDetails);
         return <AlertCircle size={16} className="text-gray-600" />;
     }
   };
-//   const gettaskStatusColor = (status) => {
-//   switch (status?.toLowerCase()) {
-//     case 'completed':
-//       return '#10b981'; // green
-//     case 'in progress':
-//       return '#3b82f6'; // blue
-//     case 'pending':
-//       return '#f59e0b'; // amber
-//     default:
-//       return '#6b7280'; // gray
-//   }
-// };
+  //   const gettaskStatusColor = (status) => {
+  //   switch (status?.toLowerCase()) {
+  //     case 'completed':
+  //       return '#10b981'; // green
+  //     case 'in progress':
+  //       return '#3b82f6'; // blue
+  //     case 'pending':
+  //       return '#f59e0b'; // amber
+  //     default:
+  //       return '#6b7280'; // gray
+  //   }
+  // };
 
   // Filter tasks
   const filteredTasks = tasks.filter(task => {
@@ -141,19 +142,19 @@ setTasks(response.data.taskDetails);
     const filterStatusNorm = filterStatus.toLowerCase();
     const filterPriorityNorm = filterPriority.toLowerCase();
 
-    const matchesSearch = 
+    const matchesSearch =
       searchQuery === "" ||
       task.taskName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = 
+
+    const matchesStatus =
       filterStatus === "All" ||
       statusNorm === filterStatusNorm;
-    
-    const matchesPriority = 
+
+    const matchesPriority =
       filterPriority === "All" ||
       priorityNorm === filterPriorityNorm;
-    
+
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
@@ -165,41 +166,41 @@ setTasks(response.data.taskDetails);
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* Sidebar placeholder */}
-    
- 
-  
-    <EmployeesSidebar />
-  
 
-  {/* Main Content - Shifts right on desktop to accommodate sidebar */}
-  <main className="min-h-screen p-4 sm:p-6 lg:p-10 min-[1112px]:ml-64 bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
-    {/* Header Section with Gradient */}
-    <div className="mb-8">
-      <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-3xl p-8 mb-6 shadow-2xl relative overflow-hidden transform transition-all">
-        {/* Animated shimmer effect */}
-        <div className="absolute inset-0 opacity-0 transition-opacity duration-700">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 -translate-x-full transition-transform duration-1000"></div>
-        </div>
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-700/20 rounded-full blur-2xl"></div>
-        
-        <div className="relative z-10">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
-              <FolderKanban size={32} className="text-white animate-pulse" />
+
+
+      <EmployeesSidebar />
+
+
+      {/* Main Content - Shifts right on desktop to accommodate sidebar */}
+      <main className="min-h-screen p-4 sm:p-6 lg:p-10 min-[1112px]:ml-64 bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+        {/* Header Section with Gradient */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-3xl p-8 mb-6 shadow-2xl relative overflow-hidden transform transition-all">
+            {/* Animated shimmer effect */}
+            <div className="absolute inset-0 opacity-0 transition-opacity duration-700">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 -translate-x-full transition-transform duration-1000"></div>
             </div>
-            <div>
-              <h1 className="text-4xl sm:text-5xl font-bold text-white drop-shadow-lg">My Tasks</h1>
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-700/20 rounded-full blur-2xl"></div>
+
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-3">
+                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
+                  <FolderKanban size={32} className="text-white animate-pulse" />
+                </div>
+                <div>
+                  <h1 className="text-4xl sm:text-5xl font-bold text-white drop-shadow-lg">My Tasks</h1>
+                </div>
+              </div>
+              <p className="text-base sm:text-lg text-blue-50 drop-shadow-md flex items-center gap-2">
+                <Zap size={20} className="text-yellow-300 animate-bounce" />
+                Manage and track your assigned tasks with ease
+              </p>
             </div>
           </div>
-          <p className="text-base sm:text-lg text-blue-50 drop-shadow-md flex items-center gap-2">
-            <Zap size={20} className="text-yellow-300 animate-bounce" />
-            Manage and track your assigned tasks with ease
-          </p>
         </div>
-      </div>
-    </div>
 
         {/* Filters */}
         <div className="bg-white rounded-3xl shadow-xl border border-blue-100 p-6 mb-8 transition-shadow duration-300">
@@ -227,17 +228,18 @@ setTasks(response.data.taskDetails);
             {/* Status Filter */}
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <ClipboardList size={18} className="text-blue-600" />
+                <Activity size={18} className="text-blue-600" />
               </div>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white transition-all duration-200 font-medium text-gray-700 appearance-none cursor-pointer"
               >
-                <option value="All">📋 All Status</option>
-                <option value="Pending">⏳ Pending</option>
-                <option value="In Progress">🔄 In Progress</option>
-                <option value="Completed">✅ Completed</option>
+                <option value="All">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="in progress">In Progress</option>
+                <option value="completed">Completed</option>
+
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
             </div>
@@ -245,17 +247,18 @@ setTasks(response.data.taskDetails);
             {/* Priority Filter */}
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Award size={18} className="text-blue-600" />
+                <Flag size={18} className="text-blue-600" />
               </div>
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white transition-all duration-200 font-medium text-gray-700 appearance-none cursor-pointer"
               >
-                <option value="All">🎯 All Priority</option>
-                <option value="High">🔴 High Priority</option>
-                <option value="Medium">🟡 Medium Priority</option>
-                <option value="Low">🟢 Low Priority</option>
+                <option value="All">All Priority</option>
+                <option value="high">High Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="low">Low Priority</option>
+
               </select>
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
             </div>
@@ -352,86 +355,103 @@ setTasks(response.data.taskDetails);
 }
 
 // Task Card Component
-const TaskCard = ({ task, onComplete, formatDate, getPriorityColor, getStatusColor, getStatusIcon }) => {
+const TaskCard = ({
+  task,
+  onComplete,
+  formatDate,
+  getPriorityColor,
+  getStatusColor,
+  getStatusIcon
+}) => {
+  const status = (task.status || "").toLowerCase();
+  const priority = (task.priority || "").toLowerCase();
+
   return (
-    <div className="bg-gradient-to-br from-white via-white to-blue-50/30 rounded-3xl shadow-xl border-2 border-blue-100/50 p-7 transition-all duration-500 overflow-hidden relative cursor-pointer backdrop-blur-sm">
-      {/* Animated shimmer effect */}
-      <div className="absolute inset-0 opacity-0 transition-opacity duration-700">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent skew-x-12 -translate-x-full transition-transform duration-1000"></div>
+    <div
+      className="bg-white border border-slate-200 rounded-xl p-6
+      shadow-sm hover:shadow-md hover:-translate-y-0.5
+      transition-all duration-300"
+    >
+      {/* HEADER */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="p-3 rounded-lg bg-blue-600 shadow-sm">
+            <FolderKanban size={18} className="text-white" />
+          </div>
+
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">
+              {task?.taskName}
+            </h3>
+            <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+              {task?.description || "No description provided"}
+            </p>
+          </div>
+        </div>
+
+        {/* STATUS */}
+        <span
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full
+          text-xs font-semibold capitalize
+          ${getStatusColor(status)}`}
+        >
+          {getStatusIcon(status)}
+          {status}
+        </span>
       </div>
-      
-      {/* Gradient Background Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-indigo-500/5 to-purple-500/5 opacity-0 transition-opacity duration-500"></div>
-      
-      {/* Decorative corner accent */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-transparent rounded-full blur-2xl transition-transform duration-700"></div>
-      
-      <div className="relative z-10">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-5">
-          <div className="flex-1">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 p-3 rounded-xl shadow-lg">
-                <ClipboardList size={20} className="text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent leading-tight">{task?.taskName}</h3>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 line-clamp-2 ml-14 leading-relaxed">{task?.description}</p>
+
+      {/* DATES */}
+      <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+        {/* Start Date */}
+        <div className="flex items-center gap-2 border border-slate-200 rounded-lg px-3 py-2">
+          <Calendar size={14} className="text-blue-600" />
+          <div>
+            <p className="text-xs text-slate-500">Start Date</p>
+            <p className="font-medium text-slate-800">
+              {formatDate(task?.startDate)}
+            </p>
           </div>
         </div>
 
-        {/* Priority & Status */}
-        <div className="flex items-center gap-3 mb-6 flex-wrap ml-14">
-          <span className={`px-5 py-2.5 rounded-xl text-xs font-bold border-2 ${getPriorityColor(task.priority)} shadow-md flex items-center gap-2 cursor-pointer backdrop-blur-sm`}>
-            <div className="w-2.5 h-2.5 rounded-full bg-current animate-pulse shadow-lg"></div>
-            <span className="tracking-wide">{task.priority} Priority</span>
-          </span>
-          <span className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 ${getStatusColor(task.status)} shadow-md cursor-pointer backdrop-blur-sm`}>
-            {getStatusIcon(task.status)}
-            <span className="tracking-wide">{task.status}</span>
-          </span>
-        </div>
-
-        {/* Dates */}
-        <div className="space-y-4 mb-7 bg-gradient-to-br from-slate-50/80 via-blue-50/80 to-indigo-50/80 rounded-2xl p-5 border-2 border-blue-200/50 backdrop-blur-sm">
-          <div className="flex items-center gap-4 text-sm">
-            <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 rounded-2xl p-3.5 shadow-lg">
-              <Calendar size={20} className="text-white" />
-            </div>
-            <div className="flex-1">
-              <span className="font-bold text-gray-900 block mb-1 text-xs uppercase tracking-wider">Start Date</span>
-              <span className="text-gray-800 font-semibold text-base">{formatDate(task?.startDate)}</span>
-            </div>
-          </div>
-          <div className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"></div>
-          <div className="flex items-center gap-4 text-sm">
-            <div className="bg-gradient-to-br from-red-600 via-red-500 to-red-400 rounded-2xl p-3.5 shadow-lg">
-              <Clock size={20} className="text-white animate-pulse" />
-            </div>
-            <div className="flex-1">
-              <span className="font-bold text-gray-900 block mb-1 text-xs uppercase tracking-wider">Due Date</span>
-              <span className="text-gray-800 font-semibold text-base">{formatDate(task?.dueDate)}</span>
-            </div>
+        {/* Due Date */}
+        <div className="flex items-center gap-2 border border-slate-200 rounded-lg px-3 py-2">
+          <Clock size={14} className="text-blue-600" />
+          <div>
+            <p className="text-xs text-slate-500">Due Date</p>
+            <p className="font-medium text-slate-800">
+              {formatDate(task?.dueDate)}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Complete Button */}
-        {task.status !== 'completed' && task.status !== 'Completed' ? (
+      {/* FOOTER */}
+      <div className="mt-5 flex items-center justify-between">
+        {/* PRIORITY */}
+        <span
+          className={`px-4 py-1.5 rounded-full border text-xs font-semibold
+          ${getPriorityColor(priority)}`}
+        >
+          {priority} priority
+        </span>
+
+        {/* ACTION */}
+        {status !== "completed" ? (
           <button
             onClick={() => onComplete(task._id)}
-            className="w-full bg-gradient-to-r from-green-600 via-green-500 to-emerald-600 text-white py-4 px-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all duration-300 shadow-xl shadow-green-500/30 active:scale-98 border border-green-400/30"
+            className="bg-blue-600 hover:bg-blue-700
+            text-white px-5 py-2 rounded-lg text-sm font-semibold
+            transition-colors"
           >
-            <CheckCircle2 size={22} className="transition-transform duration-700" />
-            <span className="text-base tracking-wide">Mark as Completed</span>
+            Mark as Completed
           </button>
         ) : (
-          <div className="w-full bg-gradient-to-br from-green-100 via-emerald-50 to-green-50 text-green-800 py-4 px-5 rounded-2xl font-bold flex items-center justify-center gap-3 border-2 border-green-400/60 shadow-lg shadow-green-200/50">
-            <div className="bg-gradient-to-br from-green-600 to-emerald-600 rounded-full p-2 shadow-md">
-              <CheckCircle2 size={18} className="text-white" />
-            </div>
-            <span className="text-base tracking-wide">Task Completed Successfully</span>
+          <div
+            className="flex items-center gap-2 px-4 py-2 rounded-lg
+            bg-green-100 text-green-700 text-sm font-semibold"
+          >
+            <CheckCircle2 size={16} />
+            Completed
           </div>
         )}
       </div>
