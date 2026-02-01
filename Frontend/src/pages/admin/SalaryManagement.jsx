@@ -17,7 +17,7 @@ import {
   Wallet,
   TrendingUp,
   ChevronDown,
-  CheckCircle
+  CheckCircle, IndianRupee
 } from "lucide-react";
 import jsPDF from "jspdf";
 
@@ -742,7 +742,7 @@ export default function SecureSalaryManagement() {
                     </>
                   ) : (
                     <>
-                      <DollarSign size={20} />
+                      <IndianRupee size={20} />
                       Pay Now
                     </>
                   )}
@@ -940,7 +940,7 @@ export default function SecureSalaryManagement() {
                                 : "Pay employee"
                             }
                           >
-                            <DollarSign size={14} />
+                            <IndianRupee size={14} />
                             Pay
                           </button>
                         )}
@@ -997,7 +997,7 @@ export default function SecureSalaryManagement() {
                   </>
                 ) : (
                   <>
-                    <DollarSign size={24} />
+                    <IndianRupee size={24} />
                     Process Payment
                   </>
                 )}
@@ -1434,7 +1434,7 @@ export default function SecureSalaryManagement() {
                     </>
                   ) : (
                     <>
-                      <DollarSign size={20} />
+                      <IndianRupee size={20} />
                       Pay Now
                     </>
                   )}
@@ -1508,7 +1508,7 @@ export default function SecureSalaryManagement() {
                     &#8377;{totalPayableSalary.toLocaleString()}
                   </p>
                 </div>
-                <DollarSign className="text-green-500 flex-shrink-0" size={32} />
+                <IndianRupee className="text-green-500 flex-shrink-0" size={32} />
               </div>
             </div>
           </div>
